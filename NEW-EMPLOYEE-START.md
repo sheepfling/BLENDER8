@@ -158,3 +158,9 @@ restart it after rebuilding so it serves the new asset manifest.
 build from step 4. A browser page rendering correctly, platform parity passing, and product
 firmware acceptance are three separate results. For custom firmware directories and direct CMake
 commands, see the [Wasm guide](platform/docs/WASM.md).
+
+## Watchdog and deadman experiments
+
+The workbench's **Supervision** tab (keyboard **U**) shows monitor enablement, timing and reboot
+reasons. See [firmware supervision options](platform/docs/SUPERVISION.md) for the production fuse
+and optional development fuse, native/Wasm build commands, firmware controls and reset history.

@@ -64,6 +64,12 @@ def main() -> int:
     wasm_build.add_argument("--firmware", type=Path)
     for command in (build, wasm_build):
         command.add_argument(
+            "--watchdog",
+            choices=("forced", "firmware"),
+            default="forced",
+            help="forced-on production fuse, or firmware-controlled development fuse",
+        )
+        command.add_argument(
             "--memory-profile", choices=("standard", "plus", "free"), default="standard"
         )
     wasm_build.add_argument("--test-fixtures", action="store_true")
@@ -143,6 +149,7 @@ def main() -> int:
             "-DBUILD_TESTING=ON",
             f"-DB8_NUMERIC_PROFILE={args.numeric_profile}",
             f"-DB8_MEMORY_PROFILE={args.memory_profile}",
+            f"-DB8_WATCHDOG_FUSED_ON={'ON' if args.watchdog == 'forced' else 'OFF'}",
             f"-DB8_FIRMWARE_DIR={from_root(args.firmware or Path('firmware'), root)}",
             f"-DB8_WASM_TEST_FIXTURES={'ON' if args.test_fixtures else 'OFF'}",
         ]
@@ -193,6 +200,7 @@ def main() -> int:
             f"-DPython3_EXECUTABLE={sys.executable}",
             f"-DB8_NUMERIC_PROFILE={args.numeric_profile}",
             f"-DB8_MEMORY_PROFILE={args.memory_profile}",
+            f"-DB8_WATCHDOG_FUSED_ON={'ON' if args.watchdog == 'forced' else 'OFF'}",
         ]
         if args.firmware:
             cmd.append(f"-DB8_FIRMWARE_DIR={from_root(args.firmware, root)}")

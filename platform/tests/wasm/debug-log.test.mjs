@@ -50,6 +50,19 @@ test('worker side-channel preserves remote sequence and rejects malformed logs',
  assert.equal(page.ingest({...messages[0].record,level:'toString'}),false);
  assert.throws(()=>page.setLevel('__proto__'),/Unknown/);
 });
+test('reset logs retain cleared causes and all resets between frames',()=>{
+ const log=quiet(),state={time_us:0,mcu:{reset_serial:1,reset_causes:0,reset_details:0}};
+ log.observe(state);
+ state.time_us=400000;state.mcu.reset_serial=3;
+ state.mcu.reset_history=[{serial:2,time_us:200000,causes:4,details:32,cause_names:'WDT'},
+  {serial:3,time_us:300000,causes:8,details:16,cause_names:'DMT'}];
+ log.observe(state);const data=log.records.at(-1).data;
+ assert.equal(data.reset_events.length,2);assert.equal(data.reset_events[0].cause_names,'WDT');
+ assert.equal(data.reset_events[1].causes,8);assert.equal(data.unavailable_events,0);
+ assert.equal(state.mcu.reset_causes,0,'logging must not change firmware latches');
+ state.mcu.reset_serial=23;state.mcu.reset_history=[];log.observe(state);
+ assert.equal(log.records.at(-1).data.unavailable_events,20,'lost history must be explicit');
+});
 test('broken console, view or forwarding sinks cannot throw into execution',()=>{
  const log=new DebugLog({consoleSink:{error(){throw new Error('console gone');}},forward(){throw new Error('worker gone');}});
  log.subscribe(()=>{throw new Error('panel gone');});

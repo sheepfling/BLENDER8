@@ -8,11 +8,12 @@ document.querySelector('#debug-open').addEventListener('click',()=>debugPanel.op
 const status=document.querySelector('#status'),report=document.querySelector('#report');
 let canvas=document.querySelector('canvas');
 const native=document.body.dataset.backend==='native';
-const mode=new URLSearchParams(location.search).get('mode')??'probe';
+const mode=new URLSearchParams(location.search).get('mode')??'student';
 const variant=mode==='probe'?'probe':'student',bench=mode==='bench';
 const validMode=['probe','student','bench'].includes(mode);
-document.querySelector('#mode').value=validMode?mode:'probe';
+document.querySelector('#mode').value=validMode?mode:'student';
 let worker=null,id=0,pending=null,chain=Promise.resolve(),dead=false,active=false,last=0,raf=0,epoch=0,upload=null,lastReport=null,sessionGeneration=0;
+let releaseKind=6;
 const heldPointers=new Set(),heldKeys=new Set();
 function fatal(message){
  if(dead)return;
@@ -37,10 +38,14 @@ function request(type,body={},transfer=[]){
  const operation=chain.then(execute);chain=operation.catch(()=>{});return operation;
 }
 function send(type,body={}){const generation=sessionGeneration;return request(type,body).catch(error=>{if(!dead&&generation===sessionGeneration)fatal(error.message);});}
+function releaseHeld(){
+ heldPointers.clear();heldKeys.clear();
+ if(worker&&!dead)void send('event',{kind:releaseKind,identifier:0,x:0,y:0});
+}
 function release(){
  if(active||heldKeys.size||heldPointers.size)diagnostics.emit('debug','input.release_all',{keys:[...heldKeys],pointers:[...heldPointers],hidden:document.hidden});
- heldPointers.clear();heldKeys.clear();active=false;last=0;++epoch;cancelAnimationFrame(raf);
- if(worker&&!dead)void send('event',{kind:6,identifier:0,x:0,y:0});
+ active=false;last=0;++epoch;cancelAnimationFrame(raf);releaseHeld();
+ document.querySelector("#live-state").textContent="Background suspended — returns on focus; no elapsed time is caught up.";
 }
 function activate(){if(active||dead||!worker)return;active=true;last=0;const generation=++epoch;raf=requestAnimationFrame(now=>pump(now,generation));}
 async function pump(now,generation){
@@ -56,10 +61,10 @@ function bindCanvas(){
  function end(event,kind=1){if(!heldPointers.delete(event.pointerId))return;const p=point(event);raw(kind,event.pointerId,p.x,p.y);}
  canvas.addEventListener('pointerup',event=>end(event));canvas.addEventListener('pointercancel',event=>end(event,3));canvas.addEventListener('lostpointercapture',event=>end(event,3));
  canvas.addEventListener('keydown',event=>{const c=keyCode(event);if(c===null||event.repeat||heldKeys.has(c))return;event.preventDefault();heldKeys.add(c);raw(4,c);});
- canvas.addEventListener('blur',release);canvas.addEventListener('focus',activate);
+ canvas.addEventListener('blur',releaseHeld);canvas.addEventListener('focus',activate);
 }
 window.addEventListener('keyup',event=>{const c=keyCode(event);if(c!==null&&heldKeys.delete(c)){event.preventDefault();raw(5,c);}});
-window.addEventListener('blur',release);document.addEventListener('visibilitychange',()=>{if(document.hidden)release();else activate();});
+window.addEventListener('blur',release);window.addEventListener('focus',activate);document.addEventListener('visibilitychange',()=>{if(document.hidden)release();else activate();});
 function download(data,name){const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 async function start(){
  const generation=++sessionGeneration;
@@ -82,24 +87,36 @@ async function start(){
    diagnostics.emit(p.type==='frame'?'trace':'debug','request.completed',{request_id:p.id,type:p.type,duration_ms:performance.now()-p.started,fatal:Boolean(data.fatal)});
    if(data.fatal){diagnostics.emit('error','worker.failure',{request_id:p.id,type:p.type,error:data.details??data.error});p.reject(new Error(data.error));fatal(data.error);return;}
    if(data.result?.machine?.state)diagnostics.observe(data.result.machine.state,data.result.view);
+   if(data.result?.view){
+    const v=data.result.view,t=data.result.machine?.state?.time_us??0;
+    document.querySelector('#live-state').textContent=`${v.running?'Running':'Paused — click RUN; LCD and physics are frozen'} · logical ${(t/1e6).toFixed(3)} s · requested ${v.rate}× · no session time limit`;
+   }
    p.resolve(data.result);
   };
   worker.onerror=event=>{if(generation===sessionGeneration){diagnostics.emit('error','worker.error',{message:event.message,file:event.filename,line:event.lineno,column:event.colno});fatal('Worker error: '+event.message);}};
   worker.onmessageerror=()=>{if(generation===sessionGeneration)fatal('Unreadable worker message');};
   const result=await request('init',{variant,bench,debug:{session:diagnostics.session,level:diagnostics.level},memory:{policy:document.querySelector('#memory-policy').value,tier:document.querySelector('#memory-tier').value},canvas:offscreen,token:document.body.dataset.token,upload,device:upload?document.querySelector('#device').value:null},[offscreen]);
   if(generation!==sessionGeneration)return false;
+  releaseKind=result.view?.input_release_kind===7?7:6;
+  if(releaseKind===6)diagnostics.emit('warn','scene.legacy_focus_pause',{message:'This older image pauses on focus release; use RUN to resume'});
   const image=result.image??{backend:'native',device:result.machine?.device,firmware:result.machine?.firmware};
+  if(!upload&&image.device)document.querySelector('#device').value=image.device;
   status.textContent=native?'NATIVE C++ / LOCAL PROCESS':`${image.device} / ${image.label} / SHA-256 ${image.wasm_sha256.slice(0,12)} / C++ Wasm machine + physics + drawing`;
   report.textContent=(image.memory?.warnings??[]).map(w=>'WARNING: '+w).join('\n');
   diagnostics.setContext({image});diagnostics.emit('info','session.ready',{device:image.device,firmware:image.firmware});
   for(const warning of image.memory?.warnings??[])diagnostics.emit('warn','image.memory_warning',{message:warning});
+  // Start pacing explicitly; C++ still owns the RUN control and every electrical action.
+  if(!bench){
+   await request('event',{kind:4,identifier:82,x:0,y:0});
+   await request('event',{kind:5,identifier:82,x:0,y:0});
+  }
   canvas.focus();activate();return true;
  }catch(error){if(generation===sessionGeneration){diagnostics.emit('error','session.start_failed',{error});fatal(error.message);}return false;}
 }
 document.querySelector('#restart').addEventListener('click',()=>void start());
 document.addEventListener('debug-level-change',event=>{if(worker&&!dead)void send('debug',{level:event.detail});});
 document.querySelector('#mode').addEventListener('change',event=>{release();location.search='?mode='+encodeURIComponent(event.target.value);});
-document.querySelector('#journal').addEventListener('click',async()=>{if(dead)return;release();const data=await send('journal');if(data)download(data,'mcu-scene-journal.json');});
+document.querySelector('#journal').addEventListener('click',async()=>{if(dead)return;releaseHeld();const data=await send('journal');if(data)download(data,'mcu-scene-journal.json');});
 document.querySelector('#load').addEventListener('click',async()=>{
  release();try{
   if(native)throw new Error('Local Wasm images need the Wasm page');

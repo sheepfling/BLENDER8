@@ -2,8 +2,11 @@
 
 The family has two choices: B8 with 8-bit integer arithmetic, and B16 with 8/16-bit integer
 arithmetic, a binary32 FPU and the expanded peripherals. B16 replaces the earlier B8P name.
-The source is [`latex/mcu/b16-follow-on.tex`](../../latex/mcu/b16-follow-on.tex), B16-004/P1.
+The source is [`latex/mcu/b16-follow-on.tex`](../../latex/mcu/b16-follow-on.tex), B16-004/P2.
 Read it with the interface-03 B8 manual for behavior it does not amend.
+
+P2 adds the separately selected D1 watchdog fuse option for both MCUs. The production watchdog
+remains fused on. See [supervision configuration and reboot status](SUPERVISION.md).
 
 ## Numeric profiles
 

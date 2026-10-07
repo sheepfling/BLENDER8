@@ -16,7 +16,7 @@ export class ViewClient {
     this.check(this.module.ccall('b8_view_resize', 'number', ['number','number'], [width,height]));
   }
   event(kind, id=0, x=0, y=0) {
-    if (!Number.isInteger(kind) || kind < 0 || kind > 6 || !Number.isInteger(id) || id < 0 || id > 2147483647 ||
+    if (!Number.isInteger(kind) || kind < 0 || kind > 7 || !Number.isInteger(id) || id < 0 || id > 2147483647 ||
         !Number.isFinite(x) || !Number.isFinite(y) || Math.abs(x)>100000 || Math.abs(y)>100000)
       throw new TypeError('Invalid input envelope');
     this.check(this.module.ccall('b8_view_event', 'number', ['number','number','number','number'], [kind,id,x,y]));

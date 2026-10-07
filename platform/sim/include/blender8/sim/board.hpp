@@ -20,7 +20,7 @@ enum class BoardProfile { clocked03, legacy02, chassis04 };
 // invisible reference device running alongside hardware, or mid-run topology replacement.
 class Board {
 public:
-    explicit Board(BoardProfile profile=BoardProfile::chassis04,ComponentFactories factories={},DeviceProfile device=DeviceProfile::b8);
+    explicit Board(BoardProfile profile=BoardProfile::chassis04,ComponentFactories factories={},DeviceProfile device=DeviceProfile::b8,bool watchdog_fused_on=true);
     Board(const Board&)=delete;Board& operator=(const Board&)=delete;
     void advance(Tick delta);
     void power(bool on);

@@ -64,13 +64,19 @@ export class DebugLog {
   const next={ready:state.ready,reset_serial:m.reset_serial,reset_causes:m.reset_causes,
    reset_details:m.reset_details,drive_enabled:state.drive_enabled,jar_ok:state.jar_ok,
    jar_permit:state.jar_permit,stop:state.stop,contacts:state.contacts,pwm_enabled:m.pwm_enabled,
-   pwm_shadow:m.pwm_shadow,clock_source:m.clock_source,clock_status:m.clock_status};
+   pwm_shadow:m.pwm_shadow,clock_source:m.clock_source,clock_status:m.clock_status,
+   watchdog_enabled:m.watchdog?.enabled,watchdog_locked:m.watchdog?.locked,
+   deadman_enabled:m.deadman?.enabled,deadman_locked:m.deadman?.locked};
   const previous=this.previous;this.previous=next;
   if(!previous){this.emit('info','machine.observed',{state:next});}
   else{
    const changes={};for(const key of Object.keys(next))if(next[key]!==previous[key])changes[key]={from:previous[key],to:next[key]};
-   if(Object.keys(changes).length)this.emit(next.reset_serial!==previous.reset_serial?'warn':'info',
-     next.reset_serial!==previous.reset_serial?'machine.reset_observed':'machine.state_changed',{changes});
+   if(Object.keys(changes).length){
+    const reset=next.reset_serial!==previous.reset_serial;
+    const events=reset?(m.reset_history??[]).filter(e=>e.serial>previous.reset_serial):[];
+    this.emit(reset?'warn':'info',reset?'machine.reset_observed':'machine.state_changed',
+     reset?{changes,reset_events:events,unavailable_events:Math.max(0,next.reset_serial-previous.reset_serial-events.length)}:{changes});
+   }
   }
   if(view?.error&&view.error!==this.viewError)this.emit('error','scene.operation_rejected',{message:view.error});
   this.viewError=view?.error??null;

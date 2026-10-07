@@ -1,13 +1,13 @@
 \documentclass[10pt]{article}
 \usepackage{vendor-northstar}
 \renewcommand{\DocID}{B16-004}
-\renewcommand{\DocRev}{P1}
+\renewcommand{\DocRev}{P2}
 \renewcommand{\RunningPart}{B16}
 \hypersetup{pdftitle={Northstar B8/B16 / arithmetic and peripheral follow-on manual}}
 \newcommand{\NextSheet}[2]{\clearpage\Continuation{#1}{#2}}
 \begin{document}
 \VendorTitle{B8 / B16}{Arithmetic and peripheral follow-on manual}{B8 numeric profile / B16 peripheral interface 04 / supplement to the B8 interface 03 manual}
-\MetaStrip{B16-004\hfill ISSUE P1\hfill 07 OCT 2026}
+\MetaStrip{B16-004\hfill ISSUE P2\hfill 07 OCT 2026}
 \section*{Device selection and scope}
 The family has two choices: B8 with eight-bit integer arithmetic, and B16 with eight/sixteen-bit integer arithmetic plus a binary32 floating-point unit. B16 also adds a byte-wide direct memory access controller, 1 KiB of addressable data SRAM, and constrained peripheral pin selection. It retains the B8 clock tree, timers, ADC, PWM, edge counter, external byte bridge, watchdog and deadman timer.
 
@@ -295,5 +295,32 @@ Use separate buffers when the CPU must draw while DMA transmits. Ownership chang
 Check fixed and incrementing addressing, first/last SRAM byte, whole-span validation, zero and excessive length, a zero pace, a wrong digital route, missing analog qualification, a masked completion interrupt, and repeated acknowledgment. Exercise abort and controller reset at different byte offsets; inspect the retained destination rather than assuming rollback.
 
 For external transfers, check source-buffer mutation, CPU/ISR bridge contention, a too-fast request stream, a clock change while armed, a late blanking start and a destination that drops a too-early write. Completion and peripheral acceptance must remain distinguishable in the evidence.
-\vfill\Caption{B16 peripheral interface 04 / B16-004 / P1. Base peripheral behavior not explicitly amended here remains defined by the B8 interface 03 manual.}
+\vfill\Caption{B16 peripheral interface 04 / B16-004 / P2. Base peripheral behavior not explicitly amended here remains defined by the B8 interface 03 manual.}
+
+\NextSheet{D1 supervision configuration option}{Applies to B8 interface 03 and B16 interface 04. Select the configuration fuse before application execution.}
+The standard production configuration retains the independent watchdog fused ON. D1 is a separately selected development configuration with firmware control of WDT enablement. It does not alter core arithmetic, register addresses, SYS\_ID, SYS\_REV, clocks or peripheral pin roles. The selected fuse persists across all MCU resets. Do not infer a fuse change from an application reset.
+\par
+\begin{tabularx}{\linewidth}{@{}l Y Y@{}}
+\toprule\TableHead Property & Standard production & D1 configuration\\\midrule
+WDT after MCU reset & ON, scale 3, unlocked. & OFF, scale 3, unlocked.\\
+WDT\_CTRL bit 0 & Reads one; cannot disable. & Writable ON while unlocked.\\
+WDT\_CTRL bit 7 & One-way configuration lock. & One-way configuration lock, including an OFF state.\\
+Disabled WDT service & Not applicable. & Sets configuration ERROR; no key reset or renewal.\\
+Locked control write & Published fused-on behavior. & Changing ON or LOCK sets ERROR and leaves control unchanged.\\
+DMT after MCU reset & OFF and unlocked. & OFF and unlocked; unchanged.\\\bottomrule
+\end{tabularx}
+\par
+\section*{Enablement and renewal}
+On D1, write WDT\_CTRL=01h to enable, 00h to disable while unlocked, or 81h to enable and lock. A change of ON resets elapsed count and cancels a pending first service key. An unchanged ON value does not renew the counter. Writing 80h locks WDT disabled until MCU reset. Configure WDT\_SCALE before locking. Configuration ERROR remains sticky until MCU reset.
+
+The independent LFRC, scale codes, A5h/5Ah sequence, fewer-than-16-tick second-key window and enabled-watchdog reset details remain as specified in the base manual. A core halt does not pause an enabled WDT. Disabled WDT does not count or request a timeout reset.
+
+DMT enablement is firmware selectable on both configurations. Configure its limit and lower window while disabled and unlocked. DMT\_CTRL=01h enables a valid window; 00h disables while unlocked; 81h enables and locks. DMT uses SYSCLK/1024 and pauses with core halt or stopped system clock. Its sequencing and expiry resets are unchanged. Neither monitor establishes meaningful application progress by accepting a service key pair.
+\section*{Reboot-cause interpretation}
+RST\_CAUSE remains an accumulating bit mask: 01h POR, 02h brownout, 04h WDT, 08h DMT, 10h clock failure, 20h software, 40h external reset. Multiple bits may be present; capture all before W1C acknowledgment. RST\_DETAIL bits are 01h WDT bad key, 02h DMT bad first key, 04h DMT bad second key, 08h DMT early service, 10h DMT late/expired, and 20h WDT timeout. Hardware can assert several causes in one reset quantum.
+\begin{Notice}{CONFIGURATION AND APPLICATION REQUIREMENTS}
+D1 permits monitor-disable experiments. It does not waive a product requirement for enabled, locked monitors or permit a runtime observer to override a locked configuration. The standard production option remains the supplied default. Peripheral supervision is separate from an operator-held deadman switch.
+\end{Notice}
+\vfill\Caption{B16-004 / P2 / D1 configuration option. No additional firmware register or interrupt source is assigned.}
+
 \end{document}

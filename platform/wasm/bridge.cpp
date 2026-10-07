@@ -33,6 +33,9 @@ extern "C" int b8_wasm_init(uint32_t mode) {
         if (mode > 2) { failure("invalid session mode"); return 1; }
         if (initialized) { failure("module already initialized; restart with a new module"); return 1; }
         b8::sim::SessionOptions options;
+#if defined(B8_FIXED_PRODUCTION_FUSE)
+        options.watchdog_fused_on = true;
+#endif
         options.bench = mode != 0;
         if (mode == 2) options.profile = b8::sim::BoardProfile::legacy02;
         session = std::make_unique<b8::sim::Session>(b8::sim::FirmwareImage{
@@ -83,7 +86,7 @@ extern "C" int b8_view_resize(uint32_t w,uint32_t h){return view_call([&]{view->
 extern "C" int b8_view_frame(double ms){return view_call([&]{view->frame(ms);});}
 extern "C" int b8_view_event(uint32_t kind,int32_t id,double x,double y){
     return view_call([&]{if(kind<4)view->pointer(kind,id,{x,y});else if(kind==4||kind==5)view->key(id,kind==4);
-       else if(kind==6)view->release_inputs();else throw std::invalid_argument("unknown input kind");});
+       else if(kind==6||kind==7)view->release_inputs(kind==6);else throw std::invalid_argument("unknown input kind");});
 }
 extern "C" const uint8_t* b8_view_pixels(void){return view?view->canvas().pixels().data():nullptr;}
 extern "C" uint32_t b8_view_width(void){return view?view->canvas().width():0;}

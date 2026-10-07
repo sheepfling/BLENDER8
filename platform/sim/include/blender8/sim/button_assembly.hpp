@@ -15,6 +15,7 @@ public:
     void set_bounce(bool enabled) noexcept { bounce_=enabled; }
     void set_slow_bounce(bool enabled) noexcept { slow_bounce_=enabled;random_bounce_=false; }
     void set_random_bounce(std::uint32_t seed) noexcept {rng_=seed?seed:1;random_bounce_=true;bounce_=true;}
+    [[nodiscard]] unsigned bounce_mode() const noexcept { return !bounce_?0:random_bounce_?3:slow_bounce_?2:1; }
     // Fault fixture only: -1 normal; 0 stuck closed; 1 stuck open.
     void contact_fault(unsigned channel, int fault);
     [[nodiscard]] std::uint8_t ideal_mask() const noexcept { return target_mask_; }

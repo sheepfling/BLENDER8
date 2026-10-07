@@ -1,17 +1,17 @@
 {
   "schema": 1,
   "project_id": "appgprj_6ac648fb3bc8819181f6a95b63f4a085",
-  "version_id": "appgprj_6ac648fb3bc8819181f6a95b63f4a085~appgver_2c75ef541fec81919a38733a03771fc3",
-  "deployment_id": "appgdep_6ac649657f58819195510d33a8f52d58",
+  "version_id": "appgprj_6ac648fb3bc8819181f6a95b63f4a085~appgver_d84d717cad80819191389736b6e055da",
+  "deployment_id": "appgdep_6ac6a50ca9508191ba946d300c50c449",
   "status": "succeeded",
   "url": "https://half-a-labs-blender8-workbench.rick583.chatgpt.site",
-  "audience": "owner-private",
-  "published_at": "2026-10-07T13:30:25.257492+00:00",
-  "sites_source_commit": "47497db567fe500f9166cc33ebee85633cba32e9",
+  "audience": "custom; existing sharing preserved",
+  "published_at": "2026-10-07T20:01:27.542787+00:00",
+  "sites_source_commit": "9e9a917b39fd87a40c277697bbd1b5d9736fb51b",
   "device": "B16",
   "firmware": "owner experimental controller",
-  "wasm_sha256": "58eed8746bd2b74aa6fa4a047f51e6e1c03fe51c21d9f961deb4b2d5f745dbb5",
-  "build_manifest_sha256": "d2732dd1ad032d2bc3534d3f477daa1cd10868c0dcabfbc0fb77201e046c3e7f",
-  "deployment_scope": "Compiled browser bundle only; no automatic synchronization from GitHub.",
-  "acceptance_scope": "61 automated correspondence cases and 19 additional scenarios pass; human reviews and requirements decisions remain open."
+  "deployment_scope": "22 allowlisted compiled browser assets only; no automatic synchronization from GitHub.",
+  "acceptance_scope": "61 automated correspondence cases, 19 additional scenarios and 2 characterization probes pass. Human reviews, requirements decisions and physical validation remain open.",
+  "wasm_sha256": "d95466d2864c35f5a900046e5f14a94c16d0b46bbb6857b459ced9b0ff95a030",
+  "build_manifest_sha256": "bb9125c4335252f80c40e13a1d11052083b0f1d3ed5dbc02bededb380f65868c"
 }

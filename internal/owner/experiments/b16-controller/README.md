@@ -21,9 +21,12 @@ firmware**, rather than Component bench, to execute this controller. Component b
 runs without firmware. A local serving session is available at
 [the B16 experiment](http://127.0.0.1:8094/?mode=student) while its Python server is running.
 
-The compiled workbench is also published as a private
+The compiled workbench is also published as a hosted
 [ChatGPT Site](https://half-a-labs-blender8-workbench.rick583.chatgpt.site).
-Choose **Selected firmware** to run the candidate; the default Pixel probe keeps the motor off.
+The Site defaults to **Selected firmware** and starts logical time. Pixel probe is an explicit
+bring-up mode that keeps the motor off. Wait for two cool logical seconds, briefly hold STOP and
+release, then select a speed. The page includes LCD fault codes and recovery instructions.
+See [workbench controls and food fixtures](../../../../platform/docs/ANIMATED-WORKBENCH.md).
 The Site includes the browser debug logs and local compiled-image loader. Its
 [deployment receipt](sites-deployment.json) identifies the published bundle. Publishing is a
 snapshot; later repository edits need a new Site deployment.
@@ -114,3 +117,40 @@ run("platform/tools/experiment.py", "--experiment", candidate, "--generate-font"
 
 The runner rejects stale font artifacts. Matching candidate templates proves the pixel encoding
 and deadlines in these cases; a human must still judge readability and meaning.
+
+## Workbench regression checks
+
+The actual compiled candidate has additional checks for LCD STOP/PULSE behavior, physical food
+loads, fault codes and continued playback. From the repository root, after the Wasm build:
+
+```python
+import os
+import subprocess
+from pathlib import Path
+
+subprocess.run(
+    ["node", "--test", "platform/tests/wasm/candidate-view.test.mjs"],
+    env={
+        **os.environ,
+        "B8_CANDIDATE_WEB": str(Path("build/experiment-b16-wasm/web").resolve()),
+    },
+    check=True,
+)
+```
+
+These tests use real scanned LCD pixels and the candidate's glyph oracle. They do not supply
+human review approval or physical hardware evidence. The original verification receipt remains
+historical; subsequent workbench runs are recorded separately in ignored build/report files.
+
+## Supervision status update
+
+The workbench now includes a read-only Supervision tab, monitor enable/lock/count/window/service
+probes and a retained 16-event reboot history. Firmware acknowledgment does not erase those events.
+B16-004/P2 documents the separate D1 development watchdog fuse; the production candidate retains
+both enabled, locked monitors and its original acceptance obligations.
+
+The verification receipt is `build/supervision-verification.json`: 235 checks in each Clang, GCC,
+sanitizer and B8 development-fuse native build; 21 real compiled-Wasm checks; six development-Wasm
+ABI checks; 68 native/Wasm paired commands; and 243 Python checks. Both selected-candidate native
+and Wasm acceptance runs retain 61 automated passes, zero failures and two open human reviews.
+The P2 manual was regenerated as pristine, G1, G2 and final G3, with 11 pages per version.

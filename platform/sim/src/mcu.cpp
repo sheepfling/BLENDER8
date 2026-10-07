@@ -2,14 +2,19 @@
 #include <stdexcept>
 #include <cmath>
 namespace b8::sim {
-Mcu::Mcu(std::array<DigitalNet*,8> a,std::array<DigitalNet*,8> b,DigitalNet& pwm,BytePeripheral& ext,std::array<const AnalogNet*,2> analog,const ClockNet* clock,DeviceProfile device)
-    :a_(a),b_(b),pwm_(pwm),pwm_driver_(pwm.attach(Logic::low)),external_(ext),adc_(analog),device_(device),clock_(clock),revision03_(clock!=nullptr) {
+Mcu::Mcu(std::array<DigitalNet*,8> a,std::array<DigitalNet*,8> b,DigitalNet& pwm,BytePeripheral& ext,std::array<const AnalogNet*,2> analog,const ClockNet* clock,DeviceProfile device,bool watchdog_fused_on)
+    :a_(a),b_(b),pwm_(pwm),pwm_driver_(pwm.attach(Logic::low)),external_(ext),adc_(analog),device_(device),clock_(clock),watchdog_(watchdog_fused_on),revision03_(clock!=nullptr) {
     if(device==DeviceProfile::b16&&!clock)throw std::invalid_argument("B16 requires a clocked board");
     for (unsigned i=0;i<8;++i) { a_drivers_[i]=a_[i]->attach();b_drivers_[i]=b_[i]->attach(); }
 }
-void Mcu::reset(ResetCause cause,std::uint8_t detail) {
+void Mcu::reset(ResetCause cause,std::uint8_t detail,std::optional<Tick> at) {
     if(cause==ResetCause::por){reset_causes_=0;reset_details_=0;}
     reset_causes_|=static_cast<std::uint8_t>(cause);reset_details_|=detail;++reset_serial_;
+    if(reset_history_size_==reset_history_.size()){
+        for(unsigned i=1;i<reset_history_size_;++i)reset_history_[i-1]=reset_history_[i];
+        --reset_history_size_;
+    }
+    reset_history_[reset_history_size_++]={reset_serial_,at.value_or(now_us_),static_cast<unsigned>(cause),detail};
     dma_.reset((static_cast<unsigned>(cause)&3)!=0);routes_={};ansel_=0x30;pin_status_=pin_key_=0;pin_locked_=true;last_dreq_=pwm_high_=false;
     clock_.reset();watchdog_.reset();deadman_.reset();reset_hold_=revision03_?1000:0;
     lf_phase_=pb_phase_=0;core_halted_=false;
@@ -262,7 +267,7 @@ void Mcu::write8(Reg reg,std::uint8_t data,Tick now) {
     }
 }
 McuObservation Mcu::observe() const noexcept {
-    return {reset_serial_,reset_causes_,reset_details_,dir_a_,out_a_,dir_b_,out_b_,
+    McuObservation out{reset_serial_,reset_causes_,reset_details_,dir_a_,out_a_,dir_b_,out_b_,
         enables_,flags_,static_cast<unsigned>(pwm_enabled_),shadow_duty_,active_duty_,tach_count_,
         clock_.active_plan().source,clock_.debug_status(),clock_.active_plan().pb,
         watchdog_.control(),watchdog_.scale(),static_cast<unsigned>(deadman_.enabled()),
@@ -271,6 +276,9 @@ McuObservation Mcu::observe() const noexcept {
         clock_.system_hz(),clock_.peripheral_hz(),adc_fresh_reads_,last_adc_read_us_,last_adc_read_code_,last_adc_read_channel_,irq_deliveries_,temperature_adc_code_,temperature_adc_us_,
         {timers_[0].count,timers_[1].count},{timers_[0].compare,timers_[1].compare},
         {routes_[0],routes_[1],routes_[2],routes_[3]},pin_locked_};
+    out.watchdog=watchdog_.observe();out.deadman=deadman_.observe();out.lfrc_hz=10000*(1+lfrc_ppm_/1e6);
+    out.supervision_available=revision03_;out.reset_released=reset_released();out.clock_stopped=clock_.stopped();
+    out.reset_history=reset_history_;out.reset_history_size=reset_history_size_;return out;
 }
 
 }

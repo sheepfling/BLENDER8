@@ -3,7 +3,7 @@ import {mountWorkbench} from './workbench.mjs';
 import {DebugLog,captureGlobalErrors} from './debug-log.mjs';
 import {mountDebugPanel} from './debug-panel.mjs';
 const log=new DebugLog({source:'diagnostics-page'}),panel=mountDebugPanel(log);captureGlobalErrors(log);
-const mode = new URLSearchParams(location.search).get('mode') || 'probe';
+const mode = new URLSearchParams(location.search).get('mode') || 'student';
 const controls = document.querySelectorAll('main button, main input, main select');
 controls.forEach(control => { control.disabled = true; });
 const badge = document.getElementById('mode');

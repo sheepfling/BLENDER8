@@ -2,6 +2,7 @@
 #include "blender8/sim/components.hpp"
 #include "blender8/sim/mcu.hpp"
 #include <optional>
+#include <string>
 namespace b8::sim {
 class Board;
 // Host-only, read-only, non-invasive scene observation. Unknown probes stay optional.
@@ -23,8 +24,12 @@ struct SceneObservation {
     std::optional<double> room_c,case_air_w,case_food_w,food_air_w,ventilation_w;
     std::optional<DmaObservation> dma;
     std::optional<bool> food_present;
+    std::optional<double> food_capacity,food_conductance;
+    std::optional<std::string> food_kind;
+    std::optional<unsigned> bounce_mode;
     std::optional<bool> jammed;
     std::optional<std::array<bool,512>> pixels;
+    std::optional<DisplayBusObservation> lcd_bus;
 };
 [[nodiscard]] SceneObservation observe_scene(Board& board);
 }
