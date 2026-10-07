@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "name": "nominal_noise_full_load",
+  "mode": "firmware",
+  "profile": "chassis04",
+  "notes": "temperature-04: stable plausible reads are valid; seeded 20 mV noise experiment",
+  "events": [
+    {
+      "at_us": 0,
+      "command": "bounce off"
+    },
+    {
+      "at_us": 2300000,
+      "command": "stop 1"
+    },
+    {
+      "at_us": 2350000,
+      "command": "stop 0"
+    },
+    {
+      "at_us": 2400000,
+      "command": "speed 4"
+    },
+    {
+      "at_us": 0,
+      "command": "noise 0.02 4815"
+    },
+    {
+      "at_us": 0,
+      "command": "load 1"
+    }
+  ],
+  "checks": [
+    {
+      "at_us": 4400000,
+      "field": "drive_enabled",
+      "op": "eq",
+      "value": true,
+      "why": "Bounded analog noise at ambient and full load must not invent a sensor or motion fault"
+    }
+  ]
+}

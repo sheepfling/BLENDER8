@@ -113,6 +113,9 @@ def test_source_bundle_excludes_fonts_and_duplicate_binders() -> None:
         "dist/Blender8-Supplier-Manuals-G3.pdf",
         "internal/owner/private/TRUE-REQUIREMENTS.md",
         "internal/owner/requirements-crosswalk.json",
+        "internal/owner/experiments/b16-controller/firmware.cpp",
+        "internal/owner/experiments/b16-controller/glyphs.json",
+        "internal/owner/experiments/b16-controller/REQUIREMENTS-AUDIT.md",
         "internal/history/docs/P4/VALIDATION.md",
     ):
         assert not module.include(ROOT / relative, ROOT)

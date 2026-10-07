@@ -319,6 +319,8 @@ if(BUILD_TESTING)
   if(B8_NODE_EXECUTABLE)
     add_test(NAME wasm_transport.javascript COMMAND ${B8_NODE_EXECUTABLE} --test ${CMAKE_CURRENT_SOURCE_DIR}/tests/wasm/transport.test.mjs ${CMAKE_CURRENT_SOURCE_DIR}/tests/wasm/client.test.mjs)
     set_tests_properties(wasm_transport.javascript PROPERTIES TIMEOUT 30 LABELS "wasm-transport;tooling")
+    add_test(NAME debug_logging.javascript COMMAND ${B8_NODE_EXECUTABLE} --test ${CMAKE_CURRENT_SOURCE_DIR}/tests/wasm/debug-log.test.mjs)
+    set_tests_properties(debug_logging.javascript PROPERTIES TIMEOUT 30 LABELS "wasm-transport;tooling")
   endif()
 endif()
 

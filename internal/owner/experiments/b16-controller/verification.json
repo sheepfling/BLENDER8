@@ -1,0 +1,245 @@
+{
+  "schema": 1,
+  "verified_at": "2026-10-07T13:03:13Z",
+  "baseline_commit": "60ed02ac2a2220070ad200be2bd60498a6564562",
+  "scope": "Owner B16 standard-profile candidate; New Employee starter and physics unchanged",
+  "source_sha256": {
+    "firmware.cpp": "b42ce3ad458dc7dcfcebeb129d78c85c5def3842dc756727fdd4c36b2a121467",
+    "font.hpp": "fa57495f69774356024280a92971fd983b58cf35133ddb872cc6d491d77f5a48",
+    "font-source.json": "43893dae670bb75ef29f994c7f1d1ead6d7a7d69e968e78ff37a0d8b1989c0f6",
+    "glyphs.json": "a036e758ecbc6b0e3ee2efd77e71d33eaede27678ab6e9496ea9e13f5dcdaaa9",
+    "scenarios/clock_fast.json": "8cf93604cd67afae986453c19a448c08622e8ee2b4c4612e567ea2794207c4c4",
+    "scenarios/clock_slow.json": "92ff28663f2365676b2495cc2b29ef8b7f818a4613403764d7700c377c0420aa",
+    "scenarios/intentional_coast_not_stall.json": "2030b6d4a460692e0e402f3360af3fdc22da920e3587fff92d19da55b5860f5a",
+    "scenarios/loaded_idle_pulse.json": "198f1f2a80e7a706676c57771eb47fafa51008d2562c634a1dd30394e5a4c2f7",
+    "scenarios/minimum_pulse_slow_bounce.json": "70982c83239eab2bfc01d662540371ca8ab031f6b7d1b71158b394b145fda640",
+    "scenarios/nominal_noise_full_load.json": "96c7b21592562ca6347076c0ac4d8548815f1ae3ce3d9283effdad517ee55cff",
+    "scenarios/priority_ck_over_wd.json": "882759ff746f422366b512f08815653bceacd7dc108f3e0aea7bbca91993f797",
+    "scenarios/priority_if_over_il.json": "a9cd3480405051d9f5edc4585e46b909b3fa752b3744aa56bf50a7bacef4a551",
+    "scenarios/priority_il_over_st.json": "ecb318b0f2a411a69e51937f5c419a4cf360d94f975f84c79269c7e3ca3e2523",
+    "scenarios/priority_th_over_if.json": "31654e8b8ab8bc157cc14ab9a9de8536da98bf4364ba5b745b1ae3d1e432ff9e",
+    "scenarios/priority_ts_over_il.json": "0dfd16a8d8b6bbed1e7da1b125a3d522ad1ceaed7bc76e42bd6d0ff68b0a4509",
+    "scenarios/priority_wd_over_dm.json": "a2a9facfb6322e8b700b06ce563a1a8f2b5ebe905cbc6d0949b4649d536b6dc6",
+    "scenarios/probe_adc_deadman_interaction.json": "38df95f0ed726bdb787a864aa6d3f47044d3aab2f638e6823f53703d9894032d",
+    "scenarios/probe_clock_recovery_policy.json": "cd6c5771fa35322a04fff2236d22b0c2d0cdae61bd4739b7ebea76edc1784f3a",
+    "scenarios/short_invalid_changeover.json": "45e117fcc5211f57388acd7574da5a489c85284c4919273a65da7599117748bc",
+    "scenarios/startup_stop_not_queued.json": "a4cc15d49b9e6a17f0399ea5ef31327d1a96e4b5a4f487c2a846f6382e1abe2d",
+    "scenarios/stuck_command_blocks_restart.json": "1e8108c1cbcea5f222528a645e84f0b847205b6925a45e0d60c743a65a4aa5fc",
+    "scenarios/tach_stuck_high.json": "b6133e23caeb6b58d50ad9ebda03b19625be1aa67fe655ab8262f9ee2bff8feb",
+    "scenarios/warm_reset_retains_ts.json": "93ab07795c333ff1eb83f530f28afbf8d2427038939ed4f4c35e4c99fbd6bd3d",
+    "scenarios/watchdog_fast.json": "b1c21e3cb189516d2ec0898a09e602f5652c3e0d718fc9de55a6c9c2021f45ed",
+    "scenarios/watchdog_slow.json": "c0cc4bd9a2d359689027363d060145ec40058a97b7ee9a9c6d99ba54b8ac2e8f"
+  },
+  "tool_source_sha256": {
+    "platform/tools/experiment.py": "aa7e9d9411eb027d1b7bf237949041cb52d98aae29f255b475c0ea41fa2f199c",
+    "platform/tools/acceptance.py": "5066978394c12210ff238d7d5d8ea24730fa73d190ae19d8a4c5cc43874be18f",
+    "platform/tools/scenario.py": "a0ee4b4b5c28676b752965f25666268d99588c4d884c32a1a6c98eeb737401c8"
+  },
+  "builds": [
+    {
+      "toolchain": "clang",
+      "image": "build/experiment-b16/b8_emulator",
+      "image_sha256": "856c2e540d8aa8b31134a158a12d96b0f2569cdfd2e227fccba3266aa3e39a93",
+      "receipt": "reports/experiment-b16.json.gz",
+      "receipt_sha256": "93af5f03bf56ecdf07921959ec59a2c515b8692c6ead44a534c73e54c97add59",
+      "acceptance": {
+        "pass": 61,
+        "fail": 0,
+        "review": 2
+      },
+      "additional_requirement_scenarios": 19,
+      "characterization_probes": 2,
+      "memory": {
+        "schema": 1,
+        "device": "B16",
+        "tier": "standard",
+        "limits": {
+          "ram": 8192,
+          "program": 65536
+        },
+        "usage": {
+          "program": 6071,
+          "ram": 1107
+        },
+        "static_ram": 83,
+        "peripheral_ram": 1024,
+        "measurement": "isolated-object-sections",
+        "unaccounted": [
+          "runtime stack",
+          "heap",
+          "external linked helpers"
+        ],
+        "exceeded": []
+      }
+    },
+    {
+      "toolchain": "gcc",
+      "image": "build/experiment-b16-gcc/b8_emulator",
+      "image_sha256": "f7f76de91c8f6c795612ef9d74fd9b9181c2ef3ff3eacc9170e3a7a3e0343f9a",
+      "receipt": "reports/experiment-b16-gcc.json.gz",
+      "receipt_sha256": "1c2f2bb72741daa14e15e3a27606443f7f62f8b3cfddf51cad55670a5abe36fc",
+      "acceptance": {
+        "pass": 61,
+        "fail": 0,
+        "review": 2
+      },
+      "additional_requirement_scenarios": 19,
+      "characterization_probes": 2,
+      "memory": {
+        "schema": 1,
+        "device": "B16",
+        "tier": "standard",
+        "limits": {
+          "ram": 8192,
+          "program": 65536
+        },
+        "usage": {
+          "program": 6624,
+          "ram": 1108
+        },
+        "static_ram": 84,
+        "peripheral_ram": 1024,
+        "measurement": "isolated-object-sections",
+        "unaccounted": [
+          "runtime stack",
+          "heap",
+          "external linked helpers"
+        ],
+        "exceeded": []
+      }
+    },
+    {
+      "toolchain": "clang-asan-ubsan",
+      "image": "build/experiment-b16-sanitize/b8_emulator",
+      "image_sha256": "89fab7e075a062449db0c5e0798c0d99ab15b0bbd7831830fb5de6ac8ec53c72",
+      "receipt": "reports/experiment-b16-sanitize.json.gz",
+      "receipt_sha256": "8b57eab072edf38eb6b659670e4708e6312910da4c5fdb121880d03fdf33c0be",
+      "acceptance": {
+        "pass": 61,
+        "fail": 0,
+        "review": 2
+      },
+      "additional_requirement_scenarios": 19,
+      "characterization_probes": 2,
+      "memory": {
+        "schema": 1,
+        "device": "B16",
+        "tier": "standard",
+        "limits": {
+          "ram": 8192,
+          "program": 65536
+        },
+        "usage": {
+          "program": 12454,
+          "ram": 4064
+        },
+        "static_ram": 3040,
+        "peripheral_ram": 1024,
+        "measurement": "isolated-object-sections",
+        "unaccounted": [
+          "runtime stack",
+          "heap",
+          "external linked helpers"
+        ],
+        "exceeded": []
+      }
+    },
+    {
+      "toolchain": "emscripten-node",
+      "image": "build/experiment-b16-wasm/site/b8_student.wasm",
+      "image_sha256": "58eed8746bd2b74aa6fa4a047f51e6e1c03fe51c21d9f961deb4b2d5f745dbb5",
+      "receipt": "reports/experiment-b16-wasm.json.gz",
+      "receipt_sha256": "93af4e61221254306121b0991abe0988792d7b4cef46d7aabb361ec7674a923c",
+      "acceptance": {
+        "pass": 61,
+        "fail": 0,
+        "review": 2
+      },
+      "additional_requirement_scenarios": 19,
+      "characterization_probes": 2,
+      "memory": {
+        "schema": 1,
+        "device": "B16",
+        "tier": "standard",
+        "limits": {
+          "ram": 8192,
+          "program": 65536
+        },
+        "usage": {
+          "program": 6928,
+          "ram": 2780
+        },
+        "static_ram": 1756,
+        "peripheral_ram": 1024,
+        "measurement": "isolated-object-sections",
+        "unaccounted": [
+          "runtime stack",
+          "heap",
+          "external linked helpers"
+        ],
+        "exceeded": []
+      }
+    }
+  ],
+  "conformance": {
+    "clang": {
+      "passed": 227,
+      "total": 227
+    },
+    "gcc": {
+      "passed": 227,
+      "total": 227,
+      "runs": [
+        224,
+        3
+      ]
+    },
+    "clang-asan-ubsan": {
+      "passed": 227,
+      "total": 227,
+      "runs": [
+        224,
+        3
+      ]
+    },
+    "emscripten_abi": {
+      "passed": 7,
+      "total": 7
+    },
+    "emscripten_render_upload": {
+      "passed": 9,
+      "total": 9
+    },
+    "python": {
+      "passed": 243,
+      "skipped": 0
+    }
+  },
+  "browser": {
+    "url": "http://127.0.0.1:8094/?mode=student",
+    "observed_speed_level": 4,
+    "observed_rpm": 10464,
+    "lcd_label": "4",
+    "image": "build/experiment-b16-browser.jpg",
+    "image_sha256": "30d1d1bbe411c86b56fed62876a5e5332a7fdc4bdafc4ed9a501ee5c4180dd61"
+  },
+  "requirements_decisions": [
+    "E-01 ADC freshness versus deadman reset",
+    "E-02 deliberate CK recovery",
+    "E-03 diagnostic lifetime and retrieval",
+    "E-04 validation envelope and missing-clock deadline"
+  ],
+  "accepted": false,
+  "pending": [
+    "human progress-authorization review",
+    "human combined-fault-retention review",
+    "human glyph legibility review",
+    "requirements decisions",
+    "physical validation"
+  ],
+  "limits": [
+    "Finite simulation evidence; no exhaustive proof",
+    "No instruction ISA or execution-cost model",
+    "Memory section accounting excludes runtime stack, heap and external linked helpers"
+  ]
+}

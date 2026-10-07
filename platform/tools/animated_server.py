@@ -119,6 +119,8 @@ def serve(
         ("/" + n): (root / "webview" / n).read_bytes()
         for n in ("scene-shell.mjs", "native-scene-worker.mjs")
     }
+    for name in ("debug-log.mjs", "debug-panel.mjs"):
+        assets["/" + name] = (root / "ui" / name).read_bytes()
     html = (root / "webview/animated.html").read_text()
     html = html.replace("<body>", f'<body data-backend="native" data-token="{token}">')
     html = html.replace(

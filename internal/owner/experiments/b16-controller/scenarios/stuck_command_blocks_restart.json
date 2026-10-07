@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "name": "stuck_command_blocks_restart",
+  "mode": "firmware",
+  "profile": "chassis04",
+  "notes": "stop-04: every command must be released before a later fresh command",
+  "events": [
+    {
+      "at_us": 0,
+      "command": "bounce off"
+    },
+    {
+      "at_us": 2300000,
+      "command": "stop 1"
+    },
+    {
+      "at_us": 2350000,
+      "command": "stop 0"
+    },
+    {
+      "at_us": 2400000,
+      "command": "speed 4"
+    },
+    {
+      "at_us": 3500000,
+      "command": "sensor open"
+    },
+    {
+      "at_us": 3600000,
+      "command": "sensor healthy"
+    },
+    {
+      "at_us": 3600000,
+      "command": "contact 0 closed"
+    },
+    {
+      "at_us": 5900000,
+      "command": "stop 1"
+    },
+    {
+      "at_us": 5950000,
+      "command": "stop 0"
+    }
+  ],
+  "checks": [
+    {
+      "at_us": 6100000,
+      "field": "mcu.gpiob_out",
+      "op": "eq",
+      "value": 0,
+      "why": "No enable request"
+    },
+    {
+      "at_us": 6100000,
+      "field": "mcu.pwm_enabled",
+      "op": "eq",
+      "value": 0,
+      "why": "PWM disabled"
+    },
+    {
+      "at_us": 6100000,
+      "field": "mcu.pwm_shadow",
+      "op": "eq",
+      "value": 0,
+      "why": "Pending duty cleared"
+    }
+  ]
+}

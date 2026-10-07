@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "name": "startup_stop_not_queued",
+  "mode": "firmware",
+  "profile": "chassis04",
+  "notes": "interlock-04 and temperature-04: early STOP is not queued across cool qualification",
+  "events": [
+    {
+      "at_us": 0,
+      "command": "bounce off"
+    },
+    {
+      "at_us": 100000,
+      "command": "stop 1"
+    },
+    {
+      "at_us": 2300000,
+      "command": "stop 0"
+    },
+    {
+      "at_us": 2350000,
+      "command": "speed 4"
+    },
+    {
+      "at_us": 2600000,
+      "command": "stop 1"
+    },
+    {
+      "at_us": 2650000,
+      "command": "stop 0"
+    },
+    {
+      "at_us": 2700000,
+      "command": "speed 4"
+    }
+  ],
+  "checks": [
+    {
+      "at_us": 2500000,
+      "field": "mcu.gpiob_out",
+      "op": "eq",
+      "value": 0,
+      "why": "No enable request"
+    },
+    {
+      "at_us": 2500000,
+      "field": "mcu.pwm_enabled",
+      "op": "eq",
+      "value": 0,
+      "why": "PWM disabled"
+    },
+    {
+      "at_us": 2500000,
+      "field": "mcu.pwm_shadow",
+      "op": "eq",
+      "value": 0,
+      "why": "Pending duty cleared"
+    },
+    {
+      "at_us": 2750000,
+      "field": "drive_enabled",
+      "op": "eq",
+      "value": true,
+      "why": "Later new STOP followed by released controls and fresh command works"
+    }
+  ]
+}

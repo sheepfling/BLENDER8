@@ -781,6 +781,8 @@ def run(
     selected: list[str] | None = None,
     glyphs: dict[str, list[str]] | None = None,
     reviews: dict[str, dict[str, str]] | None = None,
+    *,
+    engine_factory: Callable[[], Engine] | None = None,
 ) -> dict[str, Any]:
     inventory = cases()
     complete_suite = not selected or set(selected) == {c.name for c in inventory}
@@ -790,10 +792,16 @@ def run(
             raise ValueError(f"unknown cases: {set(selected) - names}")
         inventory = [c for c in inventory if c.name in selected]
     results: list[dict[str, Any]] = []
+    identities: list[dict[str, Any]] = []
     for case in inventory:
         evidence: dict[str, Any] = {}
         try:
-            with Engine(executable, timeout=15) as engine:
+            with engine_factory() if engine_factory else Engine(executable, timeout=15) as engine:
+                identity = {
+                    key: engine.hello.get(key) for key in ("device", "interface", "chassis")
+                }
+                if identity not in identities:
+                    identities.append(identity)
                 session = Session(engine, glyphs)
                 try:
                     case.function(session)
@@ -830,7 +838,8 @@ def run(
     counts = {k: sum(r["status"] == k for r in results) for k in ("pass", "fail", "review")}
     selected_passed = counts["fail"] == 0 and counts["review"] == 0
     return {
-        "contract": "Half-A/Labs correspondence P5; B8-03; chassis04",
+        "contract": "Half-A/Labs correspondence P5; published selected-device interface; chassis04",
+        "observed_devices": identities,
         "executable_sha256": hashlib.sha256(executable.read_bytes()).hexdigest(),
         "counts": counts,
         "full_suite": complete_suite,

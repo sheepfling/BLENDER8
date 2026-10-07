@@ -1,10 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {WasmTransport, NativeTransport} from '../../ui/transport.mjs';
+import {DebugLog} from '../../ui/debug-log.mjs';
 import {nodeWorkerFactory} from './node_worker_adapter.mjs';
 const factory=nodeWorkerFactory(new URL('./node_fixture_worker.mjs', import.meta.url));
 async function transport(options={}) {
-  const t=new WasmTransport({workerFactory:factory,...options});await t.ready;return t;
+  const t=new WasmTransport({workerFactory:factory,log:new DebugLog({consoleSink:null}),...options});await t.ready;return t;
 }
 test('real worker initializes through the shared ABI driver (fake module)', async () => {
   const t=await transport();try {
@@ -30,6 +31,20 @@ test('ordinary command rejection is recoverable and does not poison the queue', 
     assert.equal(t.failure,null);
   }finally{t.dispose();}
 });
+test('worker logging and level changes preserve command order and logical time', async () => {
+  const t=await transport();try {
+    const before=(await t.command('snapshot')).state;
+    await t.setLogLevel('debug');
+    assert.deepEqual((await t.command('snapshot')).state,before);
+    assert.equal(t.failure,null);
+    const remote=t.log.records.filter(r=>r.source==='core-worker');
+    assert(remote.some(r=>r.event==='worker.ready'));
+    assert(remote.every(r=>r.session===t.log.session&&Number.isInteger(r.remote_sequence)));
+    assert(remote.some(r=>r.event==='logging.level'&&r.data.level==='debug'));
+    const results=await Promise.all([t.command('run 7'),t.setLogLevel('trace'),t.command('run 11')]);
+    assert.equal(results[0].state.time_us,7);assert.equal(results[2].state.time_us,18);
+  }finally{t.dispose();}
+});
 test('worker timeout kills a genuinely nonreturning worker, not a WDT event', async () => {
   const t=await transport({timeoutMs:100});
   try {
@@ -37,6 +52,11 @@ test('worker timeout kills a genuinely nonreturning worker, not a WDT event', as
     const results=await Promise.allSettled(pending);
     assert(results.every(r=>r.status==='rejected'&&r.reason.message.includes('NOT a simulated watchdog reset')));
     assert.equal(t.pending.size,0);
+    const failure=t.log.records.find(r=>r.event==='host.failure');
+    assert.equal(failure.data.pending_requests[0].command,'TEST:hang');
+    assert.equal(failure.data.pending_requests[0].type,'command');
+    assert(failure.data.pending_requests[0].elapsed_ms>=90);
+    assert.match(failure.data.error.stack,/WASM_HOST_TIMEOUT/);
     await assert.rejects(t.command('snapshot'),/TIMEOUT/);
     const fresh=await transport();try {assert.equal(fresh.hello.state.time_us,0);}finally{fresh.dispose();}
   }finally{t.dispose();}
@@ -45,6 +65,8 @@ test('worker trap becomes a terminal host failure, never fallback', async () => 
   const t=await transport();try {
     await assert.rejects(t.command('TEST:trap'),/WASM_HOST_FAILURE/);
     await assert.rejects(t.command('snapshot'),/WASM_HOST_FAILURE/);
+    const failure=t.log.records.find(r=>r.event==='wasm.host_failure');
+    assert.match(failure.data.error.stack,/fixture-module/);
   }finally{t.dispose();}
 });
 test('unknown reply id cannot satisfy an unrelated request', async () => {

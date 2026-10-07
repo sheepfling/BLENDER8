@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "name": "probe_adc_deadman_interaction",
+  "mode": "firmware",
+  "profile": "chassis04",
+  "notes": "E-01 characterization probe, not a new normative requirement: DMT expires before TS timeout",
+  "events": [
+    {
+      "at_us": 0,
+      "command": "bounce off"
+    },
+    {
+      "at_us": 2300000,
+      "command": "stop 1"
+    },
+    {
+      "at_us": 2350000,
+      "command": "stop 0"
+    },
+    {
+      "at_us": 2400000,
+      "command": "speed 4"
+    },
+    {
+      "at_us": 3500000,
+      "command": "adc_stalled 1"
+    }
+  ],
+  "checks": [
+    {
+      "at_us": 3800000,
+      "field": "mcu.gpiob_out",
+      "op": "eq",
+      "value": 0,
+      "why": "No enable request"
+    },
+    {
+      "at_us": 3800000,
+      "field": "mcu.pwm_enabled",
+      "op": "eq",
+      "value": 0,
+      "why": "PWM disabled"
+    },
+    {
+      "at_us": 3800000,
+      "field": "mcu.pwm_shadow",
+      "op": "eq",
+      "value": 0,
+      "why": "No pending duty"
+    },
+    {
+      "at_us": 3800000,
+      "field": "lcd_pixels",
+      "op": "eq",
+      "value": "00000000000000000000000000000000000001111111100001100000011000000000011111111000011000000110000000000110000001100111100111100000000001100000011001111001111000000000011000000110011001100110000000000110000001100110011001100000000001100000011001100110011000000000011000000110011001100110000000000110000001100110000001100000000001100000011001100000011000000000011000000110011000000110000000000110000001100110000001100000000001111111100001100000011000000000011111111000011000000110000000000000000000000000000000000000",
+      "why": "Observed candidate label DM; documents a design choice rather than a new customer gate"
+    },
+    {
+      "at_us": 3800000,
+      "field": "mcu.reset_serial",
+      "op": "ge",
+      "value": 3,
+      "why": "Persistent conversion stall causes repeated DMT resets before 100 ms freshness timeout"
+    }
+  ]
+}

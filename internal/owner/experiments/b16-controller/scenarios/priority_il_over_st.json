@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "name": "priority_il_over_st",
+  "mode": "firmware",
+  "profile": "chassis04",
+  "notes": "interlock-04: IL > ST; earlier ST remains subordinate",
+  "events": [
+    {
+      "at_us": 0,
+      "command": "bounce off"
+    },
+    {
+      "at_us": 2300000,
+      "command": "stop 1"
+    },
+    {
+      "at_us": 2350000,
+      "command": "stop 0"
+    },
+    {
+      "at_us": 2400000,
+      "command": "speed 4"
+    },
+    {
+      "at_us": 3500000,
+      "command": "jam 1"
+    },
+    {
+      "at_us": 3700000,
+      "command": "jar 0"
+    }
+  ],
+  "checks": [
+    {
+      "at_us": 3800000,
+      "field": "mcu.gpiob_out",
+      "op": "eq",
+      "value": 0,
+      "why": "No enable request"
+    },
+    {
+      "at_us": 3800000,
+      "field": "mcu.pwm_enabled",
+      "op": "eq",
+      "value": 0,
+      "why": "PWM disabled"
+    },
+    {
+      "at_us": 3800000,
+      "field": "mcu.pwm_shadow",
+      "op": "eq",
+      "value": 0,
+      "why": "Pending duty cleared"
+    },
+    {
+      "at_us": 3900000,
+      "field": "lcd_pixels",
+      "op": "eq",
+      "value": "00000000000000000000000000000000000001111111111001100000000000000000011111111110011000000000000000000000011000000110000000000000000000000110000001100000000000000000000001100000011000000000000000000000011000000110000000000000000000000110000001100000000000000000000001100000011000000000000000000000011000000110000000000000000000000110000001100000000000000000000001100000011000000000000000000000011000000110000000000000000001111111111001111111111000000000011111111110011111111110000000000000000000000000000000000000",
+      "why": "Candidate encoding for IL; legibility remains human review"
+    }
+  ]
+}

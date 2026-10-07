@@ -11,3 +11,7 @@ The [editorial record](CORRESPONDENCE-EDITORIAL-RECORD.md) explains the authored
 [ownership audit](DOCUMENT-OWNERSHIP-AUDIT.md) records source boundaries. The private mapping is
 local to this checkout. Back it up through an owner-controlled channel if it needs to survive a
 fresh clone.
+
+The [B16 controller experiment](experiments/b16-controller/README.md) contains an isolated candidate,
+additional scenarios and a requirements sufficiency audit. Keep the solution out of the New Employee
+route. The entire `owner/` directory is excluded from the source handoff bundle.

@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "name": "minimum_pulse_slow_bounce",
+  "mode": "firmware",
+  "profile": "chassis04",
+  "notes": "panel-04: minimum guaranteed pulse and slow supplier bounce",
+  "events": [
+    {
+      "at_us": 0,
+      "command": "bounce off"
+    },
+    {
+      "at_us": 2300000,
+      "command": "stop 1"
+    },
+    {
+      "at_us": 2350000,
+      "command": "stop 0"
+    },
+    {
+      "at_us": 0,
+      "command": "bounce slow"
+    },
+    {
+      "at_us": 2400000,
+      "command": "pulse 1"
+    },
+    {
+      "at_us": 2450000,
+      "command": "pulse 0"
+    }
+  ],
+  "checks": [
+    {
+      "at_us": 2445000,
+      "field": "drive_enabled",
+      "op": "eq",
+      "value": true,
+      "why": "Guaranteed 50 ms PULSE registers"
+    },
+    {
+      "at_us": 2495000,
+      "field": "mcu.gpiob_out",
+      "op": "eq",
+      "value": 0,
+      "why": "No enable request"
+    },
+    {
+      "at_us": 2495000,
+      "field": "mcu.pwm_enabled",
+      "op": "eq",
+      "value": 0,
+      "why": "PWM disabled"
+    },
+    {
+      "at_us": 2495000,
+      "field": "mcu.pwm_shadow",
+      "op": "eq",
+      "value": 0,
+      "why": "Pending duty cleared"
+    }
+  ]
+}

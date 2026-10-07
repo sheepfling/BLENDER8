@@ -196,6 +196,39 @@ a fresh session with the same firmware and bench mode; the scene test exercises 
 authenticated customer approval or a self-contained firmware binary. Use the separate release
 manifest/executable hashes when comparing builds.
 
+## Browser debug logs
+
+Both `index.html` and `diagnostics.html` have a **Debug logs** button. The panel combines page and
+worker records and also sends them to the browser console with a `[Half-A/Labs]` prefix. Use the
+console's severity filter or search for an event such as `host.failure` or `wasm.abort`.
+
+| Level          | Output                                                         |
+| -------------- | -------------------------------------------------------------- |
+| Info (default) | Image identity, startup, observed machine changes and failures |
+| Debug          | Also request IDs, queue/response durations and input events    |
+| Trace          | Also every frame or high-frequency snapshot/run request        |
+| Warn / Error   | Only the selected severity and higher                          |
+
+Each record identifies its source, session, sequence, wall timestamp and host elapsed time. Page
+observations also carry the last observed logical microsecond count. These clocks are separate:
+host timing is diagnostic context and does not drive firmware. Image loading records include the
+Wasm SHA-256, ABI, device and memory-policy result. Worker exceptions retain their JavaScript stack
+when available; Emscripten stdout, stderr and abort messages use the same log. Host timeouts report
+the outstanding request and explicitly remain distinct from observed MCU resets.
+
+**Save debug log** downloads `mcu-debug-log.json` with the structured records and context. **View
+JSON** exposes a selectable export snapshot, including in embedded browsers without file downloads.
+The panel retains at most 1,000 entries and reports evicted entries. Scene restart preserves the existing
+history with a new session ID; page reload clears it. **Clear log** clears the retained history.
+Local loader source, binary contents and native preview capability tokens are omitted or redacted.
+The log has no network collector or persistent browser storage.
+
+Logs observe replies already produced by the C++ machine. They do not read registers, advance
+logical time, consume firmware RAM or replace the fixture journal. State-change records can miss
+transitions between replies. Trace can slow the host, so enable it only for a bounded investigation.
+Full C++ source stacks require a Wasm build containing suitable debug information; JavaScript
+logging cannot recover symbols absent from the compiled image.
+
 ## Verification gates
 
 ```text

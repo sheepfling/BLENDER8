@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "project_id": "appgprj_6ac648fb3bc8819181f6a95b63f4a085",
+  "version_id": "appgprj_6ac648fb3bc8819181f6a95b63f4a085~appgver_2c75ef541fec81919a38733a03771fc3",
+  "deployment_id": "appgdep_6ac649657f58819195510d33a8f52d58",
+  "status": "succeeded",
+  "url": "https://half-a-labs-blender8-workbench.rick583.chatgpt.site",
+  "audience": "owner-private",
+  "published_at": "2026-10-07T13:30:25.257492+00:00",
+  "sites_source_commit": "47497db567fe500f9166cc33ebee85633cba32e9",
+  "device": "B16",
+  "firmware": "owner experimental controller",
+  "wasm_sha256": "58eed8746bd2b74aa6fa4a047f51e6e1c03fe51c21d9f961deb4b2d5f745dbb5",
+  "build_manifest_sha256": "d2732dd1ad032d2bc3534d3f477daa1cd10868c0dcabfbc0fb77201e046c3e7f",
+  "deployment_scope": "Compiled browser bundle only; no automatic synchronization from GitHub.",
+  "acceptance_scope": "61 automated correspondence cases and 19 additional scenarios pass; human reviews and requirements decisions remain open."
+}
