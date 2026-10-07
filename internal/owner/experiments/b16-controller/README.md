@@ -1,8 +1,9 @@
-# B16 controller experiment
+# Worked B16 controller
 
-Owner material, outside the New Employee route and excluded from the source handoff bundle.
-The learner starter remains unfinished. This candidate uses only the public SDK and its own
-files; the plant, emulator and renderer retain their normal precision.
+Teaching material on `feature/b16-solution`, outside the New Employee route and excluded from the
+learner source handoff bundle. Begin with the [teaching guide](../../../../TEACHING-SOLUTION.md).
+The learner starter remains unfinished. This candidate uses only the public SDK and its own files;
+the plant, emulator and renderer retain their normal precision.
 
 ## Result
 
@@ -69,8 +70,9 @@ observed device identity. In the upload UI, choose B16 and the matching `b8_stud
 
 In the page: press **R** to run, allow the two-second temperature qualification, press and
 release **Space** for a new STOP acknowledgment, allow controls to settle, then press **1–7**.
-Hold **P** for boost. **Space** stops; **J** removes/reseats the jar. **T**, **Y**, **M** and **S**
-open Thermal, Truth, Motor and Systems. Jar reseating needs another deliberate STOP acknowledgment.
+Hold **P** for boost. **Space** stops; **J** removes/reseats the jar. **T** or **Y** opens Thermal +
+Truth, **M** Motor, **S** Systems, **U** Supervision and **L** LCD BUS. Jar reseating needs another
+deliberate STOP acknowledgment.
 
 ## Design choices and timing
 

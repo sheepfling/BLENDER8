@@ -1,4 +1,8 @@
-# Blender-8 source workspace
+# Blender-8 teaching and solution workspace
+
+This is **`feature/b16-solution`**. Start with the [worked B16 teaching route](TEACHING-SOLUTION.md)
+for the explicit solution build, code walkthrough, experiments and requirements discussion.
+This branch stays outside `main`. The problem presentation lives on `feature/b8-b16-workbench`.
 
 Half-A/Labs maintains a fictional B8 firmware exercise, its logical C++ device model, and a
 LaTeX document foundry. The selectable MCU models are B8 interface 03 and B16 interface 04, on
@@ -13,8 +17,6 @@ Start with the [New Employee route](NEW-EMPLOYEE-START.md) to install the Python
 the PDF packet, compile C++ tests, and build and serve the WebAssembly page. The
 [documentation index](docs/INDEX.md) links the current guides.
 
-This is the **problem presentation** branch, `feature/b8-b16-workbench`, intended for `main`.
-The worked teaching example lives on `feature/b16-solution` and stays outside `main`.
 See [branch purposes and update direction](docs/BRANCHES.md).
 
 | Location                                                              | Role                                                                   |
