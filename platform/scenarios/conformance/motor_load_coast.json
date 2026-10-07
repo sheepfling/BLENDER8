@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "name": "motor_load_coast",
+  "mode": "bench",
+  "profile": "legacy02",
+  "events": [
+    {
+      "at_us": 0,
+      "command": "bounce off"
+    },
+    {
+      "at_us": 0,
+      "command": "speed 1"
+    },
+    {
+      "at_us": 0,
+      "command": "write 0x28 1"
+    },
+    {
+      "at_us": 0,
+      "command": "write 0x29 1"
+    },
+    {
+      "at_us": 0,
+      "command": "write 0x61 255"
+    },
+    {
+      "at_us": 0,
+      "command": "write 0x60 1"
+    },
+    {
+      "at_us": 1000000,
+      "command": "load 1"
+    },
+    {
+      "at_us": 2000000,
+      "command": "stop 1"
+    }
+  ],
+  "checks": [
+    {
+      "at_us": 999999,
+      "field": "motor.rpm",
+      "op": "between",
+      "value": [
+        19900,
+        20000
+      ]
+    },
+    {
+      "at_us": 1900000,
+      "field": "motor.rpm",
+      "op": "between",
+      "value": [
+        9900,
+        10100
+      ]
+    },
+    {
+      "at_us": 2000000,
+      "field": "drive_enabled",
+      "op": "eq",
+      "value": false
+    },
+    {
+      "at_us": 2350000,
+      "field": "motor.rpm",
+      "op": "between",
+      "value": [
+        3500,
+        3800
+      ]
+    }
+  ]
+}

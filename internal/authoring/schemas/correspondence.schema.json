@@ -1,0 +1,235 @@
+{
+  "$defs": {
+    "Attachment": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "parent_message": {
+          "title": "Parent Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "path",
+        "title",
+        "parent_message"
+      ],
+      "title": "Attachment",
+      "type": "object"
+    },
+    "Message": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "author": {
+          "enum": [
+            "rick",
+            "mara"
+          ],
+          "title": "Author",
+          "type": "string"
+        },
+        "to": {
+          "items": {
+            "enum": [
+              "rick",
+              "mara",
+              "team"
+            ],
+            "type": "string"
+          },
+          "title": "To",
+          "type": "array"
+        },
+        "date": {
+          "format": "date-time",
+          "title": "Date",
+          "type": "string"
+        },
+        "subject": {
+          "title": "Subject",
+          "type": "string"
+        },
+        "body": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Body",
+          "type": "array"
+        },
+        "in_reply_to": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "In Reply To"
+        },
+        "sketch": {
+          "anyOf": [
+            {
+              "enum": [
+                "pulse",
+                "stop",
+                "motion",
+                "thermal",
+                "clock",
+                "supervision",
+                "interlock"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sketch"
+        },
+        "attachments": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Attachments",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "author",
+        "to",
+        "date",
+        "subject",
+        "body"
+      ],
+      "title": "Message",
+      "type": "object"
+    },
+    "Person": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "organization": {
+          "title": "Organization",
+          "type": "string"
+        },
+        "email": {
+          "title": "Email",
+          "type": "string"
+        },
+        "signature": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Signature",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "organization",
+        "email"
+      ],
+      "title": "Person",
+      "type": "object"
+    },
+    "Thread": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "subject": {
+          "title": "Subject",
+          "type": "string"
+        },
+        "messages": {
+          "items": {
+            "$ref": "#/$defs/Message"
+          },
+          "maxItems": 5,
+          "minItems": 5,
+          "title": "Messages",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "subject",
+        "messages"
+      ],
+      "title": "Thread",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "edition": {
+      "title": "Edition",
+      "type": "string"
+    },
+    "organization": {
+      "const": "Half-A/Labs",
+      "title": "Organization",
+      "type": "string"
+    },
+    "people": {
+      "additionalProperties": {
+        "$ref": "#/$defs/Person"
+      },
+      "title": "People",
+      "type": "object"
+    },
+    "forward": {
+      "$ref": "#/$defs/Message"
+    },
+    "threads": {
+      "items": {
+        "$ref": "#/$defs/Thread"
+      },
+      "title": "Threads",
+      "type": "array"
+    },
+    "attachments": {
+      "items": {
+        "$ref": "#/$defs/Attachment"
+      },
+      "title": "Attachments",
+      "type": "array"
+    }
+  },
+  "required": [
+    "edition",
+    "organization",
+    "people",
+    "forward",
+    "threads",
+    "attachments"
+  ],
+  "title": "Archive",
+  "type": "object"
+}

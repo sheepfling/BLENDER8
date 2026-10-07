@@ -1,0 +1,24 @@
++ /opt/pyvenv/bin/python -m b8docs doctor --json
+{
+  "latex_ready": true,
+  "latexmk": "/usr/bin/latexmk",
+  "pdflatex": "/usr/bin/pdflatex",
+  "pyright": null,
+  "render_ready": true,
+  "ruff": null,
+  "versions": {
+    "Pillow": "12.3.0",
+    "b8docs": "0.7.0",
+    "engine_sha256": "e56b987bf05b9bc9327415627ba92b8c73ea5b1168c89a64a83389a72726235a",
+    "machine": "x86_64",
+    "numpy": "2.3.5",
+    "platform": "Linux",
+    "pydantic": "2.13.4",
+    "pypdf": "5.9.0",
+    "pypdfium2": "5.8.0",
+    "python": "3.13.5",
+    "reportlab": "4.4.9",
+    "typer": "0.26.3",
+    "zlib": "1.3.1"
+  }
+}

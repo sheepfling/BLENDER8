@@ -1,0 +1,385 @@
+{
+  "version": "0.2.0",
+  "execution_status": "specified_not_implemented_as_full_firmware_acceptance_runner",
+  "cases": [
+    {
+      "id": "A01",
+      "title": "Boot with no command",
+      "requirements": [
+        "REQ-FW-002",
+        "REQ-FW-003"
+      ],
+      "stimulus": "Power-on at25 C, all controls released.",
+      "expected": "Remain disabled during2-s qualification; become READY without running."
+    },
+    {
+      "id": "A02",
+      "title": "Boot with latched speed",
+      "requirements": [
+        "REQ-FW-002",
+        "REQ-FW-025"
+      ],
+      "stimulus": "Latch speed4, cycle panel power, leave speed held.",
+      "expected": "Never run until STOP releases all controls and a subsequent fresh command occurs."
+    },
+    {
+      "id": "A03",
+      "title": "Warm power cycle",
+      "requirements": [
+        "REQ-FW-002",
+        "REQ-FW-025"
+      ],
+      "stimulus": "Trip TH; cycle power while motor case/sensor remain hot.",
+      "expected": "Stay disabled; no reset-to-room-temperature shortcut."
+    },
+    {
+      "id": "A04",
+      "title": "Nominal speed sweep",
+      "requirements": [
+        "REQ-FW-008",
+        "REQ-FW-010"
+      ],
+      "stimulus": "After READY, command each of seven speeds at L=0 for1 s.",
+      "expected": "Each steady speed meets max(100 RPM,2%) tolerance; monotonic evenly spaced nominal targets."
+    },
+    {
+      "id": "A05",
+      "title": "Low standalone PULSE",
+      "requirements": [
+        "REQ-FW-009",
+        "REQ-FW-008"
+      ],
+      "stimulus": "From READY press PULSE for100 ms; then release.",
+      "expected": "Command2000 RPM nominal while held, not10% duty; restore idle after debounce."
+    },
+    {
+      "id": "A06",
+      "title": "Boost and cap",
+      "requirements": [
+        "REQ-FW-009"
+      ],
+      "stimulus": "Select speed7, hold PULSE, release it.",
+      "expected": "Target20000 RPM while held, then18000; do not restart stall grace while boosting."
+    },
+    {
+      "id": "A07",
+      "title": "Slow contact bounce",
+      "requirements": [
+        "REQ-FW-004",
+        "REQ-FW-005"
+      ],
+      "stimulus": "Use slow5-ms bounce on speed and PULSE transitions with scan-phase offsets.",
+      "expected": "One accepted transition per final state; response within40 ms of stability."
+    },
+    {
+      "id": "A08",
+      "title": "STOP versus held PULSE",
+      "requirements": [
+        "REQ-FW-007",
+        "REQ-FW-009"
+      ],
+      "stimulus": "Run with PULSE held; press STOP, release STOP while PULSE stays held.",
+      "expected": "Gate opens immediately; firmware disables; no restart until PULSE release/fresh press."
+    },
+    {
+      "id": "A09",
+      "title": "STOP during scan/ISR",
+      "requirements": [
+        "REQ-FW-007",
+        "REQ-FW-013"
+      ],
+      "stimulus": "Assert STOP at every phase of mux scan and during ordinary interrupt work.",
+      "expected": "Independent drive inhibit; firmware-owned outputs cleared within the10-ms requirement."
+    },
+    {
+      "id": "A10",
+      "title": "Conflicting contacts",
+      "requirements": [
+        "REQ-FW-006"
+      ],
+      "stimulus": "Inject two stuck-closed speed sense contacts for>40 ms.",
+      "expected": "Latch IF; no arbitrary speed winner; recover only through deliberate rearm."
+    },
+    {
+      "id": "A11",
+      "title": "Sequential scan transient",
+      "requirements": [
+        "REQ-FW-004",
+        "REQ-FW-006"
+      ],
+      "stimulus": "Change from speed1 to7 between channel samples under healthy mechanics.",
+      "expected": "Do not latch IF from a short scan-skew/bounce transient."
+    },
+    {
+      "id": "A12",
+      "title": "LCD busy fault",
+      "requirements": [
+        "REQ-FW-011"
+      ],
+      "stimulus": "Exercise rendering with ISR interruptions and closely spaced writes.",
+      "expected": "No lost accepted frame bytes; honor busy timing and clear errors deliberately."
+    },
+    {
+      "id": "A13",
+      "title": "VRAM layout/wrap",
+      "requirements": [
+        "REQ-FW-011"
+      ],
+      "stimulus": "Render known pixel test pattern and full64-byte frame.",
+      "expected": "Vertical bit order correct, bounds respected and scanned result matches intended image."
+    },
+    {
+      "id": "A14",
+      "title": "ADC conversion driver",
+      "requirements": [
+        "REQ-FW-015",
+        "REQ-FW-016"
+      ],
+      "stimulus": "AN0 nominal temperatures plus AN1 ground; vary conversion phase.",
+      "expected": "Correct52-us readiness, low/high snapshot and conversion units; no stale read treated fresh."
+    },
+    {
+      "id": "A15",
+      "title": "Negative temperature math",
+      "requirements": [
+        "REQ-FW-016"
+      ],
+      "stimulus": "Inject a sensor-equilibrated temperature below0 C but within rated range.",
+      "expected": "Signed converted temperature is correct, not an unsigned huge overtemperature."
+    },
+    {
+      "id": "A16",
+      "title": "Cold startup jam",
+      "requirements": [
+        "REQ-FW-019",
+        "REQ-FW-020",
+        "REQ-FW-021"
+      ],
+      "stimulus": "At25 C, after READY jam rotor before requesting speed3.",
+      "expected": "Startup grace tolerated, then ST; disable within750 ms; do not wait for heat."
+    },
+    {
+      "id": "A17",
+      "title": "Cold running jam",
+      "requirements": [
+        "REQ-FW-020",
+        "REQ-FW-021"
+      ],
+      "stimulus": "Run speed3 for1 s at nominal load, then hard jam.",
+      "expected": "ST disables within400 ms of jam; PWM and enable off even though case stays cool."
+    },
+    {
+      "id": "A18",
+      "title": "Hot but rotating",
+      "requirements": [
+        "REQ-FW-017",
+        "REQ-FW-021"
+      ],
+      "stimulus": "Sustain heavy load while tach remains far above stall threshold, or use labeled hot-case setup.",
+      "expected": "TH disables independently of stall; no need for tach failure."
+    },
+    {
+      "id": "A19",
+      "title": "Combined qualified causes",
+      "requirements": [
+        "REQ-FW-021",
+        "REQ-FW-022",
+        "REQ-FW-023"
+      ],
+      "stimulus": "Arrange same-evaluation qualifying low-motion and two high-temperature samples.",
+      "expected": "Retain ST and TH; display TH; physical disable is not delayed for UI."
+    },
+    {
+      "id": "A20",
+      "title": "ST then delayed sensor heat",
+      "requirements": [
+        "REQ-FW-021",
+        "REQ-FW-022",
+        "REQ-FW-023"
+      ],
+      "stimulus": "Qualify ST near hot case while sensor lags; TH later qualifies during faulted idle.",
+      "expected": "Keep ST, add TH, change display priority toTH; never re-enable drive."
+    },
+    {
+      "id": "A21",
+      "title": "Thermal threshold noise",
+      "requirements": [
+        "REQ-FW-017",
+        "REQ-FW-024"
+      ],
+      "stimulus": "Apply bounded ADC/sensor noise near85 C and during cooldown near65 C.",
+      "expected": "Trip only on two consecutive qualified high samples; no auto-clear or chatter-driven restart."
+    },
+    {
+      "id": "A22",
+      "title": "Tach startup delay",
+      "requirements": [
+        "REQ-FW-019",
+        "REQ-FW-020"
+      ],
+      "stimulus": "Healthy minimum command with normal inertia; vary initial rotor phase.",
+      "expected": "No false ST before motion develops; grace is bounded and not endlessly extended."
+    },
+    {
+      "id": "A23",
+      "title": "Transient tach dropout",
+      "requirements": [
+        "REQ-FW-014",
+        "REQ-FW-020"
+      ],
+      "stimulus": "Suppress tach for<100 ms after stable normal motion, then restore.",
+      "expected": "No200-ms-qualified ST; sustained dropout still trips."
+    },
+    {
+      "id": "A24",
+      "title": "Tach disconnected while spinning",
+      "requirements": [
+        "REQ-FW-014",
+        "REQ-FW-020"
+      ],
+      "stimulus": "Set tach stuck low while actual motor remains spinning.",
+      "expected": "ST as unverified motion; do not claim simulator truth tells firmware it is only a tach fault."
+    },
+    {
+      "id": "A25",
+      "title": "Intentional coastdown",
+      "requirements": [
+        "REQ-FW-014",
+        "REQ-FW-021",
+        "REQ-FW-027"
+      ],
+      "stimulus": "Command normal STOP and observe falling but nonzero RPM.",
+      "expected": "No new ST while disabled; drive-off deadline is not a zero-RPM deadline."
+    },
+    {
+      "id": "A26",
+      "title": "Sensor open/short",
+      "requirements": [
+        "REQ-FW-018"
+      ],
+      "stimulus": "Inject open, short-ground, short-supply separately while running.",
+      "expected": "Fresh rail conversion latches TS and disables; invalid rail is not interpreted as trustworthy TH."
+    },
+    {
+      "id": "A27",
+      "title": "ADC stale completion",
+      "requirements": [
+        "REQ-FW-015",
+        "REQ-FW-018"
+      ],
+      "stimulus": "Fault-inject missed/disabled acquisition while old result is plausible.",
+      "expected": "Freshness expiry at100 ms followed by disable within10 ms; repeated code reads do not reset age."
+    },
+    {
+      "id": "A28",
+      "title": "Plausible frozen sensor",
+      "requirements": [
+        "REQ-FW-018",
+        "REQ-FW-028"
+      ],
+      "stimulus": "Freeze VOUT at a valid room-temperature voltage while case warms.",
+      "expected": "Demonstrate observability limitation; infallible detection is not an acceptance requirement."
+    },
+    {
+      "id": "A29",
+      "title": "Fault clearing alone",
+      "requirements": [
+        "REQ-FW-022",
+        "REQ-FW-026"
+      ],
+      "stimulus": "Clear jam or restore tach after ST without operator acknowledgment.",
+      "expected": "Still latched and disabled."
+    },
+    {
+      "id": "A30",
+      "title": "Cold-fault acknowledgment",
+      "requirements": [
+        "REQ-FW-024"
+      ],
+      "stimulus": "While faulted obtain2 s of valid\u226465 C readings; then freshly press/release STOP; then new speed.",
+      "expected": "Only the complete sequence enables a new run; acknowledgment itself never starts it."
+    },
+    {
+      "id": "A31",
+      "title": "STOP held during cooling",
+      "requirements": [
+        "REQ-FW-024"
+      ],
+      "stimulus": "Press STOP while hot and hold it through2 s below65 C.",
+      "expected": "No queued acknowledgment; require a new STOP press after permissive qualifies."
+    },
+    {
+      "id": "A32",
+      "title": "Cooling not sufficient",
+      "requirements": [
+        "REQ-FW-024",
+        "REQ-FW-026"
+      ],
+      "stimulus": "Let TH cool below65 C without pressing STOP.",
+      "expected": "Remain latched and disabled; TH label remains until deliberate recovery."
+    },
+    {
+      "id": "A33",
+      "title": "Food cooling versus load",
+      "requirements": [
+        "REQ-FW-017",
+        "REQ-FW-021",
+        "REQ-FW-028"
+      ],
+      "stimulus": "Compare L=1 with food coupling0 versus0.15 W/K at0 C; preserve all other parameters.",
+      "expected": "Thermal path changes temperatures but never exempts ST/TH decisions or changes thresholds."
+    },
+    {
+      "id": "A34",
+      "title": "Counter wrap",
+      "requirements": [
+        "REQ-FW-013",
+        "REQ-FW-014"
+      ],
+      "stimulus": "Run across timer/software-time and tach counter wrap boundaries.",
+      "expected": "No underflow-driven speed spike, missed fault or false restart; use bounded modulo arithmetic."
+    },
+    {
+      "id": "A35",
+      "title": "IRQ contention and ownership",
+      "requirements": [
+        "REQ-FW-012",
+        "REQ-FW-013",
+        "REQ-FW-015"
+      ],
+      "stimulus": "Make timer, tach, VBLANK and ADC events pending together; mask/unmask briefly.",
+      "expected": "Priority/acknowledgment correct, no torn samples, no assumption that flags queue events."
+    },
+    {
+      "id": "A36",
+      "title": "Deterministic replay",
+      "requirements": [
+        "REQ-FW-028",
+        "REQ-FW-030"
+      ],
+      "stimulus": "Repeat same nominal/slow-bounce/noise-seeded fixture and command timing.",
+      "expected": "Same logical outputs within defined numerical tolerance, regardless of host pacing."
+    },
+    {
+      "id": "A37",
+      "title": "Thermal fault during startup",
+      "requirements": [
+        "REQ-FW-017",
+        "REQ-FW-019"
+      ],
+      "stimulus": "High valid temperature develops during500-ms stall grace.",
+      "expected": "TH remains active; grace masks only stall qualification."
+    },
+    {
+      "id": "A38",
+      "title": "Fault UI deadline",
+      "requirements": [
+        "REQ-FW-011",
+        "REQ-FW-023",
+        "REQ-FW-027"
+      ],
+      "stimulus": "Qualify each fault cause at multiple LCD frame phases.",
+      "expected": "Dominant diagnostic appears in scanned pixels within100 ms while drive remains disabled."
+    }
+  ]
+}

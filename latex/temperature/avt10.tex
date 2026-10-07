@@ -1,0 +1,88 @@
+\documentclass[10pt]{article}
+\usepackage{vendor-thermasense}
+\usepackage{pgfplots}\pgfplotsset{compat=1.18}
+\renewcommand{\DocID}{TEMP-001}
+\renewcommand{\RunningPart}{AVT10}
+\hypersetup{pdftitle={ThermaSense AVT10 / Linear Case-Temperature Sensor}}
+\begin{document}
+\VendorTitle{AVT10}{Linear case-temperature sensor}{10 mV/$^\circ$C sensitivity / 500 mV offset / 3.3 V supply}
+\MetaStrip{CHARACTERISTIC SET 02\hfill DOCUMENT ISSUE P3\hfill 06 OCT 2026}
+\section*{Description}
+The AVT10 provides a voltage proportional to sensor-package temperature. It is a powered linear sensor; it is not a thermocouple or a resistive thermistor. A thermal attachment couples the package to the monitored surface. The electrical interface comprises VDD, ground and VOUT.
+\par\noindent\begin{tabularx}{\linewidth}{@{}l l Y@{}}
+\toprule\TableHead Characteristic & Nominal value & Comment\\\midrule
+Supply & 3.3 V & Powered analog voltage output.\\
+Temperature range & $-20$ to $+125\,^{\circ}$C & Range for the stated nominal transfer.\\
+Zero-degree output & 0.500 V & Offset retained at negative temperatures.\\
+Sensitivity & 0.010 V/$^\circ$C & Positive slope.\\
+Thermal lag & 0.250 s & First-order package-to-case characteristic.\\\bottomrule
+\end{tabularx}
+\section*{Nominal transfer}
+\[
+ V_{\mathrm{OUT}}=0.500+0.010T_s\quad[\mathrm{V}],\qquad
+ T_s=\frac{V_{\mathrm{OUT}}-0.500}{0.010}\quad[^{\circ}\mathrm{C}].
+\]
+$T_s$ is the sensor-package temperature. The forward relationship applies to package temperature, not an instantaneous remote winding temperature.
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[width=.83\linewidth,height=5.3cm,xmin=-20,xmax=125,ymin=.2,ymax=1.85,
+ xlabel={Sensor temperature ($^\circ$C)},ylabel={Output voltage (V)},grid=major,
+ tick label style={font=\scriptsize},label style={font=\small}]
+\addplot[VendorInk,thick,domain=-20:125,samples=2]{.5+.01*x};
+\addplot[only marks,mark=*,VendorInk] coordinates {(0,.5)(25,.75)(65,1.15)(85,1.35)(125,1.75)};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+\vfill\Caption{Nominal transfer data / no separate production accuracy grade is assigned by this interface issue. P3 / characteristic set 02 retained; electrical transfer and mounting response unchanged.}
+\clearpage
+\Continuation{Mounting response and acquisition}{Allow for package lag and converter sample timing.}
+\section*{Thermal response}
+For attachment-surface temperature $T_m$:
+\[
+ \frac{dT_s}{dt}=\frac{T_m-T_s}{0.250\ \mathrm{s}}.
+\]
+For a step in the mounting temperature, the package reaches approximately 63.2\% of the change after one time constant. Electrical sampling faster than this lag does not remove the physical lag.
+
+Package heat continues to evolve when the system supply is off. Restoring electrical power does not reset a warm sensor to ambient. A poor thermal attachment changes the relation between the package and the monitored surface.
+\section*{Reference transfer points}
+The following values are voltages at the sensor output. They do not prescribe a converter resolution, input-channel number or equipment temperature limit.
+\begin{center}
+\begin{tabular}{@{}r r@{}}
+\toprule\TableHead Package temperature ($^\circ$C) & Nominal $V_{\mathrm{OUT}}$ (V)\\\midrule
+-20 & 0.300\\0 & 0.500\\25 & 0.750\\50 & 1.000\\75 & 1.250\\100 & 1.500\\125 & 1.750\\\bottomrule
+\end{tabular}
+\end{center}
+\section*{Acquisition considerations}
+A connected converter measures the output voltage. Its reference, input loading, acquisition time and transfer characteristic belong to that converter and its external circuit. They do not change the sensor's nominal sensitivity.
+
+For a converter voltage increment $\Delta V$, the corresponding temperature increment is $\Delta T=\Delta V/(0.010\ \mathrm{V}/{}^\circ\mathrm{C})$. A voltage measurement resolution is not a sensor-accuracy guarantee.
+\begin{Notice}{NEGATIVE-TEMPERATURE OUTPUT}
+Within the stated range, voltages below 0.500 V represent negative package temperatures. Voltage, temperature and converter code are different quantities. Subtract the voltage offset before applying the temperature scale.
+\end{Notice}
+\vfill\Caption{No ADC register sequence, sample cadence or control threshold is assigned by this sensor sheet.}
+\clearpage
+\Continuation{Analog interface and fault interpretation}{Keep signal validity separate from thermal-limit decisions.}
+\section*{Electrical integration}
+Connect VDD to the 3.3 V analog supply, ground to the acquisition return, and VOUT to the selected analog channel. Provide adequate source settling for the selected acquisition circuit. Channel assignment and reference selection are determined by the host circuit.
+
+A weak board diagnostic pull-up can cause an open signal wire to approach the reference/supply rail. A short to ground approaches zero. These are board-level diagnostic behaviors, not temperatures to pass uncritically through the linear equation.
+\par\noindent\begin{tabularx}{\linewidth}{@{}l Y@{}}
+\toprule\TableHead Observation & Interpretation\\\midrule
+Near-ground voltage & Check short-to-ground, supply loss or connection failure; not automatically a very cold case.\\
+Near-supply voltage & Check open signal with pull-up or short-to-supply; not automatically trustworthy overtemperature.\\
+Stable in-range voltage & May be steady temperature. It does not prove the sensor is changing correctly.\\
+No new conversion & Converter-side observation; the sensor has no digital conversion-complete output.\\\bottomrule
+\end{tabularx}
+\section*{Error sources}
+Sensor offset, slope variation, output noise, converter quantization and ADC reference variation contribute separately. A 2 mV output perturbation corresponds to 0.2 $^\circ$C before converter quantization. Treat this as a conversion sensitivity, not a separately guaranteed noise specification.
+
+A new ADC result proves a fresh acquisition of the present voltage. It does not prove that the voltage remains thermally coupled to the case. A plausible frozen output cannot be identified reliably from one analog channel without independent evidence.
+\section*{Signal interpretation}
+The sensor supplies a continuous analog voltage. It does not issue a trip, fault label, fresh-sample marker or reset acknowledgment. Threshold selection and any decision based on an acquired value belong to the connected equipment.
+
+The stated thermal response continues through electrical power interruption. This describes retained package heat, not a valid powered output while supply is absent. After power returns, package temperature is not necessarily equal to ambient temperature.
+\begin{Notice}{DO NOT SUBSTITUTE PACKAGE TEMPERATURE FOR A HOTSPOT LIMIT}
+Case-to-package lag and winding-to-case gradients are different effects. The sensor reports its local package temperature. The equipment integrator must choose limits appropriate to the monitored case location and required response.
+\end{Notice}
+\vfill\Caption{ThermaSense Components / Analog Measurement Products / TEMP-001, issue P3.}
+\end{document}

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "name": "jar_held_stop",
+  "mode": "bench",
+  "profile": "chassis04",
+  "events": [
+    {
+      "at_us": 0,
+      "command": "jar 0"
+    },
+    {
+      "at_us": 60000,
+      "command": "stop 1"
+    },
+    {
+      "at_us": 70000,
+      "command": "jar 1"
+    },
+    {
+      "at_us": 100000,
+      "command": "stop 0"
+    },
+    {
+      "at_us": 110000,
+      "command": "stop 1"
+    }
+  ],
+  "checks": [
+    {
+      "at_us": 99999,
+      "field": "jar_permit",
+      "op": "eq",
+      "value": false
+    },
+    {
+      "at_us": 110001,
+      "field": "jar_permit",
+      "op": "eq",
+      "value": true
+    },
+    {
+      "at_us": 110001,
+      "field": "run_permit",
+      "op": "eq",
+      "value": false
+    }
+  ]
+}

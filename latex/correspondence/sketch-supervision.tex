@@ -1,0 +1,4 @@
+\begin{tikzpicture}[font=\scriptsize,>=Stealth,box/.style={draw,minimum height=7mm,align=center}]
+\node[box](a)at(0,0){Fresh inputs};\node[box](b)at(3.0,0){New temperature};\node[box](c)at(6.2,0){Protection checked};\node[box](d)at(9.5,0){Outputs applied};\node[box](e)at(12.5,0){Renew?};
+\draw[->](a)--(b);\draw[->](b)--(c);\draw[->](c)--(d);\draw[->](d)--(e);
+\end{tikzpicture}

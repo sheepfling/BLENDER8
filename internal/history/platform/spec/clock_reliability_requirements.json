@@ -1,0 +1,65 @@
+{
+  "interface": "03",
+  "clauses": [
+    {
+      "id": "R-031",
+      "title": "Clock plan",
+      "latex_text": "Use the supplied XO8-33 as the run-time source through the B8 EC/PLL path. Select legal PLL input division, multiplication, output division and peripheral division. Nominal SYSCLK may be 8--32 MHz. The run peripheral clock shall be 1.000 MHz within $\\pm0.1\\%$. Do not copy a prescribed register tuple: submit the derived frequency of every clock-tree node and proof that each is inside its operating range.",
+      "status": "specified; no completed application acceptance claimed"
+    },
+    {
+      "id": "R-032",
+      "title": "Timing evidence",
+      "latex_text": "Derive both timer periods, the PWM carrier, ADC acquisition/conversion times, watchdog bounds and the deadman window from their actual source clocks. The required PWM carrier is 3,906.25 Hz within $\\pm0.1\\%$. Preserve the acquisition and product-response requirements in Attachment A. Include oscillator tolerance, independent LFRC tolerance and register quantization in the margin calculation. Equal frequency does not imply phase alignment.",
+      "status": "specified; no completed application acceptance claimed"
+    },
+    {
+      "id": "R-033",
+      "title": "Bounded startup",
+      "latex_text": "Keep all drive requests off through power qualification, reset release, external-clock startup and PLL switching. Establish and verify the active run clock within 100 ms of the first reset-entry execution with a healthy supplied oscillator. A source that fails to qualify must leave the drive disabled; there must be no unbounded wait that evades watchdog service policy. Internal FRC is permitted for startup and fault reporting, not normal drive operation.",
+      "status": "specified; no completed application acceptance claimed"
+    },
+    {
+      "id": "R-034",
+      "title": "Clock loss",
+      "latex_text": "A loss of the active external source must result in drive inhibition within 1 ms of continuous absence. Read and retain the reset cause on restart. Recovered clock edges do not authorize an automatic restart. Show that mux delay, display timing, motor inertia and thermal evolution have not accidentally been rescaled with the processor clock.",
+      "status": "specified; no completed application acceptance claimed"
+    },
+    {
+      "id": "R-035",
+      "title": "Power and reset",
+      "latex_text": "Opening SW1 or losing qualified logic power must inhibit drive independently of firmware. On any new execution after POR, brownout, external reset, WDT, DMT or clock-fail reset, discard stale command authorization and apply the startup/rearm criteria again. Retain physical button latches, case heat and shaft momentum as external state. A warm B8 reset does not guarantee LCD reset: reinitialize its interface explicitly.",
+      "status": "specified; no completed application acceptance claimed"
+    },
+    {
+      "id": "R-036",
+      "title": "Independent watchdog",
+      "latex_text": "Keep the fused-on watchdog enabled. Select a period whose slowest permitted timeout does not exceed 250 ms; lock the configuration before permitting drive. Service only after checking that required application work is current. No unconditional service in a timer ISR, idle loop, clock-wait loop or display poll is acceptable. Include startup and faulted operation in the service design.",
+      "status": "specified; no completed application acceptance claimed"
+    },
+    {
+      "id": "R-037",
+      "title": "Progress evidence",
+      "latex_text": "Authorize service using new evidence from command acquisition, completed temperature acquisition, protection evaluation and output-state application. One full supervisory epoch must not be counted twice. A timer interrupt firing is not evidence that foreground work finished. Explain which failure each monitored milestone reveals and how stale or missing evidence blocks renewal.",
+      "status": "specified; no completed application acceptance claimed"
+    },
+    {
+      "id": "R-038",
+      "title": "Windowed deadman",
+      "latex_text": "Enable and lock DMT after the run clock is established and before permitting drive. Choose a window and maximum count giving no more than 100 ms to expiry at the slowest approved run clock. Service within the published window after the required work completes. Demonstrate early service, missing first key, repeated first key, late second key and missing renewal. The independent watchdog remains required when the core or main clock stops.",
+      "status": "specified; no completed application acceptance claimed"
+    },
+    {
+      "id": "R-039",
+      "title": "Reset indication and recovery",
+      "latex_text": "After WDT or DMT reset, display WD or DM; after clock-fail reset or failed source qualification display CK. These new latched reasons rank CK, WD, DM ahead of TS, TH, IF and ST. Capture all reset-cause bits before acknowledging them. These diagnostic latches clear only after the same cooling, new STOP acknowledgment, released-control and fresh-command sequence in A3. While held in reset, no immediate display update is assumed; after reset release show the diagnostic within 100 ms.",
+      "status": "specified; no completed application acceptance claimed"
+    },
+    {
+      "id": "R-040",
+      "title": "Reliability acceptance",
+      "latex_text": "Return traces for absent oscillator, worst-case startup, legal and illegal PLL plans, masked interrupts, stalled foreground with live tick ISR, uncontrolled feed loop, genuine core halt, clock failure during drive, warm reset inside an ISR, switch bounce, brownout with the motor rail still energized, and each fused branch open. Distinguish hardware tests from completed-firmware acceptance. A reset, or an exception caught by the host, is not evidence of correct rearm by itself.",
+      "status": "specified; no completed application acceptance claimed"
+    }
+  ]
+}

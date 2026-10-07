@@ -1,0 +1,414 @@
+{
+  "passed": true,
+  "files_checked": 102,
+  "files": [
+    {
+      "path": "config/catalog.toml",
+      "unchanged": true
+    },
+    {
+      "path": "config/examples/board-bench.toml",
+      "unchanged": true
+    },
+    {
+      "path": "config/examples/mux-returned-copy.toml",
+      "unchanged": true
+    },
+    {
+      "path": "config/manuals/buttons.toml",
+      "unchanged": true
+    },
+    {
+      "path": "config/manuals/lcd.toml",
+      "unchanged": true
+    },
+    {
+      "path": "config/manuals/mcu.toml",
+      "unchanged": true
+    },
+    {
+      "path": "config/manuals/motor.toml",
+      "unchanged": true
+    },
+    {
+      "path": "config/manuals/mux.toml",
+      "unchanged": true
+    },
+    {
+      "path": "config/manuals/oscillator.toml",
+      "unchanged": true
+    },
+    {
+      "path": "config/manuals/requirements.toml",
+      "unchanged": true
+    },
+    {
+      "path": "config/manuals/temperature.toml",
+      "unchanged": true
+    },
+    {
+      "path": "config/presets/archive_scan.toml",
+      "unchanged": true
+    },
+    {
+      "path": "config/presets/bad_xerox.toml",
+      "unchanged": true
+    },
+    {
+      "path": "config/presets/clean.toml",
+      "unchanged": true
+    },
+    {
+      "path": "config/presets/lab_copy.toml",
+      "unchanged": true
+    },
+    {
+      "path": "config/presets/shop_copy.toml",
+      "unchanged": true
+    },
+    {
+      "path": "correspondence/archive.json",
+      "unchanged": true
+    },
+    {
+      "path": "dist/clean/HAL-Customer-Correspondence.pdf",
+      "unchanged": true
+    },
+    {
+      "path": "dist/clean/KAS-BA-8.pdf",
+      "unchanged": true
+    },
+    {
+      "path": "dist/clean/MFP-XO8-33.pdf",
+      "unchanged": true
+    },
+    {
+      "path": "dist/clean/MX8-1.pdf",
+      "unchanged": true
+    },
+    {
+      "path": "dist/clean/NMD-B8-Controller.pdf",
+      "unchanged": true
+    },
+    {
+      "path": "dist/clean/PRD-PX32-16.pdf",
+      "unchanged": true
+    },
+    {
+      "path": "dist/clean/TSC-AVT10.pdf",
+      "unchanged": true
+    },
+    {
+      "path": "dist/clean/VM-MD20.pdf",
+      "unchanged": true
+    },
+    {
+      "path": "dist/field/HAL-Customer-Correspondence.field.manifest.json",
+      "unchanged": true
+    },
+    {
+      "path": "dist/field/HAL-Customer-Correspondence.field.pdf",
+      "unchanged": true
+    },
+    {
+      "path": "dist/field/KAS-BA-8.field.manifest.json",
+      "unchanged": true
+    },
+    {
+      "path": "dist/field/KAS-BA-8.field.pdf",
+      "unchanged": true
+    },
+    {
+      "path": "dist/field/MFP-XO8-33.field.manifest.json",
+      "unchanged": true
+    },
+    {
+      "path": "dist/field/MFP-XO8-33.field.pdf",
+      "unchanged": true
+    },
+    {
+      "path": "dist/field/MX8-1.field.manifest.json",
+      "unchanged": true
+    },
+    {
+      "path": "dist/field/MX8-1.field.pdf",
+      "unchanged": true
+    },
+    {
+      "path": "dist/field/NMD-B8-Controller.field.manifest.json",
+      "unchanged": true
+    },
+    {
+      "path": "dist/field/NMD-B8-Controller.field.pdf",
+      "unchanged": true
+    },
+    {
+      "path": "dist/field/PRD-PX32-16.field.manifest.json",
+      "unchanged": true
+    },
+    {
+      "path": "dist/field/PRD-PX32-16.field.pdf",
+      "unchanged": true
+    },
+    {
+      "path": "dist/field/TSC-AVT10.field.manifest.json",
+      "unchanged": true
+    },
+    {
+      "path": "dist/field/TSC-AVT10.field.pdf",
+      "unchanged": true
+    },
+    {
+      "path": "dist/field/VM-MD20.field.manifest.json",
+      "unchanged": true
+    },
+    {
+      "path": "dist/field/VM-MD20.field.pdf",
+      "unchanged": true
+    },
+    {
+      "path": "latex/buttons/ba-8.tex",
+      "unchanged": true
+    },
+    {
+      "path": "latex/common/datasheet-core.sty",
+      "unchanged": true
+    },
+    {
+      "path": "latex/common/mail-archive.sty",
+      "unchanged": true
+    },
+    {
+      "path": "latex/correspondence/bench-harness.tex",
+      "unchanged": true
+    },
+    {
+      "path": "latex/correspondence/rear-switch.tex",
+      "unchanged": true
+    },
+    {
+      "path": "latex/correspondence/sketch-clock.tex",
+      "unchanged": true
+    },
+    {
+      "path": "latex/correspondence/sketch-interlock.tex",
+      "unchanged": true
+    },
+    {
+      "path": "latex/correspondence/sketch-motion.tex",
+      "unchanged": true
+    },
+    {
+      "path": "latex/correspondence/sketch-pulse.tex",
+      "unchanged": true
+    },
+    {
+      "path": "latex/correspondence/sketch-stop.tex",
+      "unchanged": true
+    },
+    {
+      "path": "latex/correspondence/sketch-supervision.tex",
+      "unchanged": true
+    },
+    {
+      "path": "latex/correspondence/sketch-thermal.tex",
+      "unchanged": true
+    },
+    {
+      "path": "latex/lcd/px32-16.tex",
+      "unchanged": true
+    },
+    {
+      "path": "latex/mcu/blender8.tex",
+      "unchanged": true
+    },
+    {
+      "path": "latex/motor/md20.tex",
+      "unchanged": true
+    },
+    {
+      "path": "latex/mux/mx8-1.tex",
+      "unchanged": true
+    },
+    {
+      "path": "latex/oscillator/xo8.tex",
+      "unchanged": true
+    },
+    {
+      "path": "latex/proofs/kestrel.tex",
+      "unchanged": true
+    },
+    {
+      "path": "latex/proofs/northstar.tex",
+      "unchanged": true
+    },
+    {
+      "path": "latex/proofs/pixelriver.tex",
+      "unchanged": true
+    },
+    {
+      "path": "latex/proofs/thermasense.tex",
+      "unchanged": true
+    },
+    {
+      "path": "latex/proofs/triaxis.tex",
+      "unchanged": true
+    },
+    {
+      "path": "latex/proofs/vortek.tex",
+      "unchanged": true
+    },
+    {
+      "path": "latex/requirements/brief.tex",
+      "unchanged": true
+    },
+    {
+      "path": "latex/temperature/avt10.tex",
+      "unchanged": true
+    },
+    {
+      "path": "latex/vendors/vendor-halfalabs.sty",
+      "unchanged": true
+    },
+    {
+      "path": "latex/vendors/vendor-kestrel.sty",
+      "unchanged": true
+    },
+    {
+      "path": "latex/vendors/vendor-meridion.sty",
+      "unchanged": true
+    },
+    {
+      "path": "latex/vendors/vendor-northstar.sty",
+      "unchanged": true
+    },
+    {
+      "path": "latex/vendors/vendor-pixelriver.sty",
+      "unchanged": true
+    },
+    {
+      "path": "latex/vendors/vendor-thermasense.sty",
+      "unchanged": true
+    },
+    {
+      "path": "latex/vendors/vendor-triaxis.sty",
+      "unchanged": true
+    },
+    {
+      "path": "latex/vendors/vendor-vortek.sty",
+      "unchanged": true
+    },
+    {
+      "path": "source_inputs/B8-registers-rev03.json",
+      "unchanged": true
+    },
+    {
+      "path": "source_inputs/BOARD_WIRING-v0.2.0.md",
+      "unchanged": true
+    },
+    {
+      "path": "source_inputs/BOARD_WIRING.md",
+      "unchanged": true
+    },
+    {
+      "path": "source_inputs/BUTTON_ASSEMBLY.md",
+      "unchanged": true
+    },
+    {
+      "path": "source_inputs/FW_REQUIREMENTS.md",
+      "unchanged": true
+    },
+    {
+      "path": "source_inputs/LCD32.md",
+      "unchanged": true
+    },
+    {
+      "path": "source_inputs/MCU_B8.md",
+      "unchanged": true
+    },
+    {
+      "path": "source_inputs/MOTOR.md",
+      "unchanged": true
+    },
+    {
+      "path": "source_inputs/MUX8-v0.2.0.md",
+      "unchanged": true
+    },
+    {
+      "path": "source_inputs/MUX8.md",
+      "unchanged": true
+    },
+    {
+      "path": "source_inputs/TEMPERATURE_SENSOR.md",
+      "unchanged": true
+    },
+    {
+      "path": "src/b8docs/__init__.py",
+      "unchanged": true
+    },
+    {
+      "path": "src/b8docs/__main__.py",
+      "unchanged": true
+    },
+    {
+      "path": "src/b8docs/artifact.py",
+      "unchanged": true
+    },
+    {
+      "path": "src/b8docs/boundaries.py",
+      "unchanged": true
+    },
+    {
+      "path": "src/b8docs/cli.py",
+      "unchanged": true
+    },
+    {
+      "path": "src/b8docs/correspondence.py",
+      "unchanged": true
+    },
+    {
+      "path": "src/b8docs/effects/__init__.py",
+      "unchanged": true
+    },
+    {
+      "path": "src/b8docs/effects/affine.py",
+      "unchanged": true
+    },
+    {
+      "path": "src/b8docs/effects/coffee.py",
+      "unchanged": true
+    },
+    {
+      "path": "src/b8docs/effects/common.py",
+      "unchanged": true
+    },
+    {
+      "path": "src/b8docs/effects/handling.py",
+      "unchanged": true
+    },
+    {
+      "path": "src/b8docs/effects/optical.py",
+      "unchanged": true
+    },
+    {
+      "path": "src/b8docs/effects/tears.py",
+      "unchanged": true
+    },
+    {
+      "path": "src/b8docs/manuals.py",
+      "unchanged": true
+    },
+    {
+      "path": "src/b8docs/models.py",
+      "unchanged": true
+    },
+    {
+      "path": "src/b8docs/pipeline.py",
+      "unchanged": true
+    },
+    {
+      "path": "src/b8docs/recipe.py",
+      "unchanged": true
+    }
+  ]
+}

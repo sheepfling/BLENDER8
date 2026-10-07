@@ -1,0 +1,177 @@
+\documentclass[10pt]{article}
+\usepackage{vendor-pixelriver}
+\renewcommand{\DocID}{LCD-001}
+\renewcommand{\RunningPart}{PX32-16}
+\hypersetup{pdftitle={PixelRiver PX32-16 / Display Module Interface Reference}}
+\begin{document}
+\VendorTitle{PX32-16}{Monochrome display module}{32 columns $\times$ 16 rows / 64-byte display RAM / parallel byte interface}
+\MetaStrip{INTERFACE REVISION 02\hfill DOCUMENT ISSUE P3\hfill 06 OCT 2026}
+\section*{General description}
+The PX32-16 combines a 32-by-16 pixel monochrome panel, a 64-byte display RAM and a four-register controller. The host writes pixel data through an eight-bit transfer interface. Display refresh runs independently of host accesses.
+
+The RAM is arranged as two pages of vertical, eight-pixel columns. A stored one turns a pixel on; a stored zero turns it off. There is no character generator: symbols, digits and graphics are supplied as pixel patterns by the host.
+\begin{center}
+\begin{tikzpicture}[font=\small,>=Stealth,node distance=9mm]
+\node[draw=VendorInk,fill=VendorTint,minimum width=28mm,minimum height=15mm,align=center](a){Host byte\\interface};
+\node[draw=VendorInk,minimum width=25mm,minimum height=15mm,align=center,right=of a](b){4 registers\\address/control};
+\node[draw=VendorInk,minimum width=24mm,minimum height=15mm,align=center,right=of b](c){64 bytes\\display RAM};
+\node[draw=VendorInk,fill=VendorTint,minimum width=25mm,minimum height=15mm,align=center,right=of c](d){32 $\times$ 16\\panel};
+\draw[<->](a)--(b);\draw[<->](b)--(c);\draw[->](c)--(d);
+\node[below=8mm of c,align=center,font=\scriptsize](s){Row scan controller\\20 ms frame / 4 ms vertical blank};
+\draw[->](s)--(c);\draw[->](s.east)-|(d.south);
+\end{tikzpicture}
+\end{center}
+\section*{Interface summary}
+\par\noindent\begin{tabularx}{\linewidth}{@{}l Y@{}}
+\toprule\TableHead Function & Specification\\\midrule
+Raster & 32 columns by 16 rows, one bit per pixel.\\
+Display RAM & 64 bytes; two 32-byte pages; vertical bit order.\\
+Register select & Two bits select ADDRESS, DATA, STATUS or CONTROL.\\
+Data transfer & Eight-bit, ordered reads and writes.\\
+Refresh & 50 Hz; row-sampled scanout, not a frame-buffer swap.\\
+VBLANK & Active during the last 4 ms of each frame; available in STATUS and as a controller output.\\
+Write recovery & 8 $\mu$s after each accepted DATA write.\\\bottomrule
+\end{tabularx}
+\begin{Notice}{POWER-ON STATE}
+The display is blanked. RAM, scan registers and ADDRESS are zero. Auto-increment is enabled: CONTROL reads 02h. BUSY and ERROR are clear. Enabling the display does not clear or rewrite RAM.
+\end{Notice}
+\vfill\Caption{DOCUMENT CONTROL / P3: interface revision 02 retained. Pixel organization, timing and register effects unchanged.}
+\clearpage
+\Continuation{Display RAM organization}{The byte address advances across the panel; bits advance down a column.}
+\MetaStrip{PX32-16\hfill MEMORY MAP\hfill LCD-001 / P3}
+\begin{align*}
+ a(x,y)&=32\left\lfloor y/8\right\rfloor+x,& b(y)&=y\bmod8,\\
+ \operatorname{pixel}(x,y)&=\bigl(\operatorname{RAM}[a]\gg b\bigr)\mathbin{\&}1,
+ &0\leq x&<32,\quad0\leq y<16.
+\end{align*}
+The origin is at the upper-left corner. Increasing $x$ moves right; increasing $y$ moves down. Bit 0 is the upper pixel in each eight-row page. The address range is 00h--3Fh.
+\begin{center}
+\begin{tikzpicture}[x=.32cm,y=-.29cm,font=\scriptsize]
+\fill[VendorTint](0,0)rectangle(32,8);
+\foreach \x in {0,...,32}{\draw[gray!45](\x,0)--(\x,16);}
+\foreach \y in {0,...,16}{\draw[gray!45](0,\y)--(32,\y);}
+\draw[VendorInk,line width=.9pt](0,0)rectangle(32,16);
+\draw[VendorInk,line width=.9pt](0,8)--(32,8);
+\fill[VendorInk](0,0)rectangle(1,1);\fill[VendorInk](0,7)rectangle(1,8);
+\foreach \x in {0,7,15,23,31}{\node[above]at(\x+.5,0){\x};}
+\foreach \y in {0,7,8,15}{\node[left]at(0,\y+.5){\y};}
+\node[anchor=west]at(33,3.0){Page 0};\node[anchor=west]at(33,5.0){00h--1Fh};
+\node[anchor=west]at(33,11.0){Page 1};\node[anchor=west]at(33,13.0){20h--3Fh};
+\node[below]at(16,17){Column $x$ / left to right};
+\end{tikzpicture}
+\end{center}
+\Caption{Example shown: RAM[00h] = 81h, all other bytes zero. The two lit pixels are vertically separated.}
+\section*{Byte interpretation}
+\par\noindent\begin{tabularx}{\linewidth}{@{}l l Y@{}}
+\toprule\TableHead Byte address & Bit & Corresponding pixel\\\midrule
+00h & 0 & $(0,0)$, upper-left pixel.\\
+00h & 7 & $(0,7)$, bottom of the first page.\\
+1Fh & 7 & $(31,7)$, right end of the first page.\\
+20h & 0 & $(0,8)$, beginning of the second page.\\
+3Fh & 7 & $(31,15)$, lower-right pixel.\\\bottomrule
+\end{tabularx}
+\begin{Notice}{ORIENTATION CHECK}
+Writing 81h at address 00h must produce pixels $(0,0)$ and $(0,7)$. It must not produce a horizontal pair. Use this pattern before loading a font or moving image data between differently packed buffers.
+\end{Notice}
+\vfill\Caption{A host-side 64-byte image buffer may simplify drawing. The module does not provide a second display page for atomic frame exchange.}
+\clearpage
+\Continuation{Controller register reference}{Register addresses are local to the display controller.}
+\MetaStrip{ACCESS: R = READ\quad W = WRITE\quad W1C = WRITE ONE TO CLEAR\hfill LCD-001}
+\par\noindent\begin{tabularx}{\linewidth}{@{}l l l l Y@{}}
+\toprule\TableHead Index & Name & Access & Reset & Function\\\midrule
+0 & ADDRESS & RW & 00h & Low six bits select RAM byte 0--63.\\
+1 & DATA & RW & 00h$^*$ & Read or write RAM at ADDRESS. Auto-increment when enabled.\\
+2 & STATUS & R/W1C & 00h & BUSY, VBLANK and sticky ERROR.\\
+3 & CONTROL & RW & 02h & Display enable and auto-increment.\\\bottomrule
+\end{tabularx}
+\Caption{$^*$RAM is initially zero; DATA is a window onto the selected byte, not a separate storage register.}
+\section*{STATUS / index 2}
+\par\noindent\begin{tabularx}{\linewidth}{@{}c l l Y@{}}
+\toprule\TableHead Bit & Name & Access & Meaning\\\midrule
+0 & BUSY & R & One while DATA-write recovery is in progress.\\
+1 & VBLANK & R & One during frame phase 16--20 ms.\\
+2 & ERROR & R/W1C & A DATA write was attempted while BUSY. Write 04h to clear.\\
+7:3 & Reserved & R & Read zero. Writes ignored.\\\bottomrule
+\end{tabularx}
+Reading STATUS does not acknowledge ERROR. Writing zero to ERROR does not clear it. Writing STATUS does not change BUSY or VBLANK.
+\section*{CONTROL / index 3}
+\par\noindent\begin{tabularx}{\linewidth}{@{}c l l Y@{}}
+\toprule\TableHead Bit & Name & Reset & Meaning\\\midrule
+0 & DISPLAY\_EN & 0 & Zero blanks the panel; one exposes the scanned image.\\
+1 & AUTO\_INC & 1 & Increment ADDRESS after each DATA read or accepted DATA write.\\
+7:2 & Reserved & 0 & Ignored on writes; read zero.\\\bottomrule
+\end{tabularx}
+Only the low six ADDRESS bits and low two CONTROL bits are retained. Blanking does not erase RAM or stop the internal row sampling sequence.
+\section*{Address side effects}
+An increment advances 3Fh to 00h. A DATA read also increments the address when AUTO\_INC is enabled, even during BUSY. A rejected DATA write neither changes RAM nor increments ADDRESS.
+\begin{Notice}{SHARED ADDRESS STATE}
+Do not allow two independent writers to interleave ADDRESS and DATA operations. An interrupt handler that uses the display must coordinate both the host bus register selection and the module's current RAM address with foreground accesses.
+\end{Notice}
+\vfill\Caption{Clearing the display ERROR flag is independent of acknowledging an interrupt in the host controller.}
+\clearpage
+\Continuation{Write timing and recovery}{An accepted DATA write occupies an eight-microsecond recovery interval.}
+\MetaStrip{WRITE RECOVERY $t_W = 8\,\mu$s\hfill OTHER REGISTERS REMAIN ACCESSIBLE}
+A DATA write is accepted when BUSY is zero. BUSY then remains one for 8 $\mu$s. The next DATA write may be accepted at the recovery boundary. No write queue is provided.
+\begin{center}
+\begin{tikzpicture}[x=.62cm,y=.65cm,font=\scriptsize,>=Stealth]
+\fill[VendorTint](0,-.25)rectangle(8,3.6);
+\foreach \x in {0,4,8,12}{\draw[gray!45](\x,-.2)--(\x,3.3);\node[below]at(\x,-.35){\x};}
+\node[left]at(-.25,2.8){DATA write};\node[left]at(-.25,1.45){BUSY};
+\foreach \x/\s in {0/accepted,4/dropped,8/accepted}{\draw[->,thick](\x,3.5)--(\x,2.5);\node[above]at(\x,3.6){\s};}
+\draw[thick](-.2,1.1)--(0,1.1)--(0,1.8)--(8,1.8)--(8,1.1);
+\draw[thick](8,1.1)--(8,1.8)--(12.5,1.8);
+\node[right]at(12.65,1.8){next recovery};\node[right]at(12.65,-.35){$\mu$s};
+\draw[<->](0,.35)--node[above]{$t_W$}(8,.35);
+\end{tikzpicture}
+\end{center}
+\Caption{At 8 $\mu$s the prior recovery has ended; accepting another write immediately begins a new recovery. The boundary is shown separated for clarity.}
+\section*{Operations while BUSY = 1}
+\par\noindent\begin{tabularx}{\linewidth}{@{}l Y@{}}
+\toprule\TableHead Operation & Result\\\midrule
+Write DATA & Dropped; ERROR set; no RAM change; ADDRESS unchanged.\\
+Read DATA & Returns current RAM byte; increments ADDRESS when AUTO\_INC is set.\\
+Write or read ADDRESS & Available. The new address affects subsequent DATA operations.\\
+Write or read CONTROL & Available.\\
+Read STATUS / clear ERROR & Available. Clearing ERROR does not shorten BUSY.\\\bottomrule
+\end{tabularx}
+\section*{Full-image transfers}
+With auto-increment enabled, a 64-byte write beginning at address 00h wraps back to 00h. At exactly 8 $\mu$s between writes, the last byte is accepted 504 $\mu$s after the first and its recovery ends at 512 $\mu$s. Host bus accesses and scheduling add to the transfer budget.
+
+The vertical blank interval is 4 ms. A complete image transfer fits inside that interval when the host budgets register selection, polling, data transfers and interrupt latency together. This is a scheduling opportunity, not an automatic controller guarantee.
+\begin{Notice}{RECOVERY FROM A DROPPED WRITE}
+ERROR reports the condition; it does not identify a byte or rewind the address. Re-establish a known address before retransmitting an interrupted image. Do not advance a software byte counter as though a rejected write reached RAM.
+\end{Notice}
+\vfill\Caption{The controller interface specifies byte transactions and recovery time. Board-level bus setup and hold requirements belong to the host interconnect specification.}
+\clearpage
+\Continuation{Scanout and application notes}{RAM writes and visible row updates are different events.}
+\MetaStrip{FRAME = 20 ms\hfill ACTIVE = 16 ms\hfill VERTICAL BLANK = 4 ms}
+Rows are sampled from RAM at frame phases 0, 1, 2, \ldots, 15 ms. Row $y$ is sampled at phase $y$ ms. VBLANK is high from phase 16 ms up to, but not including, the next frame boundary at 20 ms.
+\begin{center}
+\begin{tikzpicture}[x=.58cm,y=1cm,font=\scriptsize]
+\fill[VendorTint](0,0)rectangle(16,.65);\fill[VendorInk!22](16,0)rectangle(20,.65);
+\draw(0,0)rectangle(20,.65);\draw(16,0)--(16,.65);
+\foreach \x in {0,4,8,12,16,20}{\draw(\x,0)--(\x,-.1);\node[below]at(\x,-.12){\x};}
+\foreach \x in {0,...,15}{\draw[VendorInk](\x,.7)--(\x,1.0);}
+\node[above]at(7.5,1.1){Row sampling: 0 through 15};
+\node[align=center]at(18,.33){Vertical\\blank};\node[right]at(20.4,-.12){ms};
+\end{tikzpicture}
+\end{center}
+A RAM update during active scan can place old data in one row and new data in another. The resulting image can be internally inconsistent until a later refresh. Writing all 64 bytes does not cause an atomic visible-frame change.
+\section*{Reset and display enable}
+At reset, the visible scan registers are clear and the frame epoch is established. The phase-zero instant begins with a blank image; row 0 is next sampled at the following frame boundary. Later rows are sampled at their normal first-frame phases.
+
+DISPLAY\_EN gates the visible panel output. Clearing it blanks the panel immediately without destroying RAM. Re-enabling exposes the current scan registers; it does not force an immediate re-scan of every row.
+\section*{Host interrupt integration}
+The rising edge of VBLANK may be connected to a host interrupt source. A pending host interrupt flag can outlive the blanking interval. Check the current display status or maintain a bounded transfer schedule rather than treating every delayed interrupt as the beginning of a fresh 4 ms window.
+\section*{Interface checks}
+\par\noindent\begin{tabularx}{\linewidth}{@{}l Y@{}}
+\toprule\TableHead Check & Expected result\\\midrule
+Orientation & 81h at 00h lights $(0,0)$ and $(0,7)$.\\
+Address wrap & One accepted transfer at 3Fh advances to 00h when enabled.\\
+Write recovery & DATA written before recovery ends is rejected and sets ERROR.\\
+Read side effect & DATA read advances ADDRESS when enabled, including during BUSY.\\
+Blanking & Display enable changes visibility, not stored RAM.\\
+Frame consistency & Writes outside blanking may become visible row by row.\\\bottomrule
+\end{tabularx}
+\vfill\Caption{PixelRiver Display Technologies / Applications Engineering / Retain this sheet with the host interface specification.}
+\end{document}

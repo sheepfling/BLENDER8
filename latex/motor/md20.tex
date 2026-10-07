@@ -1,0 +1,128 @@
+\documentclass[10pt]{article}
+\usepackage{vendor-vortek}
+\usepackage{pgfplots}\pgfplotsset{compat=1.18}
+\renewcommand{\DocID}{MOT-001}
+\renewcommand{\RunningPart}{MD20}
+\renewcommand{\DocRev}{P4}
+\hypersetup{pdftitle={Vortek MD20 / Motor and Driver Interface Reference}}
+\begin{document}
+\VendorTitle{MD20}{Motor and driver module}{Logic PWM input / independent enable / two-pulse-per-revolution tachometer}
+\MetaStrip{CHARACTERISTIC SET 03\hfill ISSUE P4\hfill 07 OCT 2026}
+\section*{Operating profile}
+The MD20 accepts a logic PWM waveform and a separate ENABLE signal. PWM determines the nominal drive fraction; ENABLE permits or inhibits electrical drive. The tachometer reports shaft rotation independently of the requested speed.
+
+The nominal zero-load speed reaches 20,000 RPM at full duty. Speed is nonlinear with duty, and load reduces the attainable steady speed. The characteristic curves below are nominal sizing data, not a closed-loop speed guarantee.
+\par\noindent\begin{tabularx}{\linewidth}{@{}l Y@{}}
+\toprule\TableHead Connection & Function\\\midrule
+PWM & Logic drive command; input duty is averaged over 256 $\mu$s windows.\\
+ENABLE & Active-high drive permission. Low removes electrical drive.\\
+TACH & Two rising edges per shaft revolution; 50\% duty square wave.\\
+Case attachment & Thermal interface for an external temperature sensor.\\\bottomrule
+\end{tabularx}
+\section*{Nominal duty-to-speed characteristic}
+Let $d$ be effective PWM duty, $0\leq d\leq1$, and let $L$ be the normalized loading index, $0\leq L\leq1$:
+\[
+ u=\operatorname{clamp}\!\left(\frac{d-0.12}{0.88},0,1\right),\qquad
+ n_{\infty}(d,L)=20{,}000\,u^{1.6}(1-0.5L)\;\mathrm{RPM}.
+\]
+Duty at or below 12\% is in the zero-speed region. The $L=1$ curve reaches half the nominal unloaded speed. A locked shaft is a separate condition, not simply the end of this loading range.
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[width=.84\linewidth,height=5.4cm,xmin=0,xmax=100,ymin=0,ymax=21000,
+ xlabel={PWM duty (\%)},ylabel={Steady speed (RPM)},grid=major,
+ tick label style={font=\scriptsize},label style={font=\small},
+ legend style={font=\scriptsize,at={(.03,.97)},anchor=north west},scaled y ticks=false]
+\addplot[VendorInk,thick,domain=0:100,samples=101]{20000*(max((x/100-0.12)/.88,0))^1.6};\addlegendentry{$L=0$}
+\addplot[black,dashed,thick,domain=0:100,samples=101]{10000*(max((x/100-0.12)/.88,0))^1.6};\addlegendentry{$L=1$}
+\end{axis}
+\end{tikzpicture}
+\end{center}
+\vfill\Caption{P4 / Characteristic set 03. Nominal speed curves and dynamic behavior are unchanged.}
+\clearpage
+\Continuation{Dynamic response and tachometer}{Requested drive, measured motion and stopped drive are different quantities.}
+\section*{Nominal speed response}
+While enabled and not locked, speed approaches the present loaded target with a time constant of 120 ms. With ENABLE low, speed coasts toward zero with a 350 ms time constant. For a fixed target $n_{\infty}$ over interval $\Delta t$:
+\[
+ n(t+\Delta t)=n_{\infty}+[n(t)-n_{\infty}]\,e^{-\Delta t/\tau}.
+\]
+Use $\tau=0.120$ s while driven and $\tau=0.350$ s with $n_{\infty}=0$ during coastdown. A mechanical lock constrains speed to zero. Once the obstruction is removed, the module again responds to its current ENABLE and PWM inputs. No obstruction-history latch is present.
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[width=.85\linewidth,height=5.2cm,xmin=0,xmax=1,ymin=0,ymax=1.05,
+ xlabel={Time from transition (s)},ylabel={Normalized speed},grid=major,
+ tick label style={font=\scriptsize},label style={font=\small},
+ legend style={font=\scriptsize,at={(.98,.58)},anchor=east}]
+\addplot[VendorInk,thick,domain=0:1,samples=81]{1-exp(-x/.12)};\addlegendentry{Run-up}
+\addplot[black,dashed,thick,domain=0:1,samples=81]{exp(-x/.35)};\addlegendentry{Coastdown}
+\end{axis}
+\end{tikzpicture}
+\end{center}
+\section*{Tachometer relation}
+For $p=2$ rising edges per revolution:
+\[
+ f_{\mathrm{TACH}}=\frac{p\,n}{60},\qquad
+ n=\frac{60\,\Delta C}{p\,\Delta t}.
+\]
+Here $\Delta C$ is a count of rising edges over an interval $\Delta t$ in seconds. At 20,000 RPM, successive rising edges are 1.5 ms apart; at 2,000 RPM they are 15 ms apart. Tach pulses may continue after ENABLE goes low.
+\begin{Notice}{LOSS OF TACH IS NOT PROOF OF A LOCKED SHAFT}
+Missing edges may indicate an obstruction, missing drive, disconnected feedback or a failed tach signal. Treat the condition as unverified motion. Do not infer a unique mechanical cause from the tach channel alone.
+\end{Notice}
+\vfill\Caption{Removal of electrical drive is not an instantaneous zero-RPM condition. The ENABLE transition and subsequent coastdown are separate observable events.}
+\clearpage
+\Continuation{Case thermal characteristics}{A coupled reference model for case, nearby air and optional food.}
+The characteristic uses case temperature $T_m$, nearby air $T_a$ and, when present, food temperature $T_f$. Room temperature $T_r$ is an external boundary. The attached sensor has its own package lag; it does not read food or winding temperature. Food is present when $G_{mf}>0$.
+\begin{align*}
+ C_m\dot T_m&=Q_{\rm loss}-G_{ma}(T_m-T_a)-G_{mf}(T_m-T_f),\\
+ C_a\dot T_a&=G_{ma}(T_m-T_a)+G_{fa}(T_f-T_a)-G_{ar}(T_a-T_r),\\
+ C_f\dot T_f&=G_{mf}(T_m-T_f)-G_{fa}(T_f-T_a).
+\end{align*}
+\par\noindent\begin{tabularx}{\linewidth}{@{}l l Y@{}}
+\toprule\TableHead Parameter & Nominal value & Interpretation\\\midrule
+$C_m,C_a,C_f$ & 60, 200, 1200 J/K & Case, effective nearby-air and food heat capacities.\\
+$G_{ma}$ & $0.6+0.8\,\operatorname{clamp}(n/20000,0,1)$ W/K & Case-to-air transfer increases with speed.\\
+$G_{mf}$ & 0--0.2 W/K & Optional case-to-food path; zero means no food.\\
+$G_{fa},G_{ar}$ & 0.12, 20 W/K & Food-to-air when food is present; air-to-room ventilation.\\\bottomrule
+\end{tabularx}
+\section*{Nominal loss characteristic}
+Define the motion ratio against the unloaded target:
+\[
+ r=\operatorname{clamp}\!\left(\frac{n}{\max(n_{\infty}(d,0),1)},0,1\right).
+\]
+Use $r=0$ when the unloaded target is no greater than 1 RPM. The sizing loss characteristic is
+\[
+ I_{\rm load}=10d\sqrt{1-r}\;\mathrm{A},\qquad
+ Q_{\mathrm{loss}}=\begin{cases}
+ 0,&\text{ENABLE low},\\
+ 8d+22d^2+(1\,\Omega)I_{\rm load}^{2},&\text{ENABLE high}.
+ \end{cases}
+\]
+At full duty, healthy unloaded motion gives 30 W; a locked shaft gives 130 W. $I_{\rm load}$ is a loss-equivalent current proxy, not measured supply or winding current. For changing drive and speed, integrate the coupled balances in successive steps. Heat crosses each internal path with equal and opposite signs; ventilation exchanges heat with the prescribed room boundary.
+\vfill\begin{Notice}{CASE TEMPERATURE IS NOT WINDING-HOTSPOT TEMPERATURE}
+This lumped characteristic supports system sizing scenarios. It does not resolve winding hotspots, material limits, internal current regulation, food phase change or detailed gradients. No automatic shutdown is supplied by this thermal model.
+\end{Notice}
+\clearpage
+\Continuation{Input behavior and thermal attachment}{The module responds to its inputs; it does not interpret equipment operating modes.}
+\section*{Enable, drive and retained state}
+ENABLE low removes electrical drive independently of the incoming PWM duty. The rotor may continue to turn and the case remains at its current temperature. Neither shaft momentum nor stored heat is reset by interruption of electrical power.
+
+With ENABLE high, the module follows the specified duty-to-speed and loss characteristics. A duty in the zero-speed region is not the same electrical condition as ENABLE low: the loss characteristic can remain nonzero even when no shaft rotation develops.
+\begin{Notice}{NO AUTONOMOUS PROTECTIVE LATCH}
+This interface provides no automatic thermal cutout, stall latch, retry sequencer or acknowledgment input. Removing a lock while drive remains asserted permits acceleration according to the dynamic characteristic. Any equipment-level lockout must be provided outside this module.
+\end{Notice}
+\section*{Case-temperature sensing}
+An external sensor is thermally attached to the case. Its power supply and signal return are electrical connections; its attachment to the case is a thermal connection. The sensor output represents its package temperature and is subject to its own mounting response.
+
+The accompanying AVT10 sheet specifies the powered voltage-output sensor furnished with this drive documentation. Its transfer, electrical connections and mounting lag remain ThermaSense specifications. The sensor is not an internal MD20 cutoff switch.
+\section*{Food and atmosphere heat exchange}
+An optional food mass warms or cools through its case and nearby-air paths. Nearby air exchanges heat with the case, food and the prescribed room temperature. Cold food may initially cool the case, but mechanical load can increase loss at the same time. Initial food and room temperatures and $G_{mf}$ are application conditions, not MD20 electrical signals. Food melting, evaporation and detailed shaft conduction remain outside this sizing model.
+\section*{Component observations}
+\begin{tabularx}{\linewidth}{@{}p{.32\linewidth} Y@{}}
+\toprule\TableHead Condition & Module response\\\midrule
+Equal PWM-duty increments & Unequal nominal speed increments because the transfer is nonlinear.\\
+ENABLE removed & Electrical drive ceases; inertia and heat remain.\\
+Shaft locked, drive asserted & Zero rotation; loss follows the locked-motion characteristic.\\
+Lock removed, drive asserted & Acceleration resumes; the module has no memory-based lockout.\\
+Tach disconnected & The host loses a motion observation; this is not uniquely evidence of a locked shaft.\\\bottomrule
+\end{tabularx}
+\vfill\Caption{Vortek Motion / MOT-001 / Characteristic set 03. Equipment speed selections, trip thresholds and recovery rules are not parameters of this module.}
+\end{document}

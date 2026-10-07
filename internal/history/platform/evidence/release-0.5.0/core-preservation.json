@@ -1,0 +1,303 @@
+{
+  "scope": "Existing SDK, host binding, firmware, current requirements/scenarios, component/runtime/model sources and headers",
+  "existing_files_checked": 58,
+  "changed": [],
+  "missing": [],
+  "unchanged": true,
+  "new_host_sources": [
+    "sim/include/blender8/sim/session.hpp",
+    "sim/src/session.cpp"
+  ],
+  "files": [
+    {
+      "path": "firmware/board_config.hpp",
+      "sha256": "2ed93ed47d470316d926f2ee250bc47af4877b8d5674ae39551ac3e0456390d9",
+      "unchanged": true
+    },
+    {
+      "path": "firmware/firmware.cpp",
+      "sha256": "c5d07d08c24f628a571a860fa718bf4db46ae0bcbbd29482ba8963ff2089076e",
+      "unchanged": true
+    },
+    {
+      "path": "firmware/firmware.hpp",
+      "sha256": "2e097f14239402420ea8d63fd221576758aea331ed4ba9955e637122c9130efc",
+      "unchanged": true
+    },
+    {
+      "path": "host/include/blender8/host/backend.hpp",
+      "sha256": "0084b407d6f698854d0e99bffc065486aeb29c0a704dfbaf9c68db632bbaf9a3",
+      "unchanged": true
+    },
+    {
+      "path": "host/src/backend.cpp",
+      "sha256": "5cf4c20860433cb8ae01918a4c36307689e9a62bc809d71cf8799c2f202c3b3b",
+      "unchanged": true
+    },
+    {
+      "path": "requirements/correspondence.json",
+      "sha256": "b6089f20f16b9a55f276adaadaf83960ae66ae38d76ff1b969d3847924e89dcf",
+      "unchanged": true
+    },
+    {
+      "path": "requirements/correspondence.md",
+      "sha256": "5228b58bcd9ed24442c70970a89d148a5963b305ef9dcc769bb9b78c6749e4e4",
+      "unchanged": true
+    },
+    {
+      "path": "scenarios/README.md",
+      "sha256": "6980542cc49b7d614f9d69cb499ece2399c394d22b8e21da6f645b7da5fa998c",
+      "unchanged": true
+    },
+    {
+      "path": "scenarios/acceptance_cases.json",
+      "sha256": "12f8cd5b35c034d8dd637b8b62312439ea56c3c9149e3d0561471e3ed2309a62",
+      "unchanged": true
+    },
+    {
+      "path": "scenarios/conformance/contact_fault_observation.json",
+      "sha256": "dbffee6d1cb2c072cc02b44d3ae9436e1deec1bff50e33669c13c3ba0b90fd37",
+      "unchanged": true
+    },
+    {
+      "path": "scenarios/conformance/fused_motor_branch.json",
+      "sha256": "54c233d4607571045b1198fdfb6ff2b7bb4fc3229503375b4aad9da92385a6f2",
+      "unchanged": true
+    },
+    {
+      "path": "scenarios/conformance/invalid_pll_tuple.json",
+      "sha256": "bea78bd02b7025dedd8b40c9816af6a5ce765af55ca053ef7335c00edd5b1911",
+      "unchanged": true
+    },
+    {
+      "path": "scenarios/conformance/jar_dropout_memory.json",
+      "sha256": "22157b14621cbb9bf321219cf576b71e460fadadc524629df96f8f801ba98cbb",
+      "unchanged": true
+    },
+    {
+      "path": "scenarios/conformance/jar_held_stop.json",
+      "sha256": "4a41b8b24b82cdfa81cd99a253063fa0b340cfe8c329ce18e1c5df9a5d4b1ed8",
+      "unchanged": true
+    },
+    {
+      "path": "scenarios/conformance/lcd_vertical_pixels.json",
+      "sha256": "c6aa1c4aedb3f9516154b1ef13d90c41cb6c5faf43ed59ed4f48bced48cea890",
+      "unchanged": true
+    },
+    {
+      "path": "scenarios/conformance/motor_load_coast.json",
+      "sha256": "91be46ea381e8a4572afb9ebedb62dff3232ab3c4e9cbb1c79100ff9a893e4e5",
+      "unchanged": true
+    },
+    {
+      "path": "scenarios/conformance/power_qualification.json",
+      "sha256": "443a41c23ac1cf67e8aeccc766e4b4a294a9b86af28ec9b702399528f1e527ea",
+      "unchanged": true
+    },
+    {
+      "path": "scenarios/conformance/sensor_faults.json",
+      "sha256": "1884519cc3c48212fc471800f5b77a3b332a7c4468b5d640914590dfa77aea08",
+      "unchanged": true
+    },
+    {
+      "path": "scenarios/conformance/watchdog_unserviced.json",
+      "sha256": "c3528388ac9fd366ebb29b984c1a798aab1a85da8cfae52fad471eb8077b80a3",
+      "unchanged": true
+    },
+    {
+      "path": "sdk/include/blender8/access.hpp",
+      "sha256": "0629ca2d53de7b3a78a41a29f4caeb29c1794b6f4b3baa0c754a1b59c0f904d2",
+      "unchanged": true
+    },
+    {
+      "path": "sdk/include/blender8/device.hpp",
+      "sha256": "5b4564e3e0e958c4e6c5167b7cbf0e9babc63e97f419fa1295e95c18267e17bf",
+      "unchanged": true
+    },
+    {
+      "path": "sdk/include/blender8/firmware.hpp",
+      "sha256": "72ad7fb2b917dd5178afac273ea3fa36acbf802b1613411d36118267a27a2e7e",
+      "unchanged": true
+    },
+    {
+      "path": "sdk/include/blender8/registers.hpp",
+      "sha256": "fc01634729ac5e090c66b942304d898b516114539b8ce26cee77bdb5301db63d",
+      "unchanged": true
+    },
+    {
+      "path": "sim/include/blender8/sim/adc.hpp",
+      "sha256": "3fc7e14381659b28dc3d63f72975e5a2531d8e11ec0e11fe3dd5fe2ac9cc75ac",
+      "unchanged": true
+    },
+    {
+      "path": "sim/include/blender8/sim/analog.hpp",
+      "sha256": "7cfee012a5aaf859f48ccd9ff7badf839c4198e497d4e64ba16ac988233e71b9",
+      "unchanged": true
+    },
+    {
+      "path": "sim/include/blender8/sim/board.hpp",
+      "sha256": "b331ec1bc874aee69ff50a3f79f69183b7a4f2831a93e016cace74631b1ffe4f",
+      "unchanged": true
+    },
+    {
+      "path": "sim/include/blender8/sim/button_assembly.hpp",
+      "sha256": "46d73e2eb2c0d3cb676150e0dc77727e752f59fcd066748ed232576cae58756c",
+      "unchanged": true
+    },
+    {
+      "path": "sim/include/blender8/sim/clock_source.hpp",
+      "sha256": "38f42c994b51287f9515686c493d5e1a6812818c9a2fd77e382abf7cfc360bbb",
+      "unchanged": true
+    },
+    {
+      "path": "sim/include/blender8/sim/clock_tree.hpp",
+      "sha256": "5d548cabe0374c9f42f129b226ba9ca079ddd614ee36e38ef84db0a6ef5855ca",
+      "unchanged": true
+    },
+    {
+      "path": "sim/include/blender8/sim/components.hpp",
+      "sha256": "e71ccf84c3afc18a9b6a19e458273b0e1dc3a6095552e0e5e0fc25606d5bfb0f",
+      "unchanged": true
+    },
+    {
+      "path": "sim/include/blender8/sim/fixture.hpp",
+      "sha256": "8910d880b9ab4ff320216c75c34cd97536a1a3034ce15797b0f8d8b6869b4b4d",
+      "unchanged": true
+    },
+    {
+      "path": "sim/include/blender8/sim/hwil.hpp",
+      "sha256": "0e363fc1b2a5e9db4ac20264cad250f46a49fe11de4623b3f731295c1e520db1",
+      "unchanged": true
+    },
+    {
+      "path": "sim/include/blender8/sim/jar_interlock.hpp",
+      "sha256": "12f20a2b65baba5cd28b4f2f029939bcd2c3de531900958d6d67a7e0b6908b43",
+      "unchanged": true
+    },
+    {
+      "path": "sim/include/blender8/sim/lcd32.hpp",
+      "sha256": "c1b2e259af18f277420cfecffacac04cda36000c5412667b9e2cdb487c36f359",
+      "unchanged": true
+    },
+    {
+      "path": "sim/include/blender8/sim/mcu.hpp",
+      "sha256": "74d81b5d2a75f6a93d3b7f2a5b0beb08b033a48f1101a6b6be4e523a124fa0cf",
+      "unchanged": true
+    },
+    {
+      "path": "sim/include/blender8/sim/motor.hpp",
+      "sha256": "1e7cbcc1944bfeb4928ac697e710694ad9718f2bdf15736338d8aa728c7fe8af",
+      "unchanged": true
+    },
+    {
+      "path": "sim/include/blender8/sim/mux8.hpp",
+      "sha256": "54437cb89b804fb3ec718274f66917f520f6b5871d40fe6e9163a929201a0c97",
+      "unchanged": true
+    },
+    {
+      "path": "sim/include/blender8/sim/power_domain.hpp",
+      "sha256": "d41329a1edac412ad5bbb78a3b3df711bd5be498479687661e28eae4aae9f313",
+      "unchanged": true
+    },
+    {
+      "path": "sim/include/blender8/sim/runtime.hpp",
+      "sha256": "cd4302beaf0a1ccc9393ce1f4b623f07315029b20011a0a66a05c03482daac4d",
+      "unchanged": true
+    },
+    {
+      "path": "sim/include/blender8/sim/signals.hpp",
+      "sha256": "8cc11b514e7520b2e9c6d97a3c3c7500964a4f5b27e59704735423b142c7eb1b",
+      "unchanged": true
+    },
+    {
+      "path": "sim/include/blender8/sim/supervision.hpp",
+      "sha256": "d73c2c41bec724e5c83c48a9018f6d2566719ac9ec7ef03f48cd4da39eace81b",
+      "unchanged": true
+    },
+    {
+      "path": "sim/include/blender8/sim/temperature_sensor.hpp",
+      "sha256": "2b08e602db5fb7df3a7cb4b67fb39da630d3037f81397cd5d184e9acd074a123",
+      "unchanged": true
+    },
+    {
+      "path": "sim/include/blender8/sim/thermal_model.hpp",
+      "sha256": "9561c4d302d3b5f6505eade020d77e55b74f8e46ce9c70b0197779cdc7d04bd0",
+      "unchanged": true
+    },
+    {
+      "path": "sim/src/adc.cpp",
+      "sha256": "302ecc9a7bc9ae7726a7903966e5779794deca1321aeadb10bca6897c1fbd8b9",
+      "unchanged": true
+    },
+    {
+      "path": "sim/src/board.cpp",
+      "sha256": "f62ea6e9f85f273666978652398f7e8253a848cd5acb8979f053df697d7758e8",
+      "unchanged": true
+    },
+    {
+      "path": "sim/src/button_assembly.cpp",
+      "sha256": "7889f6214d70be3722d3e947edf39198036f03ce7c879d31649350db90b2fff2",
+      "unchanged": true
+    },
+    {
+      "path": "sim/src/clock_tree.cpp",
+      "sha256": "7508e1bb85ad75575b0dead2bff439095eb6db1a0f6e767195f95949210ff06a",
+      "unchanged": true
+    },
+    {
+      "path": "sim/src/fixture.cpp",
+      "sha256": "2c90b6b2fc6202829faf838d58a2ac5447e31aad7deb1797d457a8e69708f5a7",
+      "unchanged": true
+    },
+    {
+      "path": "sim/src/hwil.cpp",
+      "sha256": "55fd0d8c3a4a5e3cb38a6945ea36983a65be998cb1909ad7cde524b573dc4d15",
+      "unchanged": true
+    },
+    {
+      "path": "sim/src/jar_interlock.cpp",
+      "sha256": "507ac8ffb41ecef302c9bd87030abfa5c675ba386f97e7c7c33d8d8bffdea3a6",
+      "unchanged": true
+    },
+    {
+      "path": "sim/src/lcd32.cpp",
+      "sha256": "ceab32871c10c8ef504a47b287d6ca43af0e3a05914b8be557347de7dccd4bc5",
+      "unchanged": true
+    },
+    {
+      "path": "sim/src/mcu.cpp",
+      "sha256": "ed6375a33bdad8fb4d548ca5c196801ef840acf4feb69858c40f73db4a4856a5",
+      "unchanged": true
+    },
+    {
+      "path": "sim/src/motor.cpp",
+      "sha256": "88d859b985c9e5a25e1c67cba898f84eebd544d5e475c392915afae704e9922f",
+      "unchanged": true
+    },
+    {
+      "path": "sim/src/mux8.cpp",
+      "sha256": "9785cdebcac925e0edb81e50aa54ec3c3c52ba345265bbe28577e7e1ca32fe51",
+      "unchanged": true
+    },
+    {
+      "path": "sim/src/runtime.cpp",
+      "sha256": "2fad9a0932a10fafc7cec15ae4aadcfb69bd4b07759b65069138e6c718dcbd38",
+      "unchanged": true
+    },
+    {
+      "path": "sim/src/supervision.cpp",
+      "sha256": "67a8ebedaba2209b96d4ce629c57389b441d341259d1d0507f1d9679ae06f29b",
+      "unchanged": true
+    },
+    {
+      "path": "sim/src/temperature_sensor.cpp",
+      "sha256": "93ca7aae3958c708f28f1b21c536ad9fff8b04be57ebc6897a0658bd9c9b1d8f",
+      "unchanged": true
+    },
+    {
+      "path": "sim/src/thermal_model.cpp",
+      "sha256": "9e39c0e2ea014c843c752a838ed28ef265175aca3e66124e3a47ba3bcd231d98",
+      "unchanged": true
+    }
+  ]
+}

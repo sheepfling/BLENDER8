@@ -1,0 +1,1048 @@
+{
+  "version": "0.5.0",
+  "b8_interface": "03",
+  "chassis": "04",
+  "files": [
+    {
+      "path": ".clang-format",
+      "sha256": "33c92ec1a00e31d03cb3b3446379dc08b730da3aa2606ecdca77c39527a79f98",
+      "bytes": 142
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "f4b3737bafc1fade9f074b1a122cb2a5448d40fca8fc25c7d08b032ff80b30e9",
+      "bytes": 41
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "1e32027388d049cfb47869b1b0d9e0579ec6911c8e9b79ade05302a4fe29851c",
+      "bytes": 1483
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "6d95029f39c4724590dc8ee8a5f26297b7c7b1ae7c683adf2716625c7e273dea",
+      "bytes": 16261
+    },
+    {
+      "path": "README.md",
+      "sha256": "a0decdfe425a12432e953d913ad31bfbd76b1a5bd8e6139e6a0299caa80452d8",
+      "bytes": 6791
+    },
+    {
+      "path": "apps/bench.cpp",
+      "sha256": "c1f17f83852fa514c97fbb5ae00fba773bf98d636807a96b89e19850230ffae4",
+      "bytes": 1682
+    },
+    {
+      "path": "apps/clock_bench.cpp",
+      "sha256": "8449fdafd425033c1c1f2fadcffdf4ed711ee6bfb0feb742deabdaa6dce12507",
+      "bytes": 1051
+    },
+    {
+      "path": "apps/emulator.cpp",
+      "sha256": "4f806ddaedd2660bee6ca59e76a076863f28990f2fc128423900dad1385e9589",
+      "bytes": 2296
+    },
+    {
+      "path": "apps/student_runner.cpp",
+      "sha256": "68e705e618af336ed692384db4baf0f6ff3ecb313648d60a8960c7a7c5381197",
+      "bytes": 585
+    },
+    {
+      "path": "cmake/B8Wasm.cmake",
+      "sha256": "74b45d0df602c2dae0eebd858a02f6e03a4e786e057224cd5331304512f9c834",
+      "bytes": 3025
+    },
+    {
+      "path": "docs/ACCEPTANCE.md",
+      "sha256": "0e107b5d069f6dc9383c2c280150042ead4b3ce0fb0cbfcc1658ba1a848e22c2",
+      "bytes": 4933
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "sha256": "aa514528c46a4ebf07d86383426312897dcaa1b87a98c2f466636dac4c101b42",
+      "bytes": 7587
+    },
+    {
+      "path": "docs/ASSIGNMENT.md",
+      "sha256": "38d6b92c3d63fadafa083f3f1d04bfcc8466ebd3380150890e72266a3f5ba3f3",
+      "bytes": 5110
+    },
+    {
+      "path": "docs/BOARD_WIRING.md",
+      "sha256": "7f5b9b9ed217a37123c866c9bcca47169a176aa6aef8d794efbf8679a502ef8f",
+      "bytes": 309
+    },
+    {
+      "path": "docs/CLOCK_RESET_CONTRACT.md",
+      "sha256": "ca17402df26fe3a430a0548dac1a286d5a9be3f05b22b064c4ef1e1da0838698",
+      "bytes": 17485
+    },
+    {
+      "path": "docs/COMPONENTS-AND-HWIL.md",
+      "sha256": "921a69cf30e9398df39f03d385a9fd997ab708c57d804bd6ce2f3105a3477a5f",
+      "bytes": 6569
+    },
+    {
+      "path": "docs/HIL_MIGRATION.md",
+      "sha256": "07ebd3f561f5898571407b7529174403b66b988a6d40b489b345b8c5b1a81141",
+      "bytes": 570
+    },
+    {
+      "path": "docs/IMPLEMENTATION_STATUS.md",
+      "sha256": "c9996167d7faf46c4b0d635373db4dc8d68313dea5647e7d8bad48e740b24039",
+      "bytes": 1179
+    },
+    {
+      "path": "docs/PROTOCOL.md",
+      "sha256": "bfce2399fc340b01ffb7a886ccec523e17b0964e90440a3ca4d78a7603d8dd73",
+      "bytes": 4735
+    },
+    {
+      "path": "docs/QUIRKS.md",
+      "sha256": "34525392653c60358ecbf3734e81e814a4b71501164c23adc15eebad34a0cb75",
+      "bytes": 5885
+    },
+    {
+      "path": "docs/RELEASE-0.4.0.md",
+      "sha256": "8483d0661316d91ac6cd411ba9b8dd6b5ff90a3d7316a5e90a218a0386f3c44e",
+      "bytes": 4989
+    },
+    {
+      "path": "docs/RELEASE-0.5.0.md",
+      "sha256": "99e7b7834eb27036db4bfe42405a221f6ad72843c5f8e7607de2f3c32e5de13b",
+      "bytes": 1986
+    },
+    {
+      "path": "docs/SOURCES.md",
+      "sha256": "e860fa4f876cb2a9377d4c5c5ff7e17e2bdd7b2716199b38d0769c8187add4b8",
+      "bytes": 2318
+    },
+    {
+      "path": "docs/TESTING.md",
+      "sha256": "895bb6282958327721a2e9104ff0643a951d3e733986da5680895c158fe48e80",
+      "bytes": 5569
+    },
+    {
+      "path": "docs/TEST_PLAN.md",
+      "sha256": "19731d7f704c372236a6e4d9c552f2fe318fcf3102264c2190d8ff77558ef500",
+      "bytes": 13237
+    },
+    {
+      "path": "docs/VALIDATION-0.5.0.md",
+      "sha256": "d0adc1a73485610e9fe963df3f53db7003e7c6cc29165a082ab9c6196b26ad6b",
+      "bytes": 5830
+    },
+    {
+      "path": "docs/VALIDATION.md",
+      "sha256": "961b5cdb50748f79a306396c206be433c637b89dec03d96d1b0a720c8d97861c",
+      "bytes": 2436
+    },
+    {
+      "path": "docs/WASM.md",
+      "sha256": "5e2411f19746b67191fa818502ac81911744be78dcb662f643bc7813c9e8afdb",
+      "bytes": 12331
+    },
+    {
+      "path": "docs/datasheets/BUTTON_ASSEMBLY.md",
+      "sha256": "2d521847bd5834ed66d53c2926befb94ad4480341d65ce65716f11af874f4a4c",
+      "bytes": 3300
+    },
+    {
+      "path": "docs/datasheets/LCD32.md",
+      "sha256": "1854e3affd67944abdda1427e02ae024aaea570345a1fd6352ee3603a0e5f5dd",
+      "bytes": 2876
+    },
+    {
+      "path": "docs/datasheets/MCU_B8.md",
+      "sha256": "c498260171916850d1ef1ad3449ba75566a086b9ed9653ffd944b3722312fc3a",
+      "bytes": 30515
+    },
+    {
+      "path": "docs/datasheets/MOTOR.md",
+      "sha256": "5835d444ba03df5db07b523add6fb9d46ce72a0d18e8ecfe888b5bced27ab54d",
+      "bytes": 6161
+    },
+    {
+      "path": "docs/datasheets/MUX8.md",
+      "sha256": "5ef1e7a5dba2d1f18930e39aa7335186b22e2d1e40771273c6890a290a25edca",
+      "bytes": 1417
+    },
+    {
+      "path": "docs/datasheets/TEMPERATURE_SENSOR.md",
+      "sha256": "13598979bfec89ace14e324907495c80abdbc6444b6053496888691f5a833fbb",
+      "bytes": 4032
+    },
+    {
+      "path": "docs/legacy-02/ARCHITECTURE.md",
+      "sha256": "b7cf1bb49527851b9b7c74e28a051423615f9ba86415cdcb4031cf4716f46ebc",
+      "bytes": 8771
+    },
+    {
+      "path": "docs/legacy-02/BOARD_WIRING.md",
+      "sha256": "4aaaee590a97aa69e1a652e918f92d6d538cf6b5a4022c3b7a6e695a505659e3",
+      "bytes": 3185
+    },
+    {
+      "path": "docs/legacy-02/HIL_MIGRATION.md",
+      "sha256": "31ee704385348ac2047a953f949a8b9058e7d0537e98543e506ff634f9a2953b",
+      "bytes": 3873
+    },
+    {
+      "path": "docs/legacy-02/IMPLEMENTATION_STATUS.md",
+      "sha256": "6efdcb236df44f4080a8e4a9b20448746cebf41610e77c26dbfbd9e726047fc1",
+      "bytes": 1897
+    },
+    {
+      "path": "docs/legacy-02/MCU_B8.md",
+      "sha256": "af3c095e81bf4d09f3d66da15222478378080bd5dc89d637afb1a06b56e66ec5",
+      "bytes": 10123
+    },
+    {
+      "path": "docs/legacy-02/README.md",
+      "sha256": "f41e2760fa348fb4143c0898403871e13b3c734a8be90e07c43e8d70bcc148e0",
+      "bytes": 3943
+    },
+    {
+      "path": "docs/legacy-02/VALIDATION.md",
+      "sha256": "3b91f3c40216ce6da2598eafeb98f22d6cebac9b2c344b6f7f2b2f7347f7e2d5",
+      "bytes": 2510
+    },
+    {
+      "path": "docs/requirements/FW_REQUIREMENTS.md",
+      "sha256": "abcf330fc9a2d4be6e68a5ccf190694fffab58d7512c1a28ddaced394d6d0d9f",
+      "bytes": 11530
+    },
+    {
+      "path": "evidence/clang-test.log",
+      "sha256": "9e4ab852972d96e1d84b4d02037a802fcab1743f10eb4b9ce2d82a9519bb0f31",
+      "bytes": 13100
+    },
+    {
+      "path": "evidence/clock-bench.log",
+      "sha256": "f5c3b7351def595a06757341bcb3b342f1c6be8885bad1ca6ffff408757171f6",
+      "bytes": 164
+    },
+    {
+      "path": "evidence/ctest.log",
+      "sha256": "10cdd17d0f9387792ea7eff639b183ca84b19c219d98873d215e49aefdd45cfe",
+      "bytes": 13096
+    },
+    {
+      "path": "evidence/pytest.log",
+      "sha256": "9583dda473d7c583465e70ec615ad7964a08b7135b60411d3d142b2c6c2b5c33",
+      "bytes": 260
+    },
+    {
+      "path": "evidence/release-0.4.0/acceptance-verified.log",
+      "sha256": "9720d237574d1d498cdb337e257de7972eacb14ed206f8b197851c717b18f25f",
+      "bytes": 15464
+    },
+    {
+      "path": "evidence/release-0.4.0/b8-workbench-small.png",
+      "sha256": "450e75d4367806792122f30715887f341b69bfb74fa329a9349a1468d0bd52c1",
+      "bytes": 166452
+    },
+    {
+      "path": "evidence/release-0.4.0/b8-workbench.png",
+      "sha256": "b7d667d5a623b771739ec1a63d6c1787c672352414722a6a5d8f71258e176433",
+      "bytes": 158524
+    },
+    {
+      "path": "evidence/release-0.4.0/baseline-tests.log",
+      "sha256": "19b2126ec8bb8b1d52caf52096613a0a52971fcfb72fec4563e8ecb60b9a7fd1",
+      "bytes": 13965
+    },
+    {
+      "path": "evidence/release-0.4.0/clang-release.log",
+      "sha256": "66efb302a239b5093b0dd86439155a240208eba066dede65fb8b41e50f10f329",
+      "bytes": 29399
+    },
+    {
+      "path": "evidence/release-0.4.0/custom-firmware-selection.json",
+      "sha256": "b70a5d684e7a631b3e856f16e45f2b5d3518e4f8304ea9adc5a6931056c6a84b",
+      "bytes": 741
+    },
+    {
+      "path": "evidence/release-0.4.0/document-source-preservation.json",
+      "sha256": "73fc768279ad1455af3d558dc190eb22e8681e319003fc2e4f8c1e5041105661",
+      "bytes": 8705
+    },
+    {
+      "path": "evidence/release-0.4.0/documents-verified.log",
+      "sha256": "affe2035b1626f466037ee7b1c6293429e442a37da1b7fb8d3eeb67bfd0a1eea",
+      "bytes": 291
+    },
+    {
+      "path": "evidence/release-0.4.0/environment.json",
+      "sha256": "aa869fa9b0f2ed59027425e1f6b153d54faa990604834cd0833777cae66d1873",
+      "bytes": 564
+    },
+    {
+      "path": "evidence/release-0.4.0/executables.json",
+      "sha256": "c275b45403a145be8f06a1a5a674933c26ca785f8541a6d293264c37165b927e",
+      "bytes": 262
+    },
+    {
+      "path": "evidence/release-0.4.0/extracted-smoke.log",
+      "sha256": "9dbd16c1c32fc99d6d9e70d6fe3d795a7ce42d55a5f0d32cf83f1b6e4e95c61c",
+      "bytes": 30426
+    },
+    {
+      "path": "evidence/release-0.4.0/extracted-source-check.json",
+      "sha256": "e75ba0efd93de061cbdd7bd59cb4726852f0c33c2f340299cab58fedef5c8972",
+      "bytes": 67
+    },
+    {
+      "path": "evidence/release-0.4.0/gcc-release.log",
+      "sha256": "54f82d13d2c0175b981ad082dfc91a0743f30495d9a73bc1ec940778fa66c6c8",
+      "bytes": 30626
+    },
+    {
+      "path": "evidence/release-0.4.0/sanitize-release.log",
+      "sha256": "002f1426e01780583944c1197af1fe1437a94b6adbc4330ffb1833924ad8bac1",
+      "bytes": 29408
+    },
+    {
+      "path": "evidence/release-0.4.0/starter-acceptance.json",
+      "sha256": "c54b31cc431f25277ef2e583ad5746af568d6b342622dd7635c5273ab6cfc0b0",
+      "bytes": 1906017
+    },
+    {
+      "path": "evidence/release-0.4.0/stress-verified.log",
+      "sha256": "aaa4571b5de70d00bf1f3d33a7ff7de73736b53f9a3cbe53d2e8bcd86c26321a",
+      "bytes": 306
+    },
+    {
+      "path": "evidence/release-0.4.0/summary.json",
+      "sha256": "1dde499516425c8806520505d96521f3829fba773abd2bd53b5a25dfa8237d27",
+      "bytes": 1117
+    },
+    {
+      "path": "evidence/release-0.4.0/ui-check-final.log",
+      "sha256": "53148df2d6fcfd28ee78fcac8bb55ac10943cec2b727cfbe6000c7c604cb5e87",
+      "bytes": 35
+    },
+    {
+      "path": "evidence/release-0.4.0/ui-validation.json",
+      "sha256": "d2bdf54d2f7baf8c92a11555b762f60bffc3d41fe99c4f6c64851780efb389ed",
+      "bytes": 317
+    },
+    {
+      "path": "evidence/release-0.5.0/apt-update.log",
+      "sha256": "011055385f0db582dae926e6be4c0103e6d0de60f43abdd1b73d8280c2399f24",
+      "bytes": 234
+    },
+    {
+      "path": "evidence/release-0.5.0/asan-build.log",
+      "sha256": "fd6988fa726e73bd54e5a78ccaebe74679aca72456769fcce6ffff1da9217797",
+      "bytes": 7508
+    },
+    {
+      "path": "evidence/release-0.5.0/asan-configure.log",
+      "sha256": "70ee3d7c82661fe708b8a3d7f1e168bff813fd12a0b65162f8cd522b92ef1822",
+      "bytes": 512
+    },
+    {
+      "path": "evidence/release-0.5.0/asan-no-stress.log",
+      "sha256": "4610128d4ac2ec3c8de65d16e797e746b91e284f4b5765f6067391d44a07299e",
+      "bytes": 24439
+    },
+    {
+      "path": "evidence/release-0.5.0/asan-small-stress.log",
+      "sha256": "f0b3bb93592c8c8d2ec2df1b08c663ea64357c8134ccab039301f22f21eef27a",
+      "bytes": 147
+    },
+    {
+      "path": "evidence/release-0.5.0/asan-test.log",
+      "sha256": "2ecf68ae3013f741e388b1512e42161434c7e44b81dba1e4c5423fba837f8324",
+      "bytes": 24007
+    },
+    {
+      "path": "evidence/release-0.5.0/baseline-build.log",
+      "sha256": "6aa5b908183e9aaed2c14835a85b21277bcf5b6142def8a0bc644200bf9b9bb5",
+      "bytes": 7078
+    },
+    {
+      "path": "evidence/release-0.5.0/baseline-configure.log",
+      "sha256": "cfea9a2a6541b36322337a0b30513bb8cc7df0cf2136adac070a43606f8bbcfb",
+      "bytes": 494
+    },
+    {
+      "path": "evidence/release-0.5.0/baseline-test.log",
+      "sha256": "4deb403f39717ccddf663ee4dcc4f7213ae697b1f9dfbcd7e25d27546c6d537e",
+      "bytes": 23588
+    },
+    {
+      "path": "evidence/release-0.5.0/clang-build.log",
+      "sha256": "004ca04d2d12acf403d6dbcbcb9eb119205d6e4544670129168c2c7f0fa0bfb5",
+      "bytes": 7508
+    },
+    {
+      "path": "evidence/release-0.5.0/clang-configure.log",
+      "sha256": "d5c770a790789fe039fa00c1dce18826150ef77806f90d1b2055ed48c0928b99",
+      "bytes": 513
+    },
+    {
+      "path": "evidence/release-0.5.0/clang-test-final.log",
+      "sha256": "dbf956dd270439da12a6290c52ad5087b5e5da9e5f96d7ae96f83a02d443e8de",
+      "bytes": 24609
+    },
+    {
+      "path": "evidence/release-0.5.0/clang-test.log",
+      "sha256": "4f7d4813c61295261432c78cd8cc6da53a03493dc61e20478844f7042a1dcd85",
+      "bytes": 24609
+    },
+    {
+      "path": "evidence/release-0.5.0/core-preservation.json",
+      "sha256": "8dbf46a929e8a720445fbcf80cf2c92301cdab64f495b92cd0cac2f2903e0b9e",
+      "bytes": 10262
+    },
+    {
+      "path": "evidence/release-0.5.0/extracted-build.log",
+      "sha256": "80860a1059c92203d96d93a647ac8a369827ea14214fbd0cd755216feac7fb22",
+      "bytes": 7508
+    },
+    {
+      "path": "evidence/release-0.5.0/extracted-configure.log",
+      "sha256": "c672369f135c47bb62e0752e0f2d84eca9029addcf753fa6d589ac7ad9ee8e69",
+      "bytes": 494
+    },
+    {
+      "path": "evidence/release-0.5.0/extracted-test.log",
+      "sha256": "1a36e4754735874480c8aebe6a3468bdfd1b4889633e6879658fd1df94954d84",
+      "bytes": 24615
+    },
+    {
+      "path": "evidence/release-0.5.0/js-unit.log",
+      "sha256": "a2176cc950c059d24e1f5255d4c941947692c1c3bd7ce4c371ce73b4c9bdf3e3",
+      "bytes": 2919
+    },
+    {
+      "path": "evidence/release-0.5.0/native-build.log",
+      "sha256": "51e10b3a13eb3a3a1f19d533682d417af3e25e1d8a816be533a2730e51a6639c",
+      "bytes": 3674
+    },
+    {
+      "path": "evidence/release-0.5.0/native-configure.log",
+      "sha256": "8bbeb69222f8d118008392f9027757daea10390936428b9148fb20cdcb3b23e7",
+      "bytes": 136
+    },
+    {
+      "path": "evidence/release-0.5.0/native-session-parity.json",
+      "sha256": "adacbd906bbb7e75bce70535c68b3d81830d86763be64c67fa6e11c42e17777c",
+      "bytes": 1489
+    },
+    {
+      "path": "evidence/release-0.5.0/native-test-final.log",
+      "sha256": "d42c31c56c71567678b160138a26bc2209a22f8f104afb338550946ba31598a4",
+      "bytes": 24611
+    },
+    {
+      "path": "evidence/release-0.5.0/native-test.log",
+      "sha256": "a982da020747cf5d1e7c25570bac406df5c2c07dc46e95c04fe35af45189fd98",
+      "bytes": 24611
+    },
+    {
+      "path": "evidence/release-0.5.0/release-status.json",
+      "sha256": "5d04ff59b9af7a89c3bbafca1751124dfc79b63fe97798ea263c8b7ee6bdc94c",
+      "bytes": 534
+    },
+    {
+      "path": "evidence/release-0.5.0/syntax.log",
+      "sha256": "ec0cc925768f50d1eeb02b023d20178c6a0d4bdb1831a281f2ffb5d29df83b13",
+      "bytes": 71
+    },
+    {
+      "path": "evidence/release-0.5.0/toolchain.json",
+      "sha256": "be22c8621f29d97686d535c37ea9419da91913011972d438ccbd33bbcfe6d47f",
+      "bytes": 290
+    },
+    {
+      "path": "evidence/release-0.5.0/tooling-unit.log",
+      "sha256": "81f13cb7ba9deba39877196676600fd81b0153e02ebdf838ea04c39853e01c35",
+      "bytes": 723
+    },
+    {
+      "path": "evidence/release-0.5.0/wasm-build-attempt.log",
+      "sha256": "44f2b675fbb33c6d71f6ad4406eb9c3b8d1441f4f4e37f60fa16d82a794f04e7",
+      "bytes": 123
+    },
+    {
+      "path": "evidence/release-0.5.0/wasm-test-attempt.log",
+      "sha256": "7c4f80a115706abe03892065f47778635a740d62581e0382c88218e6b0e0c0c2",
+      "bytes": 62
+    },
+    {
+      "path": "evidence/validation.json",
+      "sha256": "92092e695dfe754df7d02ef4fc4665619ec59e9e8e66080bcb747f9721e0bc11",
+      "bytes": 4675
+    },
+    {
+      "path": "examples/component_swap.cpp",
+      "sha256": "e9b72e834060bd4afa1531b29512016d7c507e0df6d52fbe7e882aa0461f7aa5",
+      "bytes": 1971
+    },
+    {
+      "path": "examples/manual_snippets.inc",
+      "sha256": "926e1038f3c99d240ecde641c9988224d436fa9a44bb117044ba8d3b2edaf874",
+      "bytes": 2852
+    },
+    {
+      "path": "examples/pixel_probe/firmware.cpp",
+      "sha256": "066c749c02367301a29f920e56e91114e1d14fd3a44a17a34af7fe318653aa8c",
+      "bytes": 1736
+    },
+    {
+      "path": "firmware/board_config.hpp",
+      "sha256": "2ed93ed47d470316d926f2ee250bc47af4877b8d5674ae39551ac3e0456390d9",
+      "bytes": 785
+    },
+    {
+      "path": "firmware/firmware.cpp",
+      "sha256": "c5d07d08c24f628a571a860fa718bf4db46ae0bcbbd29482ba8963ff2089076e",
+      "bytes": 1416
+    },
+    {
+      "path": "firmware/firmware.hpp",
+      "sha256": "2e097f14239402420ea8d63fd221576758aea331ed4ba9955e637122c9130efc",
+      "bytes": 46
+    },
+    {
+      "path": "host/include/blender8/host/backend.hpp",
+      "sha256": "0084b407d6f698854d0e99bffc065486aeb29c0a704dfbaf9c68db632bbaf9a3",
+      "bytes": 979
+    },
+    {
+      "path": "host/src/backend.cpp",
+      "sha256": "5cf4c20860433cb8ae01918a4c36307689e9a62bc809d71cf8799c2f202c3b3b",
+      "bytes": 748
+    },
+    {
+      "path": "pyrightconfig.json",
+      "sha256": "2536703ab01fe6d8aac5576a6f0299fd1aed73c403132baab9da48508521de12",
+      "bytes": 132
+    },
+    {
+      "path": "requirements/correspondence.json",
+      "sha256": "b6089f20f16b9a55f276adaadaf83960ae66ae38d76ff1b969d3847924e89dcf",
+      "bytes": 30126
+    },
+    {
+      "path": "requirements/correspondence.md",
+      "sha256": "5228b58bcd9ed24442c70970a89d148a5963b305ef9dcc769bb9b78c6749e4e4",
+      "bytes": 22664
+    },
+    {
+      "path": "ruff.toml",
+      "sha256": "6b96dac9306b54938b003f34062860ad6dafa95edfdc72234304cbb665653547",
+      "bytes": 104
+    },
+    {
+      "path": "scenarios/README.md",
+      "sha256": "6980542cc49b7d614f9d69cb499ece2399c394d22b8e21da6f645b7da5fa998c",
+      "bytes": 895
+    },
+    {
+      "path": "scenarios/acceptance_cases.json",
+      "sha256": "12f8cd5b35c034d8dd637b8b62312439ea56c3c9149e3d0561471e3ed2309a62",
+      "bytes": 12755
+    },
+    {
+      "path": "scenarios/conformance/contact_fault_observation.json",
+      "sha256": "dbffee6d1cb2c072cc02b44d3ae9436e1deec1bff50e33669c13c3ba0b90fd37",
+      "bytes": 527
+    },
+    {
+      "path": "scenarios/conformance/fused_motor_branch.json",
+      "sha256": "54c233d4607571045b1198fdfb6ff2b7bb4fc3229503375b4aad9da92385a6f2",
+      "bytes": 1070
+    },
+    {
+      "path": "scenarios/conformance/invalid_pll_tuple.json",
+      "sha256": "bea78bd02b7025dedd8b40c9816af6a5ce765af55ca053ef7335c00edd5b1911",
+      "bytes": 681
+    },
+    {
+      "path": "scenarios/conformance/jar_dropout_memory.json",
+      "sha256": "22157b14621cbb9bf321219cf576b71e460fadadc524629df96f8f801ba98cbb",
+      "bytes": 2232
+    },
+    {
+      "path": "scenarios/conformance/jar_held_stop.json",
+      "sha256": "4a41b8b24b82cdfa81cd99a253063fa0b340cfe8c329ce18e1c5df9a5d4b1ed8",
+      "bytes": 738
+    },
+    {
+      "path": "scenarios/conformance/lcd_vertical_pixels.json",
+      "sha256": "c6aa1c4aedb3f9516154b1ef13d90c41cb6c5faf43ed59ed4f48bced48cea890",
+      "bytes": 1124
+    },
+    {
+      "path": "scenarios/conformance/motor_load_coast.json",
+      "sha256": "91be46ea381e8a4572afb9ebedb62dff3232ab3c4e9cbb1c79100ff9a893e4e5",
+      "bytes": 1158
+    },
+    {
+      "path": "scenarios/conformance/power_qualification.json",
+      "sha256": "443a41c23ac1cf67e8aeccc766e4b4a294a9b86af28ec9b702399528f1e527ea",
+      "bytes": 633
+    },
+    {
+      "path": "scenarios/conformance/sensor_faults.json",
+      "sha256": "1884519cc3c48212fc471800f5b77a3b332a7c4468b5d640914590dfa77aea08",
+      "bytes": 728
+    },
+    {
+      "path": "scenarios/conformance/watchdog_unserviced.json",
+      "sha256": "c3528388ac9fd366ebb29b984c1a798aab1a85da8cfae52fad471eb8077b80a3",
+      "bytes": 450
+    },
+    {
+      "path": "sdk/include/blender8/access.hpp",
+      "sha256": "0629ca2d53de7b3a78a41a29f4caeb29c1794b6f4b3baa0c754a1b59c0f904d2",
+      "bytes": 1578
+    },
+    {
+      "path": "sdk/include/blender8/device.hpp",
+      "sha256": "5b4564e3e0e958c4e6c5167b7cbf0e9babc63e97f419fa1295e95c18267e17bf",
+      "bytes": 623
+    },
+    {
+      "path": "sdk/include/blender8/firmware.hpp",
+      "sha256": "72ad7fb2b917dd5178afac273ea3fa36acbf802b1613411d36118267a27a2e7e",
+      "bytes": 218
+    },
+    {
+      "path": "sdk/include/blender8/registers.hpp",
+      "sha256": "fc01634729ac5e090c66b942304d898b516114539b8ce26cee77bdb5301db63d",
+      "bytes": 2095
+    },
+    {
+      "path": "sim/include/blender8/sim/adc.hpp",
+      "sha256": "3fc7e14381659b28dc3d63f72975e5a2531d8e11ec0e11fe3dd5fe2ac9cc75ac",
+      "bytes": 1453
+    },
+    {
+      "path": "sim/include/blender8/sim/analog.hpp",
+      "sha256": "7cfee012a5aaf859f48ccd9ff7badf839c4198e497d4e64ba16ac988233e71b9",
+      "bytes": 842
+    },
+    {
+      "path": "sim/include/blender8/sim/board.hpp",
+      "sha256": "b331ec1bc874aee69ff50a3f79f69183b7a4f2831a93e016cace74631b1ffe4f",
+      "bytes": 4913
+    },
+    {
+      "path": "sim/include/blender8/sim/button_assembly.hpp",
+      "sha256": "46d73e2eb2c0d3cb676150e0dc77727e752f59fcd066748ed232576cae58756c",
+      "bytes": 1711
+    },
+    {
+      "path": "sim/include/blender8/sim/clock_source.hpp",
+      "sha256": "38f42c994b51287f9515686c493d5e1a6812818c9a2fd77e382abf7cfc360bbb",
+      "bytes": 1013
+    },
+    {
+      "path": "sim/include/blender8/sim/clock_tree.hpp",
+      "sha256": "5d548cabe0374c9f42f129b226ba9ca079ddd614ee36e38ef84db0a6ef5855ca",
+      "bytes": 1301
+    },
+    {
+      "path": "sim/include/blender8/sim/components.hpp",
+      "sha256": "e71ccf84c3afc18a9b6a19e458273b0e1dc3a6095552e0e5e0fc25606d5bfb0f",
+      "bytes": 3571
+    },
+    {
+      "path": "sim/include/blender8/sim/fixture.hpp",
+      "sha256": "8910d880b9ab4ff320216c75c34cd97536a1a3034ce15797b0f8d8b6869b4b4d",
+      "bytes": 531
+    },
+    {
+      "path": "sim/include/blender8/sim/hwil.hpp",
+      "sha256": "0e363fc1b2a5e9db4ac20264cad250f46a49fe11de4623b3f731295c1e520db1",
+      "bytes": 2088
+    },
+    {
+      "path": "sim/include/blender8/sim/jar_interlock.hpp",
+      "sha256": "12f20a2b65baba5cd28b4f2f029939bcd2c3de531900958d6d67a7e0b6908b43",
+      "bytes": 1382
+    },
+    {
+      "path": "sim/include/blender8/sim/lcd32.hpp",
+      "sha256": "c1b2e259af18f277420cfecffacac04cda36000c5412667b9e2cdb487c36f359",
+      "bytes": 998
+    },
+    {
+      "path": "sim/include/blender8/sim/mcu.hpp",
+      "sha256": "74d81b5d2a75f6a93d3b7f2a5b0beb08b033a48f1101a6b6be4e523a124fa0cf",
+      "bytes": 3603
+    },
+    {
+      "path": "sim/include/blender8/sim/motor.hpp",
+      "sha256": "1e7cbcc1944bfeb4928ac697e710694ad9718f2bdf15736338d8aa728c7fe8af",
+      "bytes": 1448
+    },
+    {
+      "path": "sim/include/blender8/sim/mux8.hpp",
+      "sha256": "54437cb89b804fb3ec718274f66917f520f6b5871d40fe6e9163a929201a0c97",
+      "bytes": 525
+    },
+    {
+      "path": "sim/include/blender8/sim/power_domain.hpp",
+      "sha256": "d41329a1edac412ad5bbb78a3b3df711bd5be498479687661e28eae4aae9f313",
+      "bytes": 1823
+    },
+    {
+      "path": "sim/include/blender8/sim/runtime.hpp",
+      "sha256": "cd4302beaf0a1ccc9393ce1f4b623f07315029b20011a0a66a05c03482daac4d",
+      "bytes": 1938
+    },
+    {
+      "path": "sim/include/blender8/sim/session.hpp",
+      "sha256": "771ffee41cb40846774a21f07d3e66a454f402583a38e6e3218d1b139f8430b9",
+      "bytes": 1340
+    },
+    {
+      "path": "sim/include/blender8/sim/signals.hpp",
+      "sha256": "8cc11b514e7520b2e9c6d97a3c3c7500964a4f5b27e59704735423b142c7eb1b",
+      "bytes": 1530
+    },
+    {
+      "path": "sim/include/blender8/sim/supervision.hpp",
+      "sha256": "d73c2c41bec724e5c83c48a9018f6d2566719ac9ec7ef03f48cd4da39eace81b",
+      "bytes": 1974
+    },
+    {
+      "path": "sim/include/blender8/sim/temperature_sensor.hpp",
+      "sha256": "2b08e602db5fb7df3a7cb4b67fb39da630d3037f81397cd5d184e9acd074a123",
+      "bytes": 1124
+    },
+    {
+      "path": "sim/include/blender8/sim/thermal_model.hpp",
+      "sha256": "9561c4d302d3b5f6505eade020d77e55b74f8e46ce9c70b0197779cdc7d04bd0",
+      "bytes": 864
+    },
+    {
+      "path": "sim/src/adc.cpp",
+      "sha256": "302ecc9a7bc9ae7726a7903966e5779794deca1321aeadb10bca6897c1fbd8b9",
+      "bytes": 2183
+    },
+    {
+      "path": "sim/src/board.cpp",
+      "sha256": "f62ea6e9f85f273666978652398f7e8253a848cd5acb8979f053df697d7758e8",
+      "bytes": 5369
+    },
+    {
+      "path": "sim/src/button_assembly.cpp",
+      "sha256": "7889f6214d70be3722d3e947edf39198036f03ce7c879d31649350db90b2fff2",
+      "bytes": 3426
+    },
+    {
+      "path": "sim/src/clock_tree.cpp",
+      "sha256": "7508e1bb85ad75575b0dead2bff439095eb6db1a0f6e767195f95949210ff06a",
+      "bytes": 3064
+    },
+    {
+      "path": "sim/src/fixture.cpp",
+      "sha256": "2c90b6b2fc6202829faf838d58a2ac5447e31aad7deb1797d457a8e69708f5a7",
+      "bytes": 9432
+    },
+    {
+      "path": "sim/src/hwil.cpp",
+      "sha256": "55fd0d8c3a4a5e3cb38a6945ea36983a65be998cb1909ad7cde524b573dc4d15",
+      "bytes": 1728
+    },
+    {
+      "path": "sim/src/jar_interlock.cpp",
+      "sha256": "507ac8ffb41ecef302c9bd87030abfa5c675ba386f97e7c7c33d8d8bffdea3a6",
+      "bytes": 1407
+    },
+    {
+      "path": "sim/src/lcd32.cpp",
+      "sha256": "ceab32871c10c8ef504a47b287d6ca43af0e3a05914b8be557347de7dccd4bc5",
+      "bytes": 1436
+    },
+    {
+      "path": "sim/src/mcu.cpp",
+      "sha256": "ed6375a33bdad8fb4d548ca5c196801ef840acf4feb69858c40f73db4a4856a5",
+      "bytes": 9742
+    },
+    {
+      "path": "sim/src/motor.cpp",
+      "sha256": "88d859b985c9e5a25e1c67cba898f84eebd544d5e475c392915afae704e9922f",
+      "bytes": 1969
+    },
+    {
+      "path": "sim/src/mux8.cpp",
+      "sha256": "9785cdebcac925e0edb81e50aa54ec3c3c52ba345265bbe28577e7e1ca32fe51",
+      "bytes": 609
+    },
+    {
+      "path": "sim/src/runtime.cpp",
+      "sha256": "2fad9a0932a10fafc7cec15ae4aadcfb69bd4b07759b65069138e6c718dcbd38",
+      "bytes": 3629
+    },
+    {
+      "path": "sim/src/session.cpp",
+      "sha256": "e781d169edd8bb7fafaa0e9a48377848f25a9a95950e82331197bb5c157b1e35",
+      "bytes": 5938
+    },
+    {
+      "path": "sim/src/supervision.cpp",
+      "sha256": "67a8ebedaba2209b96d4ce629c57389b441d341259d1d0507f1d9679ae06f29b",
+      "bytes": 2088
+    },
+    {
+      "path": "sim/src/temperature_sensor.cpp",
+      "sha256": "93ca7aae3958c708f28f1b21c536ad9fff8b04be57ebc6897a0658bd9c9b1d8f",
+      "bytes": 2015
+    },
+    {
+      "path": "sim/src/thermal_model.cpp",
+      "sha256": "9e39c0e2ea014c843c752a838ed28ef265175aca3e66124e3a47ba3bcd231d98",
+      "bytes": 1593
+    },
+    {
+      "path": "spec/acceptance_inventory.json",
+      "sha256": "683a01a48cbac09ebd60fecab616bb4db49f86a2efd600eac7ba7fc9b5192134",
+      "bytes": 8128
+    },
+    {
+      "path": "spec/clock_reliability_requirements.json",
+      "sha256": "3db51061d7cfe5818e5e028a5e3cac860529847a76a82c729e10da7c1ac43008",
+      "bytes": 5959
+    },
+    {
+      "path": "spec/firmware_requirements.json",
+      "sha256": "0356f535418c27796507e9b994154a3b079dbc9f2aacf9577bbf985b1e744213",
+      "bytes": 10791
+    },
+    {
+      "path": "spec/reference_test_inventory.json",
+      "sha256": "3e9362a00f84ec2a618daf4a02d563fbe298c45c351beb02117fa5dddb028efa",
+      "bytes": 1762
+    },
+    {
+      "path": "spec/registers.json",
+      "sha256": "76f7a4732cc37c3ac4fb533a40e9cf932564270f820264554a3889f17258394c",
+      "bytes": 10264
+    },
+    {
+      "path": "spec/teaching_profile.json",
+      "sha256": "2f7e8ab2960bc607e92a884d139cbc2d01f6b8e70287e2aee3ce9eba7f9edcf9",
+      "bytes": 1689
+    },
+    {
+      "path": "tests/clock_tests.cpp",
+      "sha256": "438adabda099c66e19b64870395e9542cd66b5efd54c0f6fb5388a00484e4946",
+      "bytes": 14561
+    },
+    {
+      "path": "tests/hang_firmware.cpp",
+      "sha256": "79c9aca501b36c90db3869d2e52427c6ab2890b5e1cf394154ad5a3e1b04ac2c",
+      "bytes": 172
+    },
+    {
+      "path": "tests/manual_examples.cpp",
+      "sha256": "841b5e0dec85f9d18a248f41a338d8a601827754c563b6c4baac763387531037",
+      "bytes": 3597
+    },
+    {
+      "path": "tests/platform_tests.cpp",
+      "sha256": "27319136168c36a798805b457c96b5c0e8c704cdffb7e0913a46995d52cfb451",
+      "bytes": 20865
+    },
+    {
+      "path": "tests/python_tests.py",
+      "sha256": "e731f76de47e3471b1c8ae985a3fd1249c2e873e5b70ff47a7b7968c147e417e",
+      "bytes": 9359
+    },
+    {
+      "path": "tests/reference_tests.cpp",
+      "sha256": "2b90bd8ba74d0c3d78fb741f075a66e7f88196f677d04a8bc86acc5f7ef5fbb5",
+      "bytes": 20975
+    },
+    {
+      "path": "tests/stress.cpp",
+      "sha256": "b3fe464c7a2f14227ecf62093bedc64e629fb25288182f92bad6df6edd991468",
+      "bytes": 4839
+    },
+    {
+      "path": "tests/test_support.hpp",
+      "sha256": "e713099676ae83c3236816fdd84fe12913245f18cd231cfee6e818c91910c492",
+      "bytes": 1429
+    },
+    {
+      "path": "tests/wasm/client.test.mjs",
+      "sha256": "85a26ea2dd7416435e2df0e1f1f43a6c12ebda9418ecabe28df9c8aa3f73edb0",
+      "bytes": 1671
+    },
+    {
+      "path": "tests/wasm/compiled.test.mjs",
+      "sha256": "c5036e253ecb0e4c315d8b9f9d279340c8968703cc43c209b25b4bb16b11b551",
+      "bytes": 1934
+    },
+    {
+      "path": "tests/wasm/fixture-module.mjs",
+      "sha256": "631989cc2af5ddca748146612cfaf40d546e39af9083646f03aa51a0689e1a3c",
+      "bytes": 1127
+    },
+    {
+      "path": "tests/wasm/node_core_worker.mjs",
+      "sha256": "91f098f4d338a7a1bf0feffc05b4bbb7443e0dd87029f358cf1f9dc494c82d7e",
+      "bytes": 1084
+    },
+    {
+      "path": "tests/wasm/node_fixture_worker.mjs",
+      "sha256": "bb1303720fd98f20d69ffa6d0b4bbc74861edf3c7ced070a30a74a8e8a816c4a",
+      "bytes": 529
+    },
+    {
+      "path": "tests/wasm/node_worker_adapter.mjs",
+      "sha256": "20c8afd7760586fea735987440621e32a189eb10e69675b135b3fd319d9c25f1",
+      "bytes": 575
+    },
+    {
+      "path": "tests/wasm/transport.test.mjs",
+      "sha256": "8a4893fb08d3873fe07b7b98e44c0ce5d177699ee40a506226301b42885bd9ea",
+      "bytes": 3936
+    },
+    {
+      "path": "tests/wasm_abi_tests.cpp",
+      "sha256": "3cb8b02f946841129e221bc02e77af5241417ca71e78dbfd03b69a4ca13966db",
+      "bytes": 3779
+    },
+    {
+      "path": "tests/wasm_tooling_tests.py",
+      "sha256": "7af2bbf7094f6993c4fbf96d1f0793369669fc587c8e7600b751603d2081c05c",
+      "bytes": 5622
+    },
+    {
+      "path": "tools/acceptance.py",
+      "sha256": "62add1275798a0dc22082ca1540054e71fb48690481a2e1e7a4457e44012213c",
+      "bytes": 26520
+    },
+    {
+      "path": "tools/b8.py",
+      "sha256": "b9a403703fe0ffad30aa5664705df5aa305ad5f7b448b18ea2b7e86e21ff1648",
+      "bytes": 6822
+    },
+    {
+      "path": "tools/b8client.py",
+      "sha256": "59b7075ad743a9dea1aa955d22a77e95f01ed339730c2e72bce27921cb93b86d",
+      "bytes": 6041
+    },
+    {
+      "path": "tools/bundle.py",
+      "sha256": "e4cb55bdcd0a0b1bbb6c97b29b865d2bff9bbde5967980912d99bef7a2ad9fe2",
+      "bytes": 3312
+    },
+    {
+      "path": "tools/check_boundaries.py",
+      "sha256": "7893eafb953b2b896d6357b573c272abccd5b4696e72b4798335edced099db9e",
+      "bytes": 1413
+    },
+    {
+      "path": "tools/check_contracts.py",
+      "sha256": "8ffe59da4c2c516fcffae564370ad0b6fb286cfd74ddaa0d0503f63374eecf55",
+      "bytes": 2521
+    },
+    {
+      "path": "tools/check_registers.py",
+      "sha256": "b03aa960e15bdba4a6b6fc329903078024a9cd0e0e1aff536ac991573cba07fb",
+      "bytes": 758
+    },
+    {
+      "path": "tools/emulator.py",
+      "sha256": "11e04a127700761e2a2eddd56baf77b7f8df04402c6b14b2d3d27f702da85e16",
+      "bytes": 5028
+    },
+    {
+      "path": "tools/scenario.py",
+      "sha256": "852e1d84dd56825a55671cba8910c09a522ef8b701d2f21bc557c6ec47d9a506",
+      "bytes": 5040
+    },
+    {
+      "path": "tools/wasm_check.py",
+      "sha256": "90a8c34a234321288fb4784b653231f734c65e9bf8e63e71eeba247a6f7ae797",
+      "bytes": 8795
+    },
+    {
+      "path": "tools/wasm_node.mjs",
+      "sha256": "3c22704f41f0cabd8b01346935dc16458ed5b7e25f68957574e87a28d669ebe6",
+      "bytes": 1781
+    },
+    {
+      "path": "tools/wasm_server.py",
+      "sha256": "bdbaada24482bd5417d4e52af9efdaebfe42b532928fb84d509157d53fd1cdf2",
+      "bytes": 4318
+    },
+    {
+      "path": "tools/wasm_site.py",
+      "sha256": "22ae72f45c15e717a47214d632ef7bfb69385d472ef0eb3327743b5f5bf37eaf",
+      "bytes": 3352
+    },
+    {
+      "path": "ui/b8-worker.mjs",
+      "sha256": "bc3422bb439647df9d7d8a14599c37f0be287b31973eb7143dd8f2c86569b1f8",
+      "bytes": 1380
+    },
+    {
+      "path": "ui/core-client.mjs",
+      "sha256": "63f16b565d414ef3a23a472e801e2a609b4ff12f0960a365f2ed28fce7e16c61",
+      "bytes": 2257
+    },
+    {
+      "path": "ui/index.html",
+      "sha256": "9ff7591c6b1ed61bf280908c988eb13430354cd44369a4dc4a08a29f5ed61e16",
+      "bytes": 8342
+    },
+    {
+      "path": "ui/transport.mjs",
+      "sha256": "f27ec4c9368884f5db6cac6ec83151c455e250790db25aabd44032687ca61344",
+      "bytes": 4803
+    },
+    {
+      "path": "ui/wasm-main.mjs",
+      "sha256": "bcd2cd17a27f0772c7f34d4c2d65f04451033323171639b8ac49dbfdc42fdb55",
+      "bytes": 1748
+    },
+    {
+      "path": "ui/wasm.html",
+      "sha256": "3cfed79700b02e42e5d99e16652917719b62d7f6edfb23b91fd3000cc8cc4552",
+      "bytes": 8158
+    },
+    {
+      "path": "ui/workbench.mjs",
+      "sha256": "174660a12120e9eefe9abc229dd3f91b0716755e178cf1d23d3e2b0086295157",
+      "bytes": 6780
+    },
+    {
+      "path": "ui/worker-host.mjs",
+      "sha256": "dd5c788e5a636ed73c3d703fce9026285df47a96e7433047d79477766bd88089",
+      "bytes": 2049
+    },
+    {
+      "path": "wasm/api.h",
+      "sha256": "09e97f4f8bd465a3b2de9353bc410990a59db3d7cf2468953ee805ae40586dc8",
+      "bytes": 711
+    },
+    {
+      "path": "wasm/bridge.cpp",
+      "sha256": "1f8b6c92a040b23ac45ea486afb91545c48e5274bb95cb4528b683dcd4c2c137",
+      "bytes": 2667
+    },
+    {
+      "path": "wasm/emsdk-version.txt",
+      "sha256": "4ec0b3efdba01e2fb956fa4e2d1499f798cbb5b32930f8c486a3e052891b516c",
+      "bytes": 7
+    }
+  ],
+  "font_files_included": false,
+  "firmware_solution": false,
+  "physical_hwil_validated": false,
+  "wasm_build_verified": false,
+  "wasm_binaries_included": false,
+  "wasm_status": "Source route provided; Emscripten compilation and runtime parity still require execution."
+}

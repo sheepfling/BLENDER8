@@ -1,0 +1,955 @@
+{
+  "$defs": {
+    "Box": {
+      "additionalProperties": false,
+      "description": "Normalized, top-left-origin source-page rectangle; applied before any transform.",
+      "properties": {
+        "x0": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "X0",
+          "type": "number"
+        },
+        "y0": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Y0",
+          "type": "number"
+        },
+        "x1": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "X1",
+          "type": "number"
+        },
+        "y1": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Y1",
+          "type": "number"
+        }
+      },
+      "required": [
+        "x0",
+        "y0",
+        "x1",
+        "y1"
+      ],
+      "title": "Box",
+      "type": "object"
+    },
+    "Coffee": {
+      "additionalProperties": false,
+      "description": "Paper-space cup mark dimensions; coordinates are normalized to the sheet.",
+      "properties": {
+        "radius_mm": {
+          "$ref": "#/$defs/Span",
+          "default": {
+            "min": 19.0,
+            "max": 26.0
+          }
+        },
+        "center_x": {
+          "$ref": "#/$defs/Span",
+          "default": {
+            "min": 0.94,
+            "max": 1.01
+          }
+        },
+        "center_y": {
+          "$ref": "#/$defs/Span",
+          "default": {
+            "min": 0.74,
+            "max": 0.88
+          }
+        },
+        "rim_width_mm": {
+          "default": 0.65,
+          "maximum": 3,
+          "minimum": 0.1,
+          "title": "Rim Width Mm",
+          "type": "number"
+        },
+        "irregularity": {
+          "default": 0.07,
+          "maximum": 0.2,
+          "minimum": 0,
+          "title": "Irregularity",
+          "type": "number"
+        },
+        "broken_rim": {
+          "default": 0.35,
+          "maximum": 0.85,
+          "minimum": 0,
+          "title": "Broken Rim",
+          "type": "number"
+        },
+        "droplets": {
+          "$ref": "#/$defs/CountSpan",
+          "default": {
+            "min": 2,
+            "max": 5
+          }
+        }
+      },
+      "title": "Coffee",
+      "type": "object"
+    },
+    "CountSpan": {
+      "additionalProperties": false,
+      "properties": {
+        "min": {
+          "maximum": 30,
+          "minimum": 0,
+          "title": "Min",
+          "type": "integer"
+        },
+        "max": {
+          "maximum": 30,
+          "minimum": 0,
+          "title": "Max",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "min",
+        "max"
+      ],
+      "title": "CountSpan",
+      "type": "object"
+    },
+    "Handling": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": true,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "stage": {
+          "default": "before_copy",
+          "enum": [
+            "before_copy",
+            "after_copy"
+          ],
+          "title": "Stage",
+          "type": "string"
+        },
+        "coffee": {
+          "default": false,
+          "title": "Coffee",
+          "type": "boolean"
+        },
+        "coffee_profile": {
+          "$ref": "#/$defs/Coffee",
+          "default": {
+            "radius_mm": {
+              "max": 26.0,
+              "min": 19.0
+            },
+            "center_x": {
+              "max": 1.01,
+              "min": 0.94
+            },
+            "center_y": {
+              "max": 0.88,
+              "min": 0.74
+            },
+            "rim_width_mm": 0.65,
+            "irregularity": 0.07,
+            "broken_rim": 0.35,
+            "droplets": {
+              "max": 5,
+              "min": 2
+            }
+          }
+        },
+        "preserve_color_after_copy": {
+          "default": false,
+          "title": "Preserve Color After Copy",
+          "type": "boolean"
+        },
+        "fold": {
+          "default": false,
+          "title": "Fold",
+          "type": "boolean"
+        },
+        "staple": {
+          "default": false,
+          "title": "Staple",
+          "type": "boolean"
+        },
+        "punch_holes": {
+          "default": false,
+          "title": "Punch Holes",
+          "type": "boolean"
+        },
+        "dust_count": {
+          "default": 45,
+          "maximum": 1000,
+          "minimum": 0,
+          "title": "Dust Count",
+          "type": "integer"
+        },
+        "stamp": {
+          "default": "",
+          "maxLength": 40,
+          "pattern": "^[ -~]*$",
+          "title": "Stamp",
+          "type": "string"
+        },
+        "opacity": {
+          "default": 0.3,
+          "maximum": 0.6,
+          "minimum": 0,
+          "title": "Opacity",
+          "type": "number"
+        }
+      },
+      "title": "Handling",
+      "type": "object"
+    },
+    "PageOverride": {
+      "additionalProperties": false,
+      "properties": {
+        "pages": {
+          "items": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "minItems": 1,
+          "title": "Pages",
+          "type": "array"
+        },
+        "patch": {
+          "additionalProperties": true,
+          "title": "Patch",
+          "type": "object"
+        }
+      },
+      "required": [
+        "pages",
+        "patch"
+      ],
+      "title": "PageOverride",
+      "type": "object"
+    },
+    "Paper": {
+      "additionalProperties": false,
+      "properties": {
+        "monochrome": {
+          "default": true,
+          "title": "Monochrome",
+          "type": "boolean"
+        },
+        "rgb": {
+          "default": [
+            249,
+            249,
+            249
+          ],
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "maximum": 255,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "maximum": 255,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "maximum": 255,
+              "minimum": 0,
+              "type": "integer"
+            }
+          ],
+          "title": "Rgb",
+          "type": "array"
+        },
+        "bed_rgb": {
+          "default": [
+            238,
+            238,
+            236
+          ],
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "maximum": 255,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "maximum": 255,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "maximum": 255,
+              "minimum": 0,
+              "type": "integer"
+            }
+          ],
+          "title": "Bed Rgb",
+          "type": "array"
+        }
+      },
+      "title": "Paper",
+      "type": "object"
+    },
+    "PdfOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "encoding": {
+          "default": "lossless",
+          "enum": [
+            "lossless",
+            "jpeg"
+          ],
+          "title": "Encoding",
+          "type": "string"
+        },
+        "jpeg_quality": {
+          "default": 95,
+          "maximum": 100,
+          "minimum": 85,
+          "title": "Jpeg Quality",
+          "type": "integer"
+        }
+      },
+      "title": "PdfOutput",
+      "type": "object"
+    },
+    "Placement": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": true,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "rotation_deg": {
+          "$ref": "#/$defs/Span",
+          "default": {
+            "min": -0.8,
+            "max": 0.8
+          }
+        },
+        "translate_x_mm": {
+          "$ref": "#/$defs/Span",
+          "default": {
+            "min": -1.0,
+            "max": 1.0
+          }
+        },
+        "translate_y_mm": {
+          "$ref": "#/$defs/Span",
+          "default": {
+            "min": -1.2,
+            "max": 1.2
+          }
+        },
+        "shear_deg": {
+          "$ref": "#/$defs/Span",
+          "default": {
+            "min": -0.08,
+            "max": 0.08
+          }
+        },
+        "scale": {
+          "$ref": "#/$defs/Span",
+          "default": {
+            "min": 0.995,
+            "max": 1.0
+          }
+        },
+        "inset_mm": {
+          "default": 1.0,
+          "maximum": 12,
+          "minimum": 0,
+          "title": "Inset Mm",
+          "type": "number"
+        }
+      },
+      "title": "Placement",
+      "type": "object"
+    },
+    "Protection": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": true,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "regions": {
+          "default": [
+            {
+              "x0": 0.055,
+              "y0": 0.035,
+              "x1": 0.965,
+              "y1": 0.975
+            }
+          ],
+          "items": {
+            "$ref": "#/$defs/Box"
+          },
+          "title": "Regions",
+          "type": "array"
+        },
+        "max_delta": {
+          "default": 0.1,
+          "maximum": 0.25,
+          "minimum": 0,
+          "title": "Max Delta",
+          "type": "number"
+        },
+        "min_cumulative_scale": {
+          "default": 0.78,
+          "maximum": 1,
+          "minimum": 0.5,
+          "title": "Min Cumulative Scale",
+          "type": "number"
+        }
+      },
+      "title": "Protection",
+      "type": "object"
+    },
+    "Repro": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": true,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "blur_mm": {
+          "$ref": "#/$defs/Span",
+          "default": {
+            "min": 0.025,
+            "max": 0.05
+          }
+        },
+        "resample": {
+          "$ref": "#/$defs/Span",
+          "default": {
+            "min": 0.92,
+            "max": 0.98
+          }
+        },
+        "contrast": {
+          "$ref": "#/$defs/Span",
+          "default": {
+            "min": 1.01,
+            "max": 1.06
+          }
+        },
+        "threshold_mix": {
+          "default": 0.1,
+          "maximum": 0.5,
+          "minimum": 0,
+          "title": "Threshold Mix",
+          "type": "number"
+        },
+        "threshold": {
+          "default": 176,
+          "maximum": 230,
+          "minimum": 80,
+          "title": "Threshold",
+          "type": "integer"
+        },
+        "toner_bloom": {
+          "default": 0.08,
+          "maximum": 0.4,
+          "minimum": 0,
+          "title": "Toner Bloom",
+          "type": "number"
+        },
+        "grain_sigma": {
+          "default": 0.5,
+          "maximum": 3,
+          "minimum": 0,
+          "title": "Grain Sigma",
+          "type": "number"
+        }
+      },
+      "title": "Repro",
+      "type": "object"
+    },
+    "Span": {
+      "additionalProperties": false,
+      "properties": {
+        "min": {
+          "title": "Min",
+          "type": "number"
+        },
+        "max": {
+          "title": "Max",
+          "type": "number"
+        }
+      },
+      "required": [
+        "min",
+        "max"
+      ],
+      "title": "Span",
+      "type": "object"
+    },
+    "Streaks": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": true,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "horizontal": {
+          "$ref": "#/$defs/CountSpan",
+          "default": {
+            "min": 1,
+            "max": 3
+          }
+        },
+        "vertical": {
+          "$ref": "#/$defs/CountSpan",
+          "default": {
+            "min": 1,
+            "max": 2
+          }
+        },
+        "opacity": {
+          "$ref": "#/$defs/Span",
+          "default": {
+            "min": 0.035,
+            "max": 0.1
+          }
+        },
+        "width_mm": {
+          "$ref": "#/$defs/Span",
+          "default": {
+            "min": 0.08,
+            "max": 0.4
+          }
+        },
+        "light_fraction": {
+          "default": 0.3,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Light Fraction",
+          "type": "number"
+        },
+        "waviness_mm": {
+          "default": 0.15,
+          "maximum": 2,
+          "minimum": 0,
+          "title": "Waviness Mm",
+          "type": "number"
+        },
+        "roller_pitch_mm": {
+          "default": 24,
+          "maximum": 100,
+          "minimum": 2,
+          "title": "Roller Pitch Mm",
+          "type": "number"
+        },
+        "roller_opacity": {
+          "default": 0.012,
+          "maximum": 0.08,
+          "minimum": 0,
+          "title": "Roller Opacity",
+          "type": "number"
+        }
+      },
+      "title": "Streaks",
+      "type": "object"
+    },
+    "Tears": {
+      "additionalProperties": false,
+      "description": "Missing edge material, rejected whenever it touches protected content.",
+      "properties": {
+        "enabled": {
+          "default": false,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "stage": {
+          "default": "before_copy",
+          "enum": [
+            "before_copy",
+            "after_copy"
+          ],
+          "title": "Stage",
+          "type": "string"
+        },
+        "count": {
+          "$ref": "#/$defs/CountSpan",
+          "default": {
+            "min": 1,
+            "max": 2
+          }
+        },
+        "edges": {
+          "default": [
+            "right",
+            "bottom"
+          ],
+          "items": {
+            "enum": [
+              "left",
+              "right",
+              "top",
+              "bottom"
+            ],
+            "type": "string"
+          },
+          "title": "Edges",
+          "type": "array"
+        },
+        "depth_mm": {
+          "$ref": "#/$defs/Span",
+          "default": {
+            "min": 1.5,
+            "max": 4.0
+          }
+        },
+        "length_mm": {
+          "$ref": "#/$defs/Span",
+          "default": {
+            "min": 5.0,
+            "max": 13.0
+          }
+        },
+        "clearance_mm": {
+          "default": 0.8,
+          "maximum": 5,
+          "minimum": 0,
+          "title": "Clearance Mm",
+          "type": "number"
+        },
+        "roughness": {
+          "default": 0.23,
+          "maximum": 0.5,
+          "minimum": 0,
+          "title": "Roughness",
+          "type": "number"
+        },
+        "fiber_mm": {
+          "default": 0.2,
+          "maximum": 0.8,
+          "minimum": 0.05,
+          "title": "Fiber Mm",
+          "type": "number"
+        },
+        "attempts_per_tear": {
+          "default": 32,
+          "maximum": 128,
+          "minimum": 1,
+          "title": "Attempts Per Tear",
+          "type": "integer"
+        }
+      },
+      "title": "Tears",
+      "type": "object"
+    },
+    "Vignette": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": true,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "strength": {
+          "$ref": "#/$defs/Span",
+          "default": {
+            "min": 0.06,
+            "max": 0.12
+          }
+        },
+        "width_mm": {
+          "$ref": "#/$defs/Span",
+          "default": {
+            "min": 4.0,
+            "max": 10.0
+          }
+        },
+        "edge": {
+          "default": "left",
+          "enum": [
+            "left",
+            "right",
+            "top",
+            "bottom",
+            "random"
+          ],
+          "title": "Edge",
+          "type": "string"
+        },
+        "asymmetry": {
+          "default": 0.7,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Asymmetry",
+          "type": "number"
+        },
+        "corner_strength": {
+          "default": 0.07,
+          "maximum": 0.35,
+          "minimum": 0,
+          "title": "Corner Strength",
+          "type": "number"
+        }
+      },
+      "title": "Vignette",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "dpi": {
+      "default": 240,
+      "maximum": 450,
+      "minimum": 150,
+      "title": "Dpi",
+      "type": "integer"
+    },
+    "generation_depth": {
+      "default": 2,
+      "maximum": 4,
+      "minimum": 0,
+      "title": "Generation Depth",
+      "type": "integer"
+    },
+    "copier_id": {
+      "default": "copier-04",
+      "maxLength": 80,
+      "minLength": 1,
+      "title": "Copier Id",
+      "type": "string"
+    },
+    "placement": {
+      "$ref": "#/$defs/Placement",
+      "default": {
+        "enabled": true,
+        "rotation_deg": {
+          "max": 0.8,
+          "min": -0.8
+        },
+        "translate_x_mm": {
+          "max": 1.0,
+          "min": -1.0
+        },
+        "translate_y_mm": {
+          "max": 1.2,
+          "min": -1.2
+        },
+        "shear_deg": {
+          "max": 0.08,
+          "min": -0.08
+        },
+        "scale": {
+          "max": 1.0,
+          "min": 0.995
+        },
+        "inset_mm": 1.0
+      }
+    },
+    "vignette": {
+      "$ref": "#/$defs/Vignette",
+      "default": {
+        "enabled": true,
+        "strength": {
+          "max": 0.12,
+          "min": 0.06
+        },
+        "width_mm": {
+          "max": 10.0,
+          "min": 4.0
+        },
+        "edge": "left",
+        "asymmetry": 0.7,
+        "corner_strength": 0.07
+      }
+    },
+    "streaks": {
+      "$ref": "#/$defs/Streaks",
+      "default": {
+        "enabled": true,
+        "horizontal": {
+          "max": 3,
+          "min": 1
+        },
+        "vertical": {
+          "max": 2,
+          "min": 1
+        },
+        "opacity": {
+          "max": 0.1,
+          "min": 0.035
+        },
+        "width_mm": {
+          "max": 0.4,
+          "min": 0.08
+        },
+        "light_fraction": 0.3,
+        "waviness_mm": 0.15,
+        "roller_pitch_mm": 24.0,
+        "roller_opacity": 0.012
+      }
+    },
+    "repro": {
+      "$ref": "#/$defs/Repro",
+      "default": {
+        "enabled": true,
+        "blur_mm": {
+          "max": 0.05,
+          "min": 0.025
+        },
+        "resample": {
+          "max": 0.98,
+          "min": 0.92
+        },
+        "contrast": {
+          "max": 1.06,
+          "min": 1.01
+        },
+        "threshold_mix": 0.1,
+        "threshold": 176,
+        "toner_bloom": 0.08,
+        "grain_sigma": 0.5
+      }
+    },
+    "paper": {
+      "$ref": "#/$defs/Paper",
+      "default": {
+        "monochrome": true,
+        "rgb": [
+          249,
+          249,
+          249
+        ],
+        "bed_rgb": [
+          238,
+          238,
+          236
+        ]
+      }
+    },
+    "handling": {
+      "$ref": "#/$defs/Handling",
+      "default": {
+        "enabled": true,
+        "stage": "before_copy",
+        "coffee": false,
+        "coffee_profile": {
+          "broken_rim": 0.35,
+          "center_x": {
+            "max": 1.01,
+            "min": 0.94
+          },
+          "center_y": {
+            "max": 0.88,
+            "min": 0.74
+          },
+          "droplets": {
+            "max": 5,
+            "min": 2
+          },
+          "irregularity": 0.07,
+          "radius_mm": {
+            "max": 26.0,
+            "min": 19.0
+          },
+          "rim_width_mm": 0.65
+        },
+        "preserve_color_after_copy": false,
+        "fold": false,
+        "staple": false,
+        "punch_holes": false,
+        "dust_count": 45,
+        "stamp": "",
+        "opacity": 0.3
+      }
+    },
+    "protection": {
+      "$ref": "#/$defs/Protection",
+      "default": {
+        "enabled": true,
+        "regions": [
+          {
+            "x0": 0.055,
+            "x1": 0.965,
+            "y0": 0.035,
+            "y1": 0.975
+          }
+        ],
+        "max_delta": 0.1,
+        "min_cumulative_scale": 0.78
+      }
+    },
+    "tears": {
+      "$ref": "#/$defs/Tears",
+      "default": {
+        "enabled": false,
+        "stage": "before_copy",
+        "count": {
+          "max": 2,
+          "min": 1
+        },
+        "edges": [
+          "right",
+          "bottom"
+        ],
+        "depth_mm": {
+          "max": 4.0,
+          "min": 1.5
+        },
+        "length_mm": {
+          "max": 13.0,
+          "min": 5.0
+        },
+        "clearance_mm": 0.8,
+        "roughness": 0.23,
+        "fiber_mm": 0.2,
+        "attempts_per_tear": 32
+      }
+    },
+    "output": {
+      "$ref": "#/$defs/PdfOutput",
+      "default": {
+        "encoding": "lossless",
+        "jpeg_quality": 95
+      }
+    },
+    "schema_version": {
+      "const": 2,
+      "default": 2,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "name": {
+      "maxLength": 80,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "page_overrides": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/PageOverride"
+      },
+      "title": "Page Overrides",
+      "type": "array"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "Recipe",
+  "type": "object"
+}

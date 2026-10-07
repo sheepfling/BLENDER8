@@ -1,0 +1,37 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{mail-archive}[2026/10/07 Half-A/Labs printed correspondence]
+\RequirePackage[letterpaper,top=15mm,bottom=15mm,left=18mm,right=18mm,headheight=12pt,headsep=5mm,footskip=8mm]{geometry}
+\RequirePackage[T1]{fontenc}
+\RequirePackage[utf8]{inputenc}
+\RequirePackage{lmodern}
+\RequirePackage{helvet}
+\RequirePackage{microtype}
+\RequirePackage{graphicx}
+\RequirePackage{array,tabularx,booktabs}
+\RequirePackage{tikz}
+\RequirePackage{kestrel-identity,etoolbox}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\RequirePackage{fancyhdr,lastpage,needspace}
+\RequirePackage[hidelinks]{hyperref}
+\renewcommand{\familydefault}{\sfdefault}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+\raggedbottom
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\scriptsize Half-A/Labs\quad /\quad retained correspondence}
+\fancyhead[R]{\scriptsize Blender-8}
+\fancyfoot[L]{\scriptsize Printed from the project mail file\quad |\quad Times shown in Central Time}
+\fancyfoot[R]{\scriptsize\thepage\,/\,\pageref*{LastPage}}
+\renewcommand{\headrulewidth}{.3pt}
+\renewcommand{\footrulewidth}{0pt}
+\newcommand{\ThreadTitle}[2]{\clearpage\pdfbookmark[1]{#1}{#2}{\Large\bfseries #1\par}\vspace{1mm}}
+\newenvironment{Mail}[4]{%
+\par\addvspace{4pt}\noindent\begin{minipage}{\linewidth}
+{\fontsize{8.3}{9.5}\selectfont\textbf{From:} #1\hfill\textbf{Date:} #3\par\textbf{To:} #2\par\textbf{Subject:} #4\par}
+\vspace{2pt}\hrule height .2pt\vspace{3pt}\fontsize{9.8}{11.8}\selectfont\setlength{\parskip}{2pt}
+}{\par\end{minipage}\par\addvspace{3pt}}
+\newcommand{\MailSignature}[2]{\par{\fontsize{8.3}{9.5}\selectfont
+\ifstrequal{#1}{mara}{\raisebox{-1.6ex}[0pt][0pt]{\KestrelMark}\hspace{6pt}\begin{minipage}[t]{\dimexpr\linewidth-7mm\relax}#2\end{minipage}}{#2}\par}}
+\newcommand{\MailSketch}[2]{\par\vspace{2pt}{\scriptsize\itshape #2}\par\vspace{2pt}\input{latex/correspondence/sketch-#1.tex}\par\vspace{2pt}}
+\newcommand{\DrawingTitle}[2]{\clearpage\pdfbookmark[1]{#1}{#2}{\Large\bfseries #1\par}\vspace{3mm}{\small Rick / Half-A/Labs\quad |\quad Reissued with the jug-interlock email, 1 October 2026\par}\vspace{3mm}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}

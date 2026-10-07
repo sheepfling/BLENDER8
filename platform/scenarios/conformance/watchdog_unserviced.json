@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "name": "watchdog_unserviced",
+  "mode": "bench",
+  "profile": "chassis04",
+  "events": [],
+  "checks": [
+    {
+      "at_us": 100000,
+      "field": "mcu.reset_causes",
+      "op": "eq",
+      "value": 1
+    },
+    {
+      "at_us": 300000,
+      "field": "mcu.reset_causes",
+      "op": "eq",
+      "value": 5
+    },
+    {
+      "at_us": 300000,
+      "field": "drive_enabled",
+      "op": "eq",
+      "value": false
+    }
+  ]
+}

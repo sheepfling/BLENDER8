@@ -1,0 +1,1016 @@
+\documentclass[10pt]{article}
+\usepackage{vendor-northstar}
+\renewcommand{\DocID}{MCU-001}
+\renewcommand{\DocRev}{P6}
+\renewcommand{\RunningPart}{B8 / REV 03}
+\hypersetup{pdftitle={B8 Microcontroller User Manual / Interface 03 / P6}}
+\begin{document}
+\pdfbookmark[0]{B8 microcontroller user manual}{b8-1}
+
+\VendorTitle{B8}{Microcontroller user manual}{8-bit register data / 16-bit register addressing / programmable clock tree}
+\MetaStrip{DEVICE ID B8h\hfill INTERFACE REVISION 03\hfill PUBLICATION P6 / 06 OCT 2026}
+\section*{General description}
+The B8 combines two eight-bit GPIO ports, two independent 16-bit compare timers, an eight-bit PWM generator, a 16-bit edge counter, a four-register external byte bridge and a two-channel 10-bit ADC. Five fixed-priority interrupt sources share a non-nesting vector interface. Clock selection, reset-cause reporting, an independent watchdog and a windowed deadman counter complete the control interface.
+\begin{center}
+\begin{tikzpicture}[font=\small\sffamily,box/.style={draw=VendorInk,fill=VendorTint,minimum height=9mm,align=center},>=Stealth]
+\node[box,minimum width=155mm] (bus) at (0,0) {16-BIT ADDRESS / ORDERED 8-BIT REGISTER DATA};
+\node[box,minimum width=36mm] (gpio) at (-5.7,-1.4) {GPIO A / B};
+\node[box,minimum width=36mm] (tmr) at (-1.9,-1.4) {T0 / T1 / PWM};
+\node[box,minimum width=36mm] (analog) at (1.9,-1.4) {EDGE / ADC};
+\node[box,minimum width=36mm] (xb) at (5.7,-1.4) {XBUS};
+\foreach \x in {gpio,tmr,analog,xb}{\draw[<->] (\x.north)--(\x.north|-bus.south);}
+\node[box,minimum width=72mm] (clk) at (-4,-2.8) {FRC / CLKIN / PLL / PB divider};
+\node[box,minimum width=72mm] (rst) at (4,-2.8) {RESET / WDT / DMT};
+\node[font=\small\sffamily] at (0,-3.7) {Independent LFRC \quad\textbullet\quad Five interrupt vectors};
+\end{tikzpicture}
+\end{center}
+\section*{Scope of this reference}
+This manual defines register values, ordering, timing domains, peripheral side effects and the supplied C++ service binding. An address in this manual is a device register address, not a host pointer. Program-memory organization, instruction encoding, instruction-cycle timing, package-lead numbering and production electrical ratings are not assigned by this interface publication.
+\begin{Notice}{DEVICE BEHAVIOR, NOT EQUIPMENT POLICY}
+General-purpose pad assignments, external power qualification and application authorization are properties of the board and its control software. They are not encoded as named equipment functions in the B8 registers.
+\end{Notice}
+\section*{Reset baseline}
+Reset selects the nominal 4 MHz internal FRC and PB divide-by-four. GPIO drivers are released, PWM is forced low, compare timers and ADC are inactive, and interrupt masks are clear. The independent watchdog is fused on and starts counting when reset is released. Its timeout is not extended by waiting for an external source.
+
+\newpage
+\Continuation{Reference navigation}{Addresses are hexadecimal; time units and clock domains are stated explicitly.}
+\pdfbookmark[0]{Reference navigation}{b8-2}
+\section*{Contents}
+\noindent\begin{minipage}[t]{.485\linewidth}\small\par\noindent\begin{tabularx}{\linewidth}{rY}
+3 & Register transactions and access conventions \\[4pt]
+4 & Complete map: system, GPIO and timers \\[4pt]
+5 & Complete map: waveform, bus and ADC \\[4pt]
+6 & Complete map: clocks and supervision \\[4pt]
+7 & Identification and reset-cause fields \\[4pt]
+8 & Reset, release and state retention \\[4pt]
+9 & GPIO port programming \\[4pt]
+10 & Interrupt sources and register fields \\[4pt]
+11 & Interrupt entry, return and shared state \\[4pt]
+12 & Compare timers: registers and counting \\[4pt]
+13 & Compare timers: programming and observation \\[4pt]
+14 & Multi-byte data and ownership \\[4pt]
+15 & PWM waveform generator \\[4pt]
+16 & PB1 edge counter and external events \\[4pt]
+17 & External byte-register bridge \\[4pt]\end{tabularx}\end{minipage}\hfill\begin{minipage}[t]{.485\linewidth}\small\par\noindent\begin{tabularx}{\linewidth}{rY}
+18 & ADC register fields \\[4pt]
+19 & ADC acquisition and conversion timing \\[4pt]
+20 & ADC transfer characteristic and result handling \\[4pt]
+21 & Clock sources and clock domains \\[4pt]
+22 & Clock plan: staging and legal operating ranges \\[4pt]
+23 & Clock commit and status \\[4pt]
+24 & Clock interruptions and timing continuity \\[4pt]
+25 & Independent watchdog: configuration \\[4pt]
+26 & Independent watchdog: service and margins \\[4pt]
+27 & Windowed deadman: registers and counting \\[4pt]
+28 & Windowed deadman: service state machine \\[4pt]
+29 & Reset and status error matrix \\[4pt]
+30 & C++ service interface and portability \\[4pt]
+31 & Bring-up and diagnostic worksheet \\[4pt]
+32 & Quick reference and publication notes \\[4pt]\end{tabularx}\end{minipage}
+\section*{Reading conventions}
+Hexadecimal addresses and byte values use a trailing h; binary bit positions count from zero. Multi-byte pairs list LOW before HIGH, but their ordering is a behavioral contract, not ordinary host endianness. Nominal timing examples at PBCLK=1 MHz do not prescribe a clock plan.
+\section*{Device versus binding}
+Peripheral equations refer to their stated clock domains. The C++ service binding uses one-microsecond observation boundaries; that interval is not an instruction-cycle period. External devices keep their own timing unless explicitly clocked from a shared source.
+
+\newpage
+\Continuation{Register transactions and access conventions}{One byte is atomic at the interface. A sequence of bytes is not.}
+\pdfbookmark[0]{Register transactions and access conventions}{b8-3}
+
+\section*{Address space and access types}
+Only the addresses listed in the complete register tables are implemented. Address gaps are not RAM, aliases or extra GPIO ports. Each access transfers exactly eight bits. A multi-byte register is exposed through separate low and high byte addresses with documented side effects.
+\par\noindent\begin{tabularx}{\linewidth}{lY}
+\toprule\TableHead Mark & Meaning \\ \midrule
+R & Readable. A write causes an interface-access fault unless a field-specific rule says otherwise. \\
+RW & Readable and writable, subject to field masks, enable state and configuration locks. \\
+R/W1C & Read current status; writing one to a clearable bit clears it. A zero leaves it unchanged. \\
+W & Write action or service key. Defined W locations in this revision read as zero. \\
+Strobe & A write requests an event; the request bit does not remain set when read. \\
+\bottomrule\end{tabularx}\par
+\section*{Read-modify-write is not universally safe}
+For an ordinary port latch, read-modify-write can preserve unrelated bits when there is only one writer. A status register with write-one-to-clear fields is different: reading all pending flags and writing that value back acknowledges \emph{all} flags in the snapshot. To acknowledge one interrupt, write only its mask.
+\begin{verbatim}
+// Acknowledge only TIMER0; do not echo the whole FLAGS register.
+b8::write8(b8::Reg::IRQ_FLAGS, b8::mask(b8::Irq::timer0));
+\end{verbatim}
+Reserved bits in ordinary masked control registers read zero and ignore writes. Clock-plan bytes are a deliberate exception: they retain the full staged value and validate it at commit. WDT scale and DMT configuration also have explicit validity rules. Do not apply a universal reserved-bit rule to literal numeric configuration bytes.
+\section*{Errors have different consequences}
+An invalid bus address or forbidden register write is an interface-access fault. A rejected clock plan or busy ADC reconfiguration normally sets a status error and leaves a specified state unchanged. A bad watchdog or enabled-deadman service sequence requests \emph{hardware reset}. These are three different paths, not interchangeable error codes.
+\begin{Notice}{TIME PASSES BETWEEN ACCESSES}
+The C++ binding performs the register transaction, advances one microsecond of service time, then offers interrupt delivery. Reads, writes and idle calls therefore permit hardware progress. Instructions between binding calls have no assigned execution time in this interface.
+\end{Notice}
+
+\newpage
+\Continuation{Complete map: system, GPIO and timers}{All 62 register addresses are covered across the three tables.}
+\pdfbookmark[0]{Complete map: system, GPIO and timers}{b8-4}
+\par\noindent\begin{tabularx}{\linewidth}{lYll}
+\toprule\TableHead Address & Register & Access & Reset \\ \midrule
+0000h & \texttt{SYS\_ID} & R & B8h \\
+0001h & \texttt{SYS\_REV} & R & 03h \\
+0002h & \texttt{RST\_CAUSE} & R/W1C & 01h \\
+0003h & \texttt{RST\_DETAIL} & R/W1C & 00h \\
+0004h & \texttt{SW\_RESET} & W & 00h \\
+0010h & \texttt{IRQ\_GLOBAL} & RW & 00h \\
+0011h & \texttt{IRQ\_ENABLE} & RW & 00h \\
+0012h & \texttt{IRQ\_FLAGS} & R/W1C & 00h \\
+0020h & \texttt{GPIOA\_DIR} & RW & 00h \\
+0021h & \texttt{GPIOA\_OUT} & RW & 00h \\
+0022h & \texttt{GPIOA\_IN} & R & 00h \\
+0028h & \texttt{GPIOB\_DIR} & RW & 00h \\
+0029h & \texttt{GPIOB\_OUT} & RW & 00h \\
+002Ah & \texttt{GPIOB\_IN} & R & 00h \\
+0040h & \texttt{T0\_CTRL} & RW & 00h \\
+0041h & \texttt{T0\_PRESCALE} & RW & 00h \\
+0042h & \texttt{T0\_COUNT\_LO} & R & 00h \\
+0043h & \texttt{T0\_COUNT\_HI} & R & 00h \\
+0044h & \texttt{T0\_COMPARE\_LO} & RW & 00h \\
+0045h & \texttt{T0\_COMPARE\_HI} & RW & 00h \\
+0050h & \texttt{T1\_CTRL} & RW & 00h \\
+0051h & \texttt{T1\_PRESCALE} & RW & 00h \\
+0052h & \texttt{T1\_COUNT\_LO} & R & 00h \\
+0053h & \texttt{T1\_COUNT\_HI} & R & 00h \\
+0054h & \texttt{T1\_COMPARE\_LO} & RW & 00h \\
+0055h & \texttt{T1\_COMPARE\_HI} & RW & 00h \\
+\bottomrule\end{tabularx}\par
+\section*{Reading the reset column}
+Values are register defaults immediately after device reset; dynamic status and sampled inputs can change before the first software read. The reset-cause byte reports the cause set, not a constant one on every warm reset. GPIO input values depend on external drivers and bias. XBUS DATA reflects an external transaction, not local B8 storage.
+
+\newpage
+\Continuation{Complete map: waveform, bus and ADC}{All 62 register addresses are covered across the three tables.}
+\pdfbookmark[0]{Complete map: waveform, bus and ADC}{b8-5}
+\par\noindent\begin{tabularx}{\linewidth}{lYll}
+\toprule\TableHead Address & Register & Access & Reset \\ \midrule
+0060h & \texttt{PWM\_CTRL} & RW & 00h \\
+0061h & \texttt{PWM\_DUTY} & RW & 00h \\
+0070h & \texttt{TACH\_COUNT\_LO} & R & 00h \\
+0071h & \texttt{TACH\_COUNT\_HI} & R & 00h \\
+0080h & \texttt{XBUS\_REG} & RW & 00h \\
+0081h & \texttt{XBUS\_DATA} & RW & 00h \\
+0090h & \texttt{ADC\_CTRL} & RW & 00h \\
+0091h & \texttt{ADC\_CHANNEL} & RW & 00h \\
+0092h & \texttt{ADC\_PRESCALE} & RW & 02h \\
+0093h & \texttt{ADC\_STATUS} & R/W1C & 00h \\
+0094h & \texttt{ADC\_DATA\_LO} & R & 00h \\
+0095h & \texttt{ADC\_DATA\_HI} & R & 00h \\
+\bottomrule\end{tabularx}\par
+\section*{Reading the reset column}
+Values are register defaults immediately after device reset; dynamic status and sampled inputs can change before the first software read. The reset-cause byte reports the cause set, not a constant one on every warm reset. GPIO input values depend on external drivers and bias. XBUS DATA reflects an external transaction, not local B8 storage.
+
+\section*{The three kinds of data window}
+PWM DUTY is the requested shadow value, not a readback of the active waveform. ADC DATA is the most recently completed conversion, not a fresh conversion on demand. XBUS DATA delegates the read or write to the selected external register, whose own side effects apply.
+\section*{Byte order}
+COUNT and ADC result reads capture high bits when LOW is read. Timer COMPARE and DMT configuration writes stage LOW and commit on HIGH. Reading a configuration LOW returns the committed low byte, not an uncommitted staged write.
+
+\newpage
+\Continuation{Complete map: clocks and supervision}{All 62 register addresses are covered across the three tables.}
+\pdfbookmark[0]{Complete map: clocks and supervision}{b8-6}
+\par\noindent\begin{tabularx}{\linewidth}{lYll}
+\toprule\TableHead Address & Register & Access & Reset \\ \midrule
+00A0h & \texttt{CLK\_SOURCE} & RW & 00h \\
+00A1h & \texttt{PLL\_PREDIV} & RW & 02h \\
+00A2h & \texttt{PLL\_MULT} & RW & 08h \\
+00A3h & \texttt{PLL\_POSTDIV} & RW & 02h \\
+00A4h & \texttt{PB\_DIV} & RW & 04h \\
+00A5h & \texttt{CLK\_STATUS} & R/W1C & 00h \\
+00A6h & \texttt{CLK\_ACTIVE} & R & 00h \\
+00A7h & \texttt{CLK\_KEY} & W & 00h \\
+00A8h & \texttt{CLK\_COMMIT} & W & 00h \\
+00A9h & \texttt{PB\_ACTIVE} & R & 04h \\
+00B0h & \texttt{WDT\_CTRL} & RW & 01h \\
+00B1h & \texttt{WDT\_SCALE} & RW & 03h \\
+00B2h & \texttt{WDT\_SERVICE} & W & 00h \\
+00B3h & \texttt{WDT\_STATUS} & R & 00h \\
+00C0h & \texttt{DMT\_CTRL} & RW & 00h \\
+00C1h & \texttt{DMT\_LIMIT\_LO} & RW & 00h \\
+00C2h & \texttt{DMT\_LIMIT\_HI} & RW & 04h \\
+00C3h & \texttt{DMT\_WINDOW\_LO} & RW & 00h \\
+00C4h & \texttt{DMT\_WINDOW\_HI} & RW & 01h \\
+00C5h & \texttt{DMT\_STATUS} & R/W1C & 00h \\
+00C6h & \texttt{DMT\_COUNT\_LO} & R & 00h \\
+00C7h & \texttt{DMT\_COUNT\_HI} & R & 00h \\
+00C8h & \texttt{DMT\_PRECLR} & W & 00h \\
+00C9h & \texttt{DMT\_CLR} & W & 00h \\
+\bottomrule\end{tabularx}\par
+\section*{Reading the reset column}
+Values are register defaults immediately after device reset; dynamic status and sampled inputs can change before the first software read. The reset-cause byte reports the cause set, not a constant one on every warm reset. GPIO input values depend on external drivers and bias. XBUS DATA reflects an external transaction, not local B8 storage.
+
+WDT is fused on. DMT is reset-disabled. CLK\_SOURCE and PB\_DIV are staged requests; CLK\_ACTIVE and PB\_ACTIVE identify the committed active selection. Read-only status is not an acknowledgment mechanism unless a W1C bit is explicitly listed.
+
+\newpage
+\Continuation{Identification and reset-cause fields}{Capture cause information before clearing it.}
+\pdfbookmark[0]{Identification and reset-cause fields}{b8-7}
+
+\section*{Identification}
+SYS\_ID at 0000h returns B8h. SYS\_REV at 0001h returns 03h for this interface. Neither register is writable. A different revision requires its own interface reference; the identifier alone does not establish compatibility.
+\section*{RST\_CAUSE / 0002h / R/W1C}
+\par\noindent\begin{tabularx}{\linewidth}{ll l Y}
+\toprule\TableHead Bit & Mask & Name & Set by \\ \midrule
+0 & 01h & POR & Initial qualified power-up; starts a new accumulated cause set. \\
+1 & 02h & BOR & Board-reported brownout or loss of qualified logic supply. \\
+2 & 04h & WDT & Independent watchdog expiry or invalid service. \\
+3 & 08h & DMT & Deadman expiry or invalid enabled-service sequence. \\
+4 & 10h & CLOCK & Loss of the active external clock for eight LFRC ticks. \\
+5 & 20h & SOFT & Accepted software-reset request. \\
+6 & 40h & EXTERNAL & Externally requested reset. \\
+7 & 80h & Reserved & Reads zero. \\
+\bottomrule\end{tabularx}\par
+\section*{RST\_DETAIL / 0003h / R/W1C}
+\par\noindent\begin{tabularx}{\linewidth}{llY}
+\toprule\TableHead Bit / mask & Detail & Meaning \\ \midrule
+0 / 01h & WDT bad key & Invalid service value, duplicate first key or invalid/expired second-key context. \\
+1 / 02h & DMT bad first key & Invalid or duplicate PRECLR key. \\
+2 / 04h & DMT bad second key & Invalid CLR key, no preceding key or second key too late. \\
+3 / 08h & DMT early & Service attempted before the open window. \\
+4 / 10h & DMT expiry & Maximum count reached without successful service. \\
+5 / 20h & WDT timeout & Independent watchdog count reached its programmed maximum. \\
+\bottomrule\end{tabularx}\par
+Warm-reset cause and detail bits accumulate until written as one to clear. They are not a chronological event log, event counter or one-hot code. A detail retained from an earlier event can coexist with a later cause. POR begins a new set. Read both bytes before deciding what to acknowledge.
+\section*{SW\_RESET / 0004h / W}
+Writing B6h requests reset. Other byte values are ignored. Reads return zero. An accepted request abandons the current execution context; it is not an ordinary subroutine return.
+
+\newpage
+\Continuation{Reset, release and state retention}{Hardware reset is not a reset of every device connected to the controller.}
+\pdfbookmark[0]{Reset, release and state retention}{b8-8}
+
+\section*{Local reset sequence}
+A reset request resets peripheral state and holds execution for 1 ms. An asserted external hold prevents execution regardless of the local interval. Clock selection returns to FRC with PB divide-by-four. The watchdog starts only after reset release; normal interrupt masking cannot suspend it.
+\par\noindent\begin{tabularx}{\linewidth}{lY}
+\toprule\TableHead State & Effect of B8 reset \\ \midrule
+GPIO & DIR and OUT become zero; pads are released, not actively pulled low. \\
+PWM & Disabled; shadow and active duty cleared; dedicated pad low. \\
+Timers / edge counter & Count, staging, capture and divider state cleared. \\
+ADC & Disabled; result and captures clear; channel 0 and scale code 2. \\
+Interrupts & Global/source masks and pending flags clear; old ISR context abandoned. \\
+Clock tree & Default staged and active tuple; no pending lock; source FRC. \\
+Watchdog & Fused on, scale code 3, unlocked; service-key state cleared. \\
+Deadman & Disabled and unlocked; limit 0400h, opening 0100h. \\
+External parts & No implicit clearing of external state is performed by a B8 register reset. \\
+\bottomrule\end{tabularx}\par
+\section*{GPIO release is not a low-level guarantee}
+An input-direction pad is high impedance. External pulls and connected drivers determine its voltage and resolved logic level. A board that needs an inactive level during reset must provide that level independently of firmware initialization. OUT reads zero after reset even when the corresponding IN bit reads high through a pull-up.
+\section*{Reset during an interrupt or transaction}
+The old foreground/handler continuation is discarded. There is no normal interrupt return that can restore a stale global-enable state. A binding call may perform its side effect and then encounter reset during the following service interval. Do not assume that an interrupted call had no effect on an external device.
+\section*{Software-owned state}
+The C++ reset entry must explicitly initialize state needed for a new execution. It must not assume that host static constructors are rerun by a hardware reset. External device state also needs explicit assessment or initialization through the corresponding bus interface.
+\begin{Notice}{CAUSE RETENTION IS NOT APPLICATION RETENTION}
+RST\_CAUSE and RST\_DETAIL are retained observations with W1C semantics. They do not retain an application command, authorize an output, or specify how external equipment should recover.
+\end{Notice}
+
+\newpage
+\Continuation{GPIO port programming}{Two eight-bit ports; direction, latch and observed pad are separate.}
+\pdfbookmark[0]{GPIO port programming}{b8-9}
+
+\par\noindent\begin{tabularx}{\linewidth}{lllY}
+\toprule\TableHead Function & Port A & Port B & Reset \\ \midrule
+DIR & 0020h & 0028h & 00h \\
+OUT & 0021h & 0029h & 00h \\
+IN & 0022h & 002Ah & External level \\
+\bottomrule\end{tabularx}\par
+\section*{Bit definitions}
+For each bit $i$ from 0 through 7, DIR[$i$]=0 releases the pad; DIR[$i$]=1 enables the OUT[$i$] driver. An OUT write updates its latch even with DIR=0. IN samples the resolved pad state, including the effect of external wiring; it does not simply return OUT. Each IN access samples the entire eight-bit port.
+\par\noindent\begin{tabularx}{\linewidth}{lllY}
+\toprule\TableHead DIR & OUT & B8 driver & Possible IN result \\ \midrule
+0 & 0 or 1 & Released & Defined by external drivers/bias; may be unresolved. \\
+1 & 0 & Low & Low when no opposing driver is present. \\
+1 & 1 & High & High when no opposing driver is present. \\
+\bottomrule\end{tabularx}\par
+\section*{Establish a latch before enabling the output driver}
+For an active-high output whose inactive level is low, preload the appropriate OUT bit low before changing its DIR bit to one. This avoids enabling a driver with an unintended old latch value. Choose the initial latch level from the external circuit; this procedure is not a universal active-low/active-high rule.
+\begin{verbatim}
+// Sole owner of port A; example uses only pad 5.
+constexpr std::uint8_t pad = 0x20;
+auto out = b8::read8(b8::Reg::GPIOA_OUT);
+b8::write8(b8::Reg::GPIOA_OUT,
+           static_cast<std::uint8_t>(out & ~pad));
+auto dir = b8::read8(b8::Reg::GPIOA_DIR);
+b8::write8(b8::Reg::GPIOA_DIR,
+           static_cast<std::uint8_t>(dir | pad));
+\end{verbatim}
+The two read-modify-write sequences require exclusive ownership or a critical section. A second writer can overwrite a newly changed unrelated bit between the read and write. Full-byte shadow ownership is another valid approach; the peripheral does not supply bit-set/bit-clear alias registers.
+\section*{Dedicated input function}
+PB1 is also observed by the edge counter. Configuring its GPIO driver does not detach that observation. Keep the pad released when it receives an external driven signal. There is no programmable pin-routing matrix in interface 03.
+\begin{Notice}{UNDEFINED DIGITAL INPUTS}
+A floating or contended pad has no defined logic result. A port read containing such a pad is an interface fault; a software mask applied \emph{after} the read does not prevent sampling the other bits.
+\end{Notice}
+
+\newpage
+\Continuation{Interrupt sources and register fields}{Fixed priority; pending status exists independently of delivery.}
+\pdfbookmark[0]{Interrupt sources and register fields}{b8-10}
+
+\par\noindent\begin{tabularx}{\linewidth}{llY}
+\toprule\TableHead Register & Fields & Access behavior \\ \midrule
+\texttt{IRQ\_GLOBAL} & Bit 0 global enable & Bits 7:1 read zero; writes use bit 0. \\
+\texttt{IRQ\_ENABLE} & Bits 4:0 source enables & Bits 7:5 ignored; mask does not clear pending events. \\
+\texttt{IRQ\_FLAGS} & Bits 4:0 pending flags & Readable and W1C; reading does not acknowledge. \\
+\bottomrule\end{tabularx}\par
+\section*{Vector mapping}
+\par\noindent\begin{tabularx}{\linewidth}{lllY}
+\toprule\TableHead Index & Mask & Vector & Event \\ \midrule
+0 & 01h & TIMER0 & T0 reaches compare; highest priority. \\
+1 & 02h & TIMER1 & T1 reaches compare. \\
+2 & 04h & TACH & Observed PB1 rising edge. \\
+3 & 08h & VBLANK & Observed external VBLANK rising edge. \\
+4 & 10h & ADC & Completed conversion; lowest priority. \\
+\bottomrule\end{tabularx}\par
+\section*{Pending versus eligible}
+An event sets its pending bit even when the source mask or global mask is clear. A source becomes eligible when its pending flag, source enable and global enable are all set. At a service boundary, the lowest-index eligible source is selected. At most one handler begins at that boundary.
+Repeated events coalesce into one pending bit. A flag cannot report how many events occurred while masked. The edge counter continues accumulating observations separately; its count is not limited by the one-bit TACH flag.
+\section*{Two acknowledgment layers}
+An external peripheral can have its own status bits in addition to a B8 pending flag. Acknowledging the B8 does not clear the peripheral, and clearing a peripheral does not clear IRQ\_FLAGS. ADC READY has a data-read acknowledgment distinct from the ADC interrupt flag.
+\section*{Example: two pending sources}
+With FLAGS=11h, both TIMER0 and ADC are pending. Writing 01h clears TIMER0 and preserves ADC. Writing 11h clears both. Writing 00h clears neither. The mask used to disable a source is not an acknowledgment of its previous event.
+\begin{Notice}{RESET IS NOT A SIXTH MASKABLE VECTOR}
+Watchdog, deadman and clock-failure responses can request reset without a handler in this table. Disabling IRQ\_GLOBAL cannot prevent those reset mechanisms.
+\end{Notice}
+
+\newpage
+\Continuation{Interrupt entry, return and shared state}{A handler must return; nested delivery is not supported.}
+\pdfbookmark[0]{Interrupt entry, return and shared state}{b8-11}
+
+\section*{Entry and return}
+Entry temporarily masks global delivery and marks the handler active. Register accesses inside the handler still consume service time and allow peripherals to progress, but do not recursively dispatch another handler. A normal return restores the enabled global-delivery state from entry. Writing IRQ\_GLOBAL=0 inside the handler is not a persistent global-disable request across that return.
+To keep one source disabled after returning, update its source-enable bit. To change global-delivery policy permanently, do so in foreground code. A missing vector for an eligible source is an interface fault, not a silent dropped interrupt.
+\begin{verbatim}
+void timer0_handler() {
+    b8::write8(b8::Reg::IRQ_FLAGS,
+               b8::mask(b8::Irq::timer0));
+    // Record bounded work for foreground ownership.
+}
+\end{verbatim}
+\section*{Reassertion is a real event}
+A timer can generate another event during its handler. If it happens after the acknowledgment, the pending bit is set again and can be serviced at a subsequent foreground boundary. A handler that runs longer than the period can monopolize delivery. Clearing a flag at the end can also discard events that arrived since entry; choose acknowledgment ownership deliberately.
+\section*{Multitransaction resources}
+COUNT/ADC high-byte captures, staged low-byte writes, the XBUS register selector and an external device's own address pointer are shared state. Eight-bit access atomicity does not protect an entire low/high pair or a select/data transaction from another owner.
+\section*{A bounded foreground critical section}
+Save IRQ\_GLOBAL, clear it, perform the protected accesses, then restore the saved bit. This pattern is for foreground code, not a nested-lock API. Keep it short: timers, ADC, edge observations and independent watchdog time keep progressing while delivery is masked.
+\begin{Notice}{CLOCK KEY SEQUENCES NEED REGISTER-ACCESS EXCLUSION}
+The clock unlock uses consecutive register accesses. Even an otherwise harmless ISR status read invalidates the sequence. Disabling interrupts immediately before the first key is one way to prevent that interleaving; the peripheral's quiescence requirements still apply.
+\end{Notice}
+\section*{Reset and nonlocal exit}
+If reset occurs during the handler, the old return context is abandoned. The binding must not restore the previous global-enable bit onto the freshly reset controller. After reset release the reset entry is called again, rather than resuming the interrupted handler.
+
+\newpage
+\Continuation{Compare timers: registers and counting}{T0 and T1 are independent instances with identical behavior.}
+\pdfbookmark[0]{Compare timers: registers and counting}{b8-12}
+
+\par\noindent\begin{tabularx}{\linewidth}{llY}
+\toprule\TableHead Offset & Register & Field or side effect \\ \midrule
+0 & CTRL & Bit 0 enable, bit 1 periodic; other bits ignored. \\
+1 & PRESCALE & Low two bits select divide 1, 8, 64 or 256. \\
+2 & COUNT\_LO & Read live low byte and capture current high byte. \\
+3 & COUNT\_HI & Read captured high byte; no new capture. \\
+4 & COMPARE\_LO & Read committed low; write stages low byte while disabled. \\
+5 & COMPARE\_HI & Read committed high; write commits high plus staged low. \\
+\bottomrule\end{tabularx}\par
+T0 has base 0040h; T1 has base 0050h. All six registers per instance are eight bits. CTRL writes always reset the live counter and prescaler phase, even when the stored CTRL value is unchanged. CTRL does not acknowledge the pending interrupt flag.
+\section*{Counting order}
+On a divided peripheral-clock edge, compare the current COUNT with COMPARE. If equal, set the source flag and set COUNT to zero. Otherwise increment COUNT. Periodic mode repeats. One-shot mode clears enable at the compare event; the periodic bit retains its programmed value.
+\[
+ t_{\mathrm{period}}=\frac{(C+1)D}{f_{\mathrm{PB}}},\qquad
+ f_{\mathrm{event}}=\frac{f_{\mathrm{PB}}}{(C+1)D}.
+\]
+The plus one follows directly from comparing the initial count of zero. COMPARE=0 is an event every divided edge, not a disabled timer. COMPARE=65535 produces a 65,536-edge interval; calculate $C+1$ in a type wider than 16 bits.
+\section*{Prescale encoding}
+\par\noindent\begin{tabularx}{\linewidth}{llY}
+\toprule\TableHead Code & Divider & Period with C=249 and PB=1 MHz \\ \midrule
+0 & 1 & 250 microseconds \\
+1 & 8 & 2 milliseconds \\
+2 & 64 & 16 milliseconds \\
+3 & 256 & 64 milliseconds \\
+\bottomrule\end{tabularx}\par
+The example shows prescaler meaning, not a required scheduler rate. The period scales with the active peripheral frequency. Configuring PLL factors does not automatically rewrite COMPARE or PRESCALE.
+\begin{Notice}{RECONFIGURATION WHILE ENABLED}
+PRESCALE and COMPARE writes require the timer disabled. A forbidden write causes an interface fault rather than a silently deferred update. Disable, configure, then enable explicitly.
+\end{Notice}
+
+\newpage
+\Continuation{Compare timers: programming and observation}{Committed values, count captures and pending flags have separate lifetimes.}
+\pdfbookmark[0]{Compare timers: programming and observation}{b8-13}
+
+\section*{Configuration transaction}
+Disable the selected timer. Write the prescaler code. Write COMPARE low, then high. Clear any previous source flag when it is appropriate to discard it. Finally write CTRL with the required enable and periodic bits. A one-shot uses CTRL=01h; a periodic timer uses CTRL=03h.
+\begin{verbatim}
+// Generic T1 example: a 16-bit compare supplied by the caller.
+b8::write8(b8::Reg::T1_CTRL, 0);
+b8::write8(b8::Reg::T1_PRESCALE, prescale_code);
+b8::write8(b8::Reg::T1_COMPARE_LO,
+           static_cast<std::uint8_t>(compare));
+b8::write8(b8::Reg::T1_COMPARE_HI,
+           static_cast<std::uint8_t>(compare >> 8));
+b8::write8(b8::Reg::IRQ_FLAGS, b8::mask(b8::Irq::timer1));
+b8::write8(b8::Reg::T1_CTRL, 3);
+\end{verbatim}
+\section*{What a partial write means}
+Writing only COMPARE\_LO changes the staging byte but not the committed compare. Reading LOW or HIGH still reports the old committed value. Writing HIGH first commits the new high with the \emph{previous} staged low. This is defined behavior, not automatic big-endian support.
+\section*{What a control refresh means}
+Repeatedly writing CTRL=03h to a running periodic timer repeatedly restarts its count and divider. It can postpone its event indefinitely. Configuration registers are not heartbeat registers.
+\section*{Counting trace: COMPARE=2}
+\par\noindent\begin{tabularx}{\linewidth}{lllY}
+\toprule\TableHead Divided edge & Count before & Result & Count after \\ \midrule
+1 & 0 & Not equal; increment. & 1 \\
+2 & 1 & Not equal; increment. & 2 \\
+3 & 2 & Set event; periodic repeats or one-shot disables. & 0 \\
+\bottomrule\end{tabularx}\par
+\section*{Counter reads}
+LOW captures HIGH from the same live count. Read HIGH next to reconstruct that count even if the counter advances between accesses. Reading LOW again before HIGH replaces the capture. A HIGH read alone returns the last capture, initially zero; it is not a live upper-byte read.
+\begin{Notice}{DO NOT INFER ELAPSED PERIODS FROM A STICKY FLAG}
+Several events may have coalesced while interrupts were masked. Reading one pending flag establishes at least one event, not an exact missed-period count.
+\end{Notice}
+
+\newpage
+\Continuation{Multi-byte data and ownership}{Read snapshots and write staging are intentionally asymmetric.}
+\pdfbookmark[0]{Multi-byte data and ownership}{b8-14}
+
+\par\noindent\begin{tabularx}{\linewidth}{llY}
+\toprule\TableHead Pair & LOW action & HIGH action \\ \midrule
+T0/T1 COUNT & Capture current high byte; return live low. & Return previous capture. \\
+TACH COUNT & Capture current high byte; return live low. & Return previous capture. \\
+ADC DATA & Capture result high bits; clear READY. & Return previous capture; READY unchanged. \\
+DMT COUNT & Capture current high byte; return live low. & Return previous capture. \\
+T0/T1 COMPARE & Write staging byte; read committed low. & Write commits full pair; read committed high. \\
+DMT LIMIT/WINDOW & Write staging byte; read committed low. & Write commits full pair; read committed high. \\
+\bottomrule\end{tabularx}\par
+\section*{Example: crossing 00FFh}
+A counter is 00FFh when LOW is read. The returned low byte is FFh and captured high is 00h. The counter can advance to 0100h before HIGH is read; HIGH still returns 00h, reconstructing the coherent earlier value 00FFh. Reading HIGH first could combine a stale upper byte with a later LOW and produce an unrelated value.
+\section*{A coherent foreground read}
+The following binding example excludes maskable-handler accesses to the same capture. It does not create a new device register or rely on host pointer casts.
+\begin{verbatim}
+std::uint16_t read_pair(b8::Reg low, b8::Reg high) {
+    const auto saved = b8::read8(b8::Reg::IRQ_GLOBAL);
+    b8::write8(b8::Reg::IRQ_GLOBAL, 0);
+    const auto lo = b8::read8(low);
+    const auto hi = b8::read8(high);
+    b8::write8(b8::Reg::IRQ_GLOBAL, saved);
+    return static_cast<std::uint16_t>(
+        static_cast<unsigned>(lo) |
+        (static_cast<unsigned>(hi) << 8));
+}
+\end{verbatim}
+Use this only with a documented compatible pair. Passing arbitrary neighboring addresses does not make them a 16-bit register. If the application has a single exclusive owner already, interrupt exclusion may be unnecessary; ownership, not a magic delay, prevents capture replacement.
+\section*{Independent pairs}
+Each timer count, the edge count, ADC data and DMT count has its own high-byte capture. Reading an unrelated pair does not replace it. Another reader of the \emph{same} pair can. Staging for DMT LIMIT and WINDOW is also independent.
+\begin{Notice}{RESET CAN OCCUR INSIDE A PAIR}
+Masking interrupts does not mask reset. A reset aborts the execution context and clears captures; the old function must not return a fabricated value assembled across the reset.
+\end{Notice}
+
+\newpage
+\Continuation{PWM waveform generator}{A requested duty code and the currently emitted waveform are not identical state.}
+\pdfbookmark[0]{PWM waveform generator}{b8-15}
+
+\section*{Registers}
+PWM\_CTRL (0060h) implements bit 0 enable. Clearing it forces the dedicated output low at the write. PWM\_DUTY (0061h) stores the shadow duty code; readback returns that requested code. Reset clears enable, shadow and active duty.
+\[
+ d(c)=\begin{cases}c/256,&0\le c\le254,\\1,&c=255,\end{cases}
+ \qquad f_{\mathrm{carrier}}=f_{\mathrm{PB}}/256.
+\]
+\par\noindent\begin{tabularx}{\linewidth}{llY}
+\toprule\TableHead Code & High ticks per carrier & Nominal duty \\ \midrule
+00h & 0 & 0 percent \\
+01h & 1 & 0.390625 percent \\
+80h & 128 & 50 percent \\
+FEh & 254 & 99.21875 percent \\
+FFh & 256 & 100 percent; special endpoint \\
+\bottomrule\end{tabularx}\par
+\section*{Update boundary}
+The carrier phase advances with PBCLK whether PWM is enabled or disabled. At a phase-zero peripheral tick, the shadow value transfers to the active value. A write partway through a carrier can therefore leave the previous waveform active until the next boundary. There is no active-duty readback register or duty-transfer interrupt.
+\begin{center}
+\begin{tikzpicture}[x=0.046cm,y=.55cm,font=\scriptsize\sffamily]
+\draw[->] (0,0)--(270,0) node[right]{PB ticks};
+\foreach \x in {0,64,128,192,256}{\draw (\x,0)--(\x,-.15) node[below]{\x};}
+\draw[very thick,VendorInk] (0,1)--(0,2)--(128,2)--(128,1)--(256,1)--(256,2)--(266,2);
+\node[left] at (0,1.5){80h};
+\draw[dashed] (64,0.3)--(64,2.6) node[above]{shadow write};
+\draw[dashed] (256,.3)--(256,2.6) node[above]{next latch};
+\end{tikzpicture}
+\end{center}
+\section*{Enable and disable}
+Enabling does not restart phase. The output becomes driven according to the active code on a subsequent PB tick. A phase-preserving enable is not a new full-width pulse guarantee. Disabling is immediate at the register write and does not depend on the next phase-zero latch.
+Writing duty zero alone is not an immediate disable. Disabling does not erase the shadow code; a later enable can reuse it. Clear pending duty separately when required by the caller's policy. Neither operation changes general-purpose GPIO outputs.
+\section*{Clock and reset}
+A permitted clock change requires PWM disabled. A stopped selected clock prevents further phase advancement; the pin can retain its last emitted level until another mechanism disables it or reset forces it low. External circuitry must not confuse frozen PWM with a verified continuing control signal.
+
+\newpage
+\Continuation{PB1 edge counter and external events}{Count observed rising edges; physical scaling belongs to the connected source.}
+\pdfbookmark[0]{PB1 edge counter and external events}{b8-16}
+
+\section*{Edge input}
+PB1 transitions from low to high increment the 16-bit TACH counter modulo 65,536 and set the TACH interrupt flag. There is no prescaler, edge-polarity selection or software counter-clear register. Device reset clears the counter and previous-level memory.
+Configure PB1 as an input when another device drives it. GPIO direction does not disable the edge observation function. The counter is independent of PWM enable and does not require a corresponding output waveform to be active.
+\section*{Difference between two observations}
+For two coherent unsigned counter reads $C_0$ and $C_1$:
+\[
+ \Delta C=(C_1-C_0)\bmod 65536,\qquad
+ f_{\mathrm{edge}}\approx\frac{\Delta C}{\Delta t}.
+\]
+The interval must exclude an unobserved full wrap: require fewer than 65,536 actual edges between reads. The subtraction does not reveal whether one or several full wraps occurred. Counter arithmetic alone does not provide a time interval; derive $\Delta t$ from an appropriate timebase.
+\section*{Counter versus flag}
+Ten edges while source delivery is masked can add ten to the count but leave only one TACH flag. Clearing that flag does not clear the counter. Reading the counter does not acknowledge the flag. Use the count for accumulated observations and the flag for event notification.
+\section*{Observation timing of the C++ binding}
+Input levels are observed at one-microsecond service boundaries while local reset is released. This observation is independent of PB peripheral ticking. Two or more external transitions between observations can be missed. A high level at the first observation after reset can be interpreted as a rising edge because the previous-level memory was reset low.
+A physical implementation needs the input qualification, synchronization and rate limits appropriate to its selected device. This interface publication does not assign a metastability or high-frequency capture guarantee to arbitrary waveforms.
+\section*{VBLANK event input}
+A rising VBLANK observation sets the VBLANK flag but has no B8 event counter. The B8 does not define a frame duration or a blanking width. A delayed pending edge is not proof that an external blanking interval is still active.
+\begin{Notice}{COUNTER VALUE IS NOT A DIAGNOSIS}
+The counter reports accepted transitions. It does not distinguish a stationary mechanism, disconnected source, stopped external clock, missing supply or other cause of absent transitions.
+\end{Notice}
+
+\newpage
+\Continuation{External byte-register bridge}{Four local register indices, with device-defined data behavior.}
+\pdfbookmark[0]{External byte-register bridge}{b8-17}
+
+\par\noindent\begin{tabularx}{\linewidth}{llY}
+\toprule\TableHead Address & Name & Meaning \\ \midrule
+0080h & \texttt{XBUS\_REG} & Low two bits select external register index 0--3. Reset zero. \\
+0081h & \texttt{XBUS\_DATA} & Read/write performs one corresponding external transaction. \\
+\bottomrule\end{tabularx}\par
+\section*{Transaction sequence}
+Write XBUS\_REG with the desired local index, then access XBUS\_DATA. The selector remains unchanged until explicitly written or B8 reset. There is no automatic XBUS\_REG increment. Any pointer increment, busy interval or status acknowledgment inside the external device comes from that device's specification.
+\begin{verbatim}
+// Local index supplied by the external device's own manual.
+b8::write8(b8::Reg::XBUS_REG, local_index);
+const auto value = b8::read8(b8::Reg::XBUS_DATA);
+\end{verbatim}
+Bits 7:2 of XBUS\_REG are ignored on write and read zero. XBUS\_DATA has no independent B8 storage or universal reset read value. A write of zero can be a real command to an external device; it is not necessarily a harmless clear.
+\section*{Recovery time}
+The bridge provides ordered byte transactions, not a ready/busy handshake or a queue. A completed B8 write does not mean an external device accepted it under its own timing constraints. Read that device's status where available, or meet its specified recovery interval. Each selected read or write in the C++ binding is followed by one service interval.
+\section*{Shared selector state}
+An interrupt handler can change XBUS\_REG between foreground selection and data access. Protect the whole operation or assign the bus one owner. If the external part also has a memory-address register, protect that pointer sequence as well. Saving only the B8 selector is insufficient to preserve external pointer state.
+\section*{Reset and external retention}
+B8 reset returns XBUS\_REG to zero. It does not reset the device attached to the bridge. After reset, previous external control, pointer, busy and memory state can still exist. An output intended for one old index can be misdirected if software assumes the B8 selector survived.
+\begin{Notice}{BUS FIDELITY}
+This publication defines byte-level ordering and side effects. It does not assign individual RD/WR/CS edge timing, electrical setup/hold limits, electrical loading or an external address decoder. Those belong to a physical implementation and the connected device.
+\end{Notice}
+
+\newpage
+\Continuation{ADC register fields}{Freshness, result ownership and errors are independent status.}
+\pdfbookmark[0]{ADC register fields}{b8-18}
+
+\par\noindent\begin{tabularx}{\linewidth}{lY}
+\toprule\TableHead Register & Implemented fields / behavior \\ \midrule
+\texttt{ADC\_CTRL} & EN bit 0; START bit 1 is a write strobe and reads zero. \\
+\texttt{ADC\_CHANNEL} & Low bit chooses AN0 or AN1; writes require no active conversion. \\
+\texttt{ADC\_PRESCALE} & Low two bits select divisors 1, 2, 4, 8; reset code 2. \\
+\texttt{ADC\_STATUS} & BUSY[0], READY[1], OVERRUN[2], ERROR[3]; bits 7:4 zero. \\
+\texttt{ADC\_DATA\_LO} & Read result low byte, capture high bits and clear READY. \\
+\texttt{ADC\_DATA\_HI} & Read captured high bits in bits 1:0; bits 7:2 zero. \\
+\bottomrule\end{tabularx}\par
+\section*{Control writes}
+ADC\_CTRL is a full-byte masked control write, not a set-bits alias. Writing 03h enables and starts. Writing 01h enables without starting. Writing 00h disables and aborts an active conversion. Writing 02h first makes EN zero, then attempts START while disabled: it cannot begin a conversion and sets ERROR.
+Disabling clears BUSY and READY, retains the prior numerical result, and does not clear ERROR or OVERRUN. START while BUSY sets ERROR but leaves the active conversion running. An unread old READY can coexist with a newly started BUSY conversion; it still refers to the old result until the new completion.
+\section*{Status access}
+\par\noindent\begin{tabularx}{\linewidth}{llY}
+\toprule\TableHead Bit & Set by & Cleared by \\ \midrule
+BUSY / 01h & Accepted START. & Completion or disable/abort. \\
+READY / 02h & Conversion completion. & DATA\_LO read, disable or reset. \\
+OVERRUN / 04h & New completion when old READY remains set. & W1C 04h or reset. \\
+ERROR / 08h & Invalid start or configuration attempt. & W1C 08h or reset. \\
+\bottomrule\end{tabularx}\par
+Writing BUSY or READY has no effect. Reading STATUS does not acknowledge READY, ERROR or OVERRUN. Read-modify-write of STATUS can accidentally clear both W1C errors; use deliberate masks.
+\section*{Configuration while busy}
+CHANNEL or PRESCALE writes made during BUSY are ignored and set ERROR, even when the requested value equals the existing value. The held/current conversion uses the accepted configuration. Stop or finish conversion before reconfiguration.
+\section*{Interrupt separation}
+Completion sets IRQ\_FLAGS.ADC independently of READY. DATA\_LO clears READY but does not clear that flag. Conversely, clearing the ADC interrupt does not consume its result.
+
+\newpage
+\Continuation{ADC acquisition and conversion timing}{The sampled voltage is captured before the result becomes ready.}
+\pdfbookmark[0]{ADC acquisition and conversion timing}{b8-19}
+
+\section*{Clock relationship}
+For ADC divider $D_A$, four acquisition cycles precede nine conversion cycles:
+\[
+ t_{\mathrm{sample}}=\frac{4D_A}{f_{\mathrm{PB}}},\qquad
+ t_{\mathrm{complete}}=\frac{13D_A}{f_{\mathrm{PB}}}.
+\]
+\par\noindent\begin{tabularx}{\linewidth}{lllY}
+\toprule\TableHead Scale code & Divider & Sample at PB=1 MHz & Complete at PB=1 MHz \\ \midrule
+0 & 1 & 4 microseconds & 13 microseconds \\
+1 & 2 & 8 microseconds & 26 microseconds \\
+2 & 4 & 16 microseconds & 52 microseconds \\
+3 & 8 & 32 microseconds & 104 microseconds \\
+\bottomrule\end{tabularx}\par
+\begin{center}
+\begin{tikzpicture}[x=.21cm,y=.65cm,font=\small\sffamily]
+\fill[VendorTint] (0,1) rectangle (16,2);
+\fill[VendorInk!18] (16,1) rectangle (52,2);
+\draw (0,1) rectangle (52,2);\draw (16,1)--(16,2);
+\node at (8,1.5){Acquire};\node at (34,1.5){Convert held sample};
+\draw[->] (0,0)--(56,0) node[right]{\scriptsize $\mu$s};
+\foreach \x/\n in {0/START,16/SAMPLE,52/READY}{\draw[dashed] (\x,0)--(\x,2.3);\node[below,align=center] at (\x,0){\x\\\n};}
+\end{tikzpicture}
+\end{center}
+\section*{Sample hold}
+At acquisition end, both the selected voltage and reference are captured. A voltage change before that instant can affect the current result. A change afterward affects a later conversion. The result is installed at completion, not at sample time. A result therefore has an acquisition instant, a completion instant and a later software-read instant.
+\section*{Overrun}
+If a previous READY has not been acknowledged by a LOW read, a new completion replaces the result and sets OVERRUN. There is no FIFO. Reading LOW before the new completion can preserve an old coherent result through its captured high bits, but software must understand which completion it consumed.
+\section*{Aborting}
+Disabling stops the active conversion with no completion event. The old numerical result remains. A subsequent read of that old value is not evidence that the aborted conversion completed. A result register can contain plausible data while READY is clear.
+\begin{Notice}{ACQUISITION IS NOT AN IMPEDANCE MODEL}
+The source must settle by the specified sample instant. No general source-resistance, sampling-capacitance, anti-aliasing or analog input-protection guarantee is assigned by this interface. ADC reference and source errors must not be conflated.
+\end{Notice}
+
+\newpage
+\Continuation{ADC transfer characteristic and result handling}{Endpoint-rounded conversion; no hidden engineering-unit conversion.}
+\pdfbookmark[0]{ADC transfer characteristic and result handling}{b8-20}
+
+\section*{Specified numerical transfer}
+With captured input $V$ and captured reference $V_R$:
+\[
+ N=\operatorname{clamp}\!\left(
+ \left\lfloor1023\frac{V}{V_R}+\frac12\right\rfloor,\,0,\,1023\right).
+\]
+This is the transfer convention of this device interface. Nominal $V_R=3.3$ V. The output is ten bits, split between DATA\_LO and captured DATA\_HI[1:0]. It contains no temperature, speed or application-unit conversion.
+\par\noindent\begin{tabularx}{\linewidth}{llY}
+\toprule\TableHead Input at nominal reference & Ideal code & Comment \\ \midrule
+0 V & 0 & Lower endpoint. \\
+0.825 V & 256 & One-quarter reference, rounded. \\
+1.650 V & 512 & Half reference rounds upward. \\
+2.475 V & 767 & Three-quarter reference, rounded. \\
+3.300 V & 1023 & Upper endpoint. \\
+\bottomrule\end{tabularx}\par
+\section*{Reconstruction and uncertainty}
+A nominal reconstruction is $\widehat V=N V_R/1023$. The ideal step at 3.3 V is about 3.226 mV; rounding contributes up to half a step away from saturation. Reference error, source offset, source noise and source dynamics remain separate. Saturation does not identify the physical cause of an endpoint code.
+\section*{Safe data ownership}
+Read STATUS for READY. Read LOW, then HIGH under ownership of that capture. Record that one completed result was consumed. Clear the relevant interrupt and error status separately where required. Re-reading LOW does not create a new completion and can replace a pending high-byte capture.
+\begin{verbatim}
+// Caller owns ADC access and excludes an ISR reading ADC DATA.
+if ((b8::read8(b8::Reg::ADC_STATUS) & 0x02u) != 0) {
+    const auto lo = b8::read8(b8::Reg::ADC_DATA_LO);
+    const auto hi = b8::read8(b8::Reg::ADC_DATA_HI);
+    const auto code = static_cast<std::uint16_t>(
+        static_cast<unsigned>(lo) |
+        ((static_cast<unsigned>(hi) & 0x03u) << 8));
+    // Consume this completion once; conversion policy is external.
+}
+\end{verbatim}
+\section*{Channel changes}
+There is no automatic channel scan. Software selects a channel while idle and initiates each conversion. Capture configuration with a result at the software level if another owner can change the channel before that result is interpreted.
+\begin{Notice}{VALID CODE DOES NOT PROVE VALID SENSOR}
+A newly completed ADC acquisition proves only a fresh voltage conversion. The B8 cannot establish that an external source is connected, correctly mounted, unstuck or representative of the intended physical quantity.
+\end{Notice}
+
+\newpage
+\Continuation{Clock sources and clock domains}{Frequency configuration is separate from bus-service time.}
+\pdfbookmark[0]{Clock sources and clock domains}{b8-21}
+
+\begin{center}
+\begin{tikzpicture}[font=\small\sffamily,b/.style={draw,fill=VendorTint,minimum height=8mm,minimum width=15mm},>=Stealth]
+\node[b] (e) at (0,0){CLKIN};\node[b] (p) at (2,0){$\div P$};\node[b] (m) at (4,0){$\times M$};\node[b] (q) at (6,0){$\div Q$};
+\node[b] (sel) at (9,0){Source select};\node[b] (pb) at (12,0){$\div B$};
+\foreach \a/\z in {e/p,p/m,m/q,q/sel,sel/pb}{\draw[->] (\a)--(\z);}
+\draw[->] (e.north)--++(0,0.8)-|(sel.north) node[pos=0.35,above]{direct EC};
+\node[b] (f) at (6,-1.4){FRC};\draw[->] (f.east)-|(sel.south);
+\node[below] at (10.1,-.35){SYSCLK};\node[right] at (pb.east){PBCLK};
+\node[b] (lf) at (1,-2.8){LFRC};\draw[->] (lf.east)--(7,-2.8) node[right]{WDT / clock-failure detector};
+\end{tikzpicture}
+\end{center}
+\par\noindent\begin{tabularx}{\linewidth}{llY}
+\toprule\TableHead Domain / source & Nominal specification & Consumers \\ \midrule
+FRC & 4 MHz, $\pm5\%$ & Default startup source. \\
+CLKIN / EC & Externally supplied CMOS clock & Direct source or PLL reference input. \\
+SYSCLK & Chosen active source & DMT through divide-by-1024 while core active. \\
+PBCLK & SYSCLK divided by literal B & Compare timers, PWM and ADC. \\
+LFRC & 10 kHz, $\pm10\%$ & Independent WDT and missing-clock detector. \\
+Service binding & 1 microsecond per service operation & Transaction scheduling and input observation. \\
+\bottomrule\end{tabularx}\par
+\section*{External-clock qualification}
+A continuously valid CLKIN qualifies after 256 input periods. In the service binding, this is rounded to the next one-microsecond observation. A loss of validity restarts qualification. The oscillator's own startup interval, if any, is separate from the B8's qualification interval.
+CLKIN accepts an external clock source. This interface does not expose a crystal amplifier pair or assign load capacitance for a bare resonator. Sharing an external source with another component requires actual clock wiring; attaching ordinary signal pins does not share timing.
+\section*{Domain changes}
+PB-driven peripherals change rate when PBCLK changes. DMT changes rate with SYSCLK and pauses with a halted core. LFRC is independent. An external device's internal recovery or refresh timing does not change merely because B8 selected another clock.
+\begin{Notice}{FREQUENCY STATUS IS NOT A FREQUENCY MEASUREMENT}
+READY, LOCK and active selection report state. They do not calibrate the external source's absolute frequency or eliminate its relative tolerance.
+\end{Notice}
+
+\newpage
+\Continuation{Clock plan: staging and legal operating ranges}{P, M, Q and B contain literal values, not encoded exponents.}
+\pdfbookmark[0]{Clock plan: staging and legal operating ranges}{b8-22}
+
+\section*{Frequency relationships}
+\[
+ f_{\mathrm{REF}}=f_{\mathrm{EC}}/P,\quad
+ f_{\mathrm{VCO}}=f_{\mathrm{REF}}M,\quad
+ f_{\mathrm{SYS}}=f_{\mathrm{VCO}}/Q,\quad
+ f_{\mathrm{PB}}=f_{\mathrm{SYS}}/B.
+\]
+\par\noindent\begin{tabularx}{\linewidth}{llY}
+\toprule\TableHead Register / value & Choices & Constraint \\ \midrule
+CLK\_SOURCE & 0 FRC, 1 direct EC, 2 EC/PLL & Other source values are invalid at commit. \\
+PLL\_PREDIV / P & 1, 2, 4, 8 & PLL reference 1--4 MHz nominal. \\
+PLL\_MULT / M & Integer 4--16 & VCO 16--64 MHz nominal. \\
+PLL\_POSTDIV / Q & 1, 2, 4, 8 & SYSCLK 4--32 MHz nominal. \\
+PB\_DIV / B & 1, 2, 4, 8, 16, 32 & PBCLK 0.25--4 MHz nominal. \\
+\bottomrule\end{tabularx}\par
+For EC-derived ranges, a $\pm0.1\%$ source-frequency allowance is admitted at the nominal boundaries. The allowance does not legalize an arbitrary incorrect divider. FRC has its own wider tolerance and is validated from its nominal source rate.
+\section*{Staged versus active values}
+Writes to A0h--A4h store the staged bytes. Reads return those staged bytes, including an as-yet invalid value. No clock changes until a commit is accepted. The active source and peripheral divider are read separately at A6h and A9h. There is no active multiplier/prescaler tuple readback; software should retain the successfully committed plan.
+A pending PLL request captures the submitted tuple. Subsequent staged edits do not change that pending request. Do not infer active frequency from staging registers while BUSY is set or after editing a future plan.
+\section*{Direct sources}
+FRC and direct EC bypass PLL factors. P, M and Q are not used to derive their active frequency. PB divider validity and SYS/PB range constraints still apply. An EC request also requires a qualified external input. A PLL-only factor error is evaluated for a PLL request, not as an unused source dependency.
+\section*{A plan calculation worksheet}
+Record external nominal frequency and tolerance, selected source, literal factors, reference frequency, VCO frequency, system frequency and peripheral frequency. Check every intermediate range before calculating timer, ADC, PWM and DMT settings. Several tuples can produce the same PB frequency with different system clocks.
+\begin{Notice}{NO APPLICATION CLOCK TUPLE IS SELECTED HERE}
+This manual supplies legal operating behavior. The board's source frequency and the required system timing determine the plan chosen by the integrator.
+\end{Notice}
+
+\newpage
+\Continuation{Clock commit and status}{Protected writes submit a plan; BUSY and active readback establish its outcome.}
+\pdfbookmark[0]{Clock commit and status}{b8-23}
+
+\par\noindent\begin{tabularx}{\linewidth}{llY}
+\toprule\TableHead CLK\_STATUS bit & Read meaning & Write behavior \\ \midrule
+0 / 01h EXT\_READY & External input has qualified. & Ignored. \\
+1 / 02h PLL\_LOCK & PLL lock state. & Ignored. \\
+2 / 04h BUSY & A PLL request is qualifying. & Ignored. \\
+3 / 08h ERROR & Sticky rejected/cancelled-operation condition. & One clears; zero preserves. \\
+7:4 & Zero. & Ignored. \\
+\bottomrule\end{tabularx}\par
+\section*{Commit prerequisites}
+Both compare timers must be disabled, PWM disabled, ADC not busy and DMT disabled. Keep them quiescent until switching completes. WDT is independent and continues; it is not part of the quiescence test. A locked enabled DMT prevents a later compliant clock change until reset.
+\section*{Protected sequence}
+After staging the complete plan, write C3h then 3Ch to CLK\_KEY, followed by A5h to CLK\_COMMIT. No intervening register access is permitted. Reads, even of CLK\_STATUS, invalidate the unlock. An idle service interval is not a register access, but pending handlers can perform an invalidating access.
+\begin{verbatim}
+const auto saved = b8::read8(b8::Reg::IRQ_GLOBAL);
+b8::write8(b8::Reg::IRQ_GLOBAL, 0);
+// Staging and preconditions have already been established.
+b8::write8(b8::Reg::CLK_KEY,    0xC3);
+b8::write8(b8::Reg::CLK_KEY,    0x3C);
+b8::write8(b8::Reg::CLK_COMMIT, 0xA5);
+b8::write8(b8::Reg::IRQ_GLOBAL, saved);
+\end{verbatim}
+No solved factor values are implied by this protocol example. A wrong key, wrong commit value, bad plan, unready source, nonquiescent peripheral or already pending switch sets ERROR and preserves the active clock.
+\section*{Completion}
+Accepted direct-source commits take effect at the write. Accepted PLL commits set BUSY, clear LOCK and retain the old active source for 250 microseconds. On completion, the captured tuple becomes active and LOCK is set. If qualified EC is lost while pending, the request is cancelled and ERROR set.
+Verify BUSY clear, no relevant error, expected CLK\_ACTIVE and PB\_ACTIVE, and PLL\_LOCK for a PLL plan. A status read alone cannot identify an unrecorded active multiplier. A successful operation does not clear a pre-existing sticky ERROR automatically.
+
+\newpage
+\Continuation{Clock interruptions and timing continuity}{The independent missing-clock detector is not a maskable interrupt.}
+\pdfbookmark[0]{Clock interruptions and timing continuity}{b8-24}
+
+\section*{Active external-source loss}
+When the active EC or EC/PLL source becomes invalid, its clock-driven functions stop. The independent detector counts continuous absence in LFRC ticks and requests a CLOCK reset at eight ticks. Reset selects FRC. At nominal LFRC the eight-tick interval is 0.8 ms; LFRC tolerance and phase determine the physical interval.
+\section*{Short interruption}
+A recovery before detector expiry resumes the active source. It is not a guarantee of uninterrupted phase, uninterrupted application deadlines or a new successful PLL qualification. Loss clears the lock indication; a short resumed source need not automatically regain PLL\_LOCK. Software must not treat a later READY bit as proof that all prior schedules remained valid.
+\section*{Pending versus active source}
+An external failure during pending PLL qualification cancels that request and records ERROR. If the active source is still FRC, it continues running. If the active source itself depends on EC, its separate missing-clock response still applies. The pending transaction and the active-source monitor are different state machines.
+\par\noindent\begin{tabularx}{\linewidth}{lY}
+\toprule\TableHead State during selected-clock loss & Behavior \\ \midrule
+PB compare timers / ADC & No further PB clock ticks until recovery/reset. \\
+PWM & No phase advance; last pad level may remain until disable or reset. \\
+DMT & No active system-clock progress; independent WDT remains available. \\
+WDT / clock-failure detector & LFRC continues; their reset paths remain effective. \\
+External components & Continue according to their own supplies and clocks. \\
+Input-edge observation binding & Can still observe asynchronous input changes while reset is released. \\
+\bottomrule\end{tabularx}\par
+\section*{Changing a clock deliberately}
+Commit does not rescale software deadlines, compare registers or prior counter interpretations. Timer/ADC configuration and DMT timing must be reviewed for the new rate. Do not promise a globally phase-aligned restart merely because the nominal frequency is unchanged.
+\section*{No hidden automatic fallback before reset}
+This interface does not silently swap the active source to FRC on the first missing edge while preserving execution. It stops clock-driven progress and requests reset after the specified independent qualification. Recovery strategy and post-reset application state are outside the clock peripheral.
+\begin{Notice}{OUTPUT RETENTION DURING CLOCK STOP}
+A clock-failure detector has a finite detection interval. An output pin can retain an active level during it. Any stronger external inhibition requirement must be supported by the board, not presumed from a future software write.
+\end{Notice}
+
+\newpage
+\Continuation{Independent watchdog: configuration}{Always on in this device option; configuration lock is one-way until reset.}
+\pdfbookmark[0]{Independent watchdog: configuration}{b8-25}
+
+\par\noindent\begin{tabularx}{\linewidth}{lY}
+\toprule\TableHead Register & Fields and side effects \\ \midrule
+00B0h WDT\_CTRL & Bit 0 ON reads one. Bit 7 LOCK is set-only. Other bits read zero. \\
+00B1h WDT\_SCALE & Literal code k=0--5; accepted unlocked write clears count and first-key state. \\
+00B2h WDT\_SERVICE & Write A5h then 5Ah; read returns zero. \\
+00B3h WDT\_STATUS & ARMED[0] first-key context; ERROR[7] configuration error. Read-only. \\
+\bottomrule\end{tabularx}\par
+\section*{Counter period}
+\[
+ N_W=256\,2^k,\qquad
+ t_W=\frac{N_W}{f_{\mathrm{LF}}},\qquad
+ f_{\mathrm{LF}}=10{,}000(1+\epsilon_{\mathrm{LF}})\ \mathrm{Hz}.
+\]
+\par\noindent\begin{tabularx}{\linewidth}{llY}
+\toprule\TableHead k & LFRC ticks & Nominal timeout \\ \midrule
+0 & 256 & 25.6 ms \\
+1 & 512 & 51.2 ms \\
+2 & 1,024 & 102.4 ms \\
+3 & 2,048 & 204.8 ms; reset value \\
+4 & 4,096 & 409.6 ms \\
+5 & 8,192 & 819.2 ms \\
+\bottomrule\end{tabularx}\par
+\section*{Lock and error rules}
+Writing WDT\_CTRL bit 7 sets LOCK. A later zero cannot clear it. Writing bit 0 zero cannot turn the fused watchdog off and is otherwise ignored. Rewriting CTRL is not a service operation.
+A SCALE write while locked, including the same code, is ignored and sets ERROR. A code above five also sets ERROR without changing the scale. An accepted unlocked scale write clears the watchdog count even when the scale value is unchanged. Configuration error remains sticky; no W1C register is provided for WDT\_STATUS. Device reset clears it.
+\section*{Clock independence}
+WDT advances on LFRC, not PBCLK, SYSCLK or a scheduler interrupt. Disabling global interrupts, stopping compare timers, changing system rate or halting the core does not suspend it. A hardware reset hold suspends counting; it starts anew at release with the default configuration.
+\begin{Notice}{CONFIGURATION IS NOT A HEALTH CHECK}
+The hardware accepts a valid configuration and service sequence without knowing whether application tasks made useful progress. It provides an expiry mechanism, not a diagnosis of correct execution.
+\end{Notice}
+
+\newpage
+\Continuation{Independent watchdog: service and margins}{The first key arms a sequence; only the successful second key renews time.}
+\pdfbookmark[0]{Independent watchdog: service and margins}{b8-26}
+
+\section*{Service protocol}
+Write A5h to WDT\_SERVICE when no first key is armed. Then write 5Ah before sixteen further LFRC ticks elapse. Other register accesses are permitted between these writes, unlike the clock-unlock sequence. They still consume time, and an interrupt can delay the second key.
+\par\noindent\begin{tabularx}{\linewidth}{lY}
+\toprule\TableHead Attempt & Effect \\ \midrule
+A5h with no first key armed & Arm first-key context; original watchdog age continues. \\
+5Ah with valid first key and key age $<16$ & Clear watchdog age; disarm key context. \\
+Duplicate A5h & Request WDT reset with bad-key detail. \\
+5Ah without valid context & Request WDT reset with bad-key detail. \\
+5Ah at key age $\ge16$ & Request WDT reset with bad-key detail. \\
+Any other service byte & Request WDT reset with bad-key detail. \\
+No second write & Original watchdog timeout still expires; no automatic 16-tick key timeout reset. \\
+\bottomrule\end{tabularx}\par
+\section*{Service does not restart LFRC phase}
+Successful service clears the watchdog count, not the independent oscillator's fractional phase. The next LFRC tick can be less than a full period away. The first post-service interval can therefore be shorter than $N_W/f_{\mathrm{LF}}$ by less than one LFRC period, plus service-boundary quantization.
+\section*{Tolerance budgets}
+Use the fastest allowed LFRC to bound the service deadline and the slowest to bound fault-detection latency. For reset code 3:
+\[
+ \frac{2048}{11{,}000}\approx186.18\ \mathrm{ms},\qquad
+ \frac{2048}{9{,}000}\approx227.56\ \mathrm{ms}.
+\]
+These are period-based endpoints, not a guarantee that servicing at exactly the fast endpoint is safe. Include one-tick phase allowance, service-boundary rounding and the worst delay before the second key.
+\section*{Expiry versus a later bus access}
+Expiry at a hardware boundary requests reset before a later service write can rescue the old execution. A successful write just before a deadline must be judged by its actual ordering, not the time at which the caller intended to run.
+\begin{Notice}{TIMER INTERRUPT ACTIVITY IS NOT WATCHDOG OWNERSHIP}
+A continuously firing interrupt can coexist with stalled foreground work. The device does not decide which software context may authorize renewal. That responsibility remains with the integrator.
+\end{Notice}
+
+\newpage
+\Continuation{Windowed deadman: registers and counting}{Counts divided system-clock progress, not LFRC ticks or instruction fetches.}
+\pdfbookmark[0]{Windowed deadman: registers and counting}{b8-27}
+
+\par\noindent\begin{tabularx}{\linewidth}{llY}
+\toprule\TableHead Address & Register & Behavior \\ \midrule
+00C0h & DMT\_CTRL & EN[0], LOCK[7]; reset zero. \\
+00C1h--C2h & DMT\_LIMIT\_LO/HI & Maximum count; LOW stages, HIGH commits; reset 0400h. \\
+00C3h--C4h & DMT\_WINDOW\_LO/HI & Opening count; LOW stages, HIGH commits; reset 0100h. \\
+00C5h & DMT\_STATUS & OPEN[0], ENABLED[1], ERROR W1C[7]. \\
+00C6h--C7h & DMT\_COUNT\_LO/HI & LOW captures HIGH; reset count and capture zero. \\
+00C8h & DMT\_PRECLR & First service-key location; reads zero. \\
+00C9h & DMT\_CLR & Second service-key location; reads zero. \\
+\bottomrule\end{tabularx}\par
+\section*{Timing domain}
+\[
+ f_D=\frac{f_{\mathrm{SYS}}}{1024},\quad
+ t_{\mathrm{open}}=\frac{1024N_{\mathrm{open}}}{f_{\mathrm{SYS}}},\quad
+ t_{\mathrm{limit}}=\frac{1024N_{\mathrm{limit}}}{f_{\mathrm{SYS}}}.
+\]
+DMT advances only while enabled, the core is active and the selected source is not stopped. It pauses on a core halt or selected-clock failure. PB peripherals can continue during a core halt; the independent watchdog also continues. This DMT is not an instruction-fetch counter and not an operator-presence input.
+\section*{Configuration}
+Program LIMIT and WINDOW while disabled and unlocked. Both are unsigned 16-bit values. Valid enable requires $0\le N_{\mathrm{open}}<N_{\mathrm{limit}}\le65535$. Opening zero is allowed; limit zero is not. Invalid enable leaves the device disabled and sets ERROR.
+Changing enable state clears count, fractional divider phase and the service-armed state. Rewriting an unchanged enabled CTRL does not refresh the count. Set LOCK only after choosing the configuration: it freezes both enable and count-pair configuration until reset.
+\section*{Locked behavior}
+A locked CTRL write requesting a different EN/LOCK state is ignored and sets ERROR. Rewriting the same locked state is accepted without renewal. A configuration-pair write while enabled or locked is ignored and sets ERROR. ERROR can be cleared by writing 80h to DMT\_STATUS without changing OPEN or ENABLED.
+\begin{Notice}{LOW-BYTE STAGING IS NOT LIVE CONFIGURATION}
+A LOW write does not change the committed limit or window. Always write the intended LOW before HIGH, and read back the committed pair before enabling.
+\end{Notice}
+
+\newpage
+\Continuation{Windowed deadman: service state machine}{Both keys must complete inside the valid window and before expiry.}
+\pdfbookmark[0]{Windowed deadman: service state machine}{b8-28}
+
+\[
+ \text{valid service window:}\qquad
+ N_{\mathrm{open}}\le\mathrm{COUNT}<N_{\mathrm{limit}}.
+\]
+\begin{center}
+\begin{tikzpicture}[x=.12cm,y=.6cm,font=\small\sffamily]
+\fill[VendorInk!10] (0,1) rectangle (25,2);
+\fill[VendorTint] (25,1) rectangle (100,2);
+\draw (0,1) rectangle (100,2);\draw (25,1)--(25,2);
+\node at (12.5,1.5){Closed};\node at (62.5,1.5){Service permitted};
+\foreach \x/\t in {0/zero,25/opening,100/expiry}{\draw[dashed] (\x,.2)--(\x,2.4);\node[below] at (\x,.2){\t};}
+\end{tikzpicture}
+\end{center}
+Write 69h to PRECLR in the open window, then 96h to CLR before sixteen additional DMT ticks and before maximum count. The first key does not renew the deadline. A successful second key clears count and fractional divider phase and disarms the key context. Other register accesses may intervene if timing and ownership are preserved.
+\par\noindent\begin{tabularx}{\linewidth}{lY}
+\toprule\TableHead Condition & Hardware result \\ \midrule
+PRECLR wrong value or duplicate first key & DMT reset; bad-first-key detail. \\
+Correct PRECLR before opening & DMT reset; early detail. \\
+CLR wrong value or without armed first key & DMT reset; bad-second-key detail. \\
+CLR at key age 16 or later & DMT reset; bad-second-key detail. \\
+Maximum count reached & DMT reset; expiry detail. \\
+Key writes while disabled & Configuration ERROR, not service-induced reset. \\
+First key only, no second write & Original maximum-count deadline continues running. \\
+\bottomrule\end{tabularx}\par
+\section*{Inclusive opening, exclusive expiry}
+The opening count itself is eligible; the maximum count is not. At an exact expiry boundary, hardware expiry precedes a later bus service attempt. The sixteen-tick second-key allowance never extends the overall limit: a first key close to expiry leaves only the remaining time.
+\section*{Sequence ownership}
+Another writer can insert a duplicate first key or consume the sequence with an invalid second key. Reading OPEN establishes eligibility at the read instant, not a reservation of future time. Budget any subsequent handler delay and the duration of both service calls.
+\begin{Notice}{WINDOWS DO NOT PROVE USEFUL EXECUTION}
+A loop issuing the correct keys within the window can satisfy this hardware while other work is wrong. DMT provides a lower and upper timing constraint; software must supply the meaning of an eligible service.
+\end{Notice}
+
+\newpage
+\Continuation{Reset and status error matrix}{Use the field-specific recovery path; do not conflate a flag with a reset.}
+\pdfbookmark[0]{Reset and status error matrix}{b8-29}
+
+\par\noindent\begin{tabularx}{\linewidth}{p{.31\linewidth}p{.29\linewidth}Y}
+\toprule\TableHead Operation / condition & Consequence & Available recovery \\ \midrule
+Unmapped register access & Interface-access fault. & Correct the address; not a W1C status event. \\
+Write to read-only location & Interface-access fault. & Correct the access type. \\
+GPIO read with an unresolved pad & Interface-access fault. & Resolve external bias/drivers. \\
+Timer reconfiguration enabled & Interface-access fault. & Disable before configuration. \\
+Clock bad key, plan or precondition & CLK ERROR; active clock preserved. & Clear error and resubmit valid sequence. \\
+Pending PLL loses qualification & Request cancelled; CLK ERROR. & Requalify and submit again. \\
+ADC START busy/disabled & ADC ERROR; stated active/abort behavior. & Clear error; establish valid EN/BUSY state. \\
+ADC busy channel/scale write & Ignored; ADC ERROR. & Wait or abort, then configure. \\
+ADC unread result replaced & OVERRUN; new result retained. & Read new result; clear overrun separately. \\
+WDT locked/invalid scale write & WDT configuration ERROR. & Existing scale remains; error clears at reset. \\
+DMT invalid configuration & DMT configuration ERROR. & Correct while unlocked/disabled; W1C error. \\
+Invalid WDT service & WDT reset with detail. & Fresh reset execution; inspect cause/detail. \\
+Invalid enabled DMT service & DMT reset with detail. & Fresh reset execution; inspect cause/detail. \\
+WDT or DMT expiry & Hardware reset. & Fresh reset execution. \\
+Active EC absent for 8 LF ticks & CLOCK reset. & Fresh reset execution on FRC. \\
+\bottomrule\end{tabularx}\par
+\section*{Simultaneous observations}
+Reset causes collected at one service boundary can be combined before a reset is applied. Retained cause bits can also include earlier uncleared events. The register pair is evidence, not a single-event priority encoding.
+\section*{Flags after reset}
+Device peripheral flags, enables and byte captures reset; cause/detail accumulation follows its separate rule. External device error flags are not included in that clearing. A generic write of zero to all status registers neither acknowledges W1C bits nor necessarily preserves an external device state.
+
+\newpage
+\Continuation{C++ service interface and portability}{The binding exposes registers and vectors, not attached-device classes.}
+\pdfbookmark[0]{C++ service interface and portability}{b8-30}
+
+\section*{Public surface}
+\begin{verbatim}
+namespace b8 {
+    enum class Reg : std::uint16_t;   // named addresses in this manual
+    enum class Irq : std::uint8_t;   // five sources, indices 0..4
+    using Isr = void (*)();
+    using VectorTable = std::array<Isr, 5>;
+    std::uint8_t read8(Reg address);
+    void write8(Reg address, std::uint8_t value);
+    void idle();
+}
+\end{verbatim}
+A Reg value identifies a device transaction; never reinterpret its numeric value as a native pointer. There is no direct pointer to external component storage, no unrestricted byte array representing all registers, and no generic read16 that bypasses latch side effects.
+\section*{Execution entries}
+The binding calls \texttt{firmware::reset()} after reset release and repeated bounded \texttt{firmware::step()} entries during execution. The five-entry vector table supplies functions returning void. A handler must return normally unless reset abandons its context.
+\section*{Service ordering}
+A read or write performs one transaction at the current boundary, advances one microsecond of service time, then offers one eligible interrupt. A read's returned value is the value at the transaction, even though peripheral state can change during the following interval or handler. A write can take effect before its caller resumes.
+\texttt{idle()} advances a service interval without a register transaction. It does not enter a low-power hardware sleep state. It does not expose an absolute-time oracle, and it does not invalidate the clock unlock by itself.
+\section*{Portability boundary}
+The register semantics and explicit byte transactions are portable contracts. The one-microsecond service interval is a property of this binding, not a promise about the execution time of a physical processor or an arbitrary transport. A different binding must declare its ordering, latency, reset and observation limits.
+\begin{Notice}{BOUNDED EXECUTION}
+This interface assigns no time to a C++ loop that never returns and never calls a service operation. Hardware-event progress is observed at service boundaries. Do not infer a real-time preemption or an instruction-timing guarantee from nominal SYSCLK.
+\end{Notice}
+
+\newpage
+\Continuation{Bring-up and diagnostic worksheet}{Component-level checks without selecting an equipment control architecture.}
+\pdfbookmark[0]{Bring-up and diagnostic worksheet}{b8-31}
+
+\section*{Identity and reset}
+Confirm SYS\_ID and SYS\_REV. Capture reset causes/details before clearing. Check expected reset values without assuming that sampled GPIO or external DATA reads equal their storage defaults. Keep reset-safe output assumptions tied to the actual board bias.
+\section*{Clock calculation record}
+Record the source nominal frequency and tolerance, literal divider/multiplier values, reference and VCO frequencies, and system/peripheral frequencies. Check quiescence before commit, protect the key sequence, then verify active source/divider and applicable status. Bound qualification waits while the independent watchdog continues.
+\section*{Peripheral demonstrations}
+\par\noindent\begin{tabularx}{\linewidth}{lY}
+\toprule\TableHead Block & Useful isolated observation \\ \midrule
+GPIO & OUT preload versus DIR enable; IN follows resolved pad, not merely OUT. \\
+Timer & One-shot and periodic behavior; C=0 boundary; unchanged CTRL write restarts count. \\
+Interrupt & Masking retains flags; one-source acknowledgment preserves another pending source. \\
+Byte pairs & LOW/HIGH remains coherent across a counter carry; HIGH-first remains stale. \\
+PWM & Shadow write waits for a carrier boundary; disable is immediate at its write. \\
+XBUS & Selector/data ownership and external recovery constraints. \\
+ADC & Sample-time voltage versus completion-time voltage; independent READY/IRQ acknowledgment. \\
+WDT & Valid service, invalid service, lock behavior and tolerance-bounded timeout. \\
+DMT & Opening/expiry boundaries, locked configuration and service ownership. \\
+Reset & Fresh execution entries and externally retained state. \\
+\bottomrule\end{tabularx}\par
+\section*{Timing budget worksheet}
+For a chosen plan, calculate timer event periods, ADC acquisition/completion intervals, PWM carrier frequency and DMT opening/limit times. For WDT use LFRC extrema, not system frequency. Include service-boundary quantization, interrupt delay and any external device's independent recovery time.
+\section*{What this worksheet does not determine}
+It does not choose an application's input filter, state machine, output policy, diagnostic text, restart authorization or watchdog health token. Those depend on the external system. Peripheral checks establish interface behavior, not completed-system acceptance.
+
+\newpage
+\Continuation{Quick reference and publication notes}{Interface 03 retained; publication P6 expands the programming reference.}
+\pdfbookmark[0]{Quick reference and publication notes}{b8-32}
+
+\par\noindent\begin{tabularx}{\linewidth}{lY}
+\toprule\TableHead Need & Where to look \\ \midrule
+Every implemented address & Complete register maps, pages 4--6. \\
+Reset origin and service-failure detail & Identification/reset fields and reset behavior, pages 7--8. \\
+Pad direction, latch, contention & GPIO, page 9. \\
+Priority, masks, handlers and acknowledgment & Interrupt controller, pages 10--11. \\
+Timer configuration and off-by-one behavior & Compare timers, pages 12--13. \\
+LOW/HIGH ownership & Multi-byte data, page 14. \\
+PWM latch and endpoints & PWM, page 15. \\
+PB1 accumulated observations & Edge counter, page 16. \\
+External select/data transaction & XBUS bridge, page 17. \\
+ADC registers, timing, transfer & ADC, pages 18--20. \\
+Domains, legal plan, commit and failure & Clock system, pages 21--24. \\
+Independent watchdog & WDT, pages 25--26. \\
+Windowed deadman & DMT, pages 27--28. \\
+Invalid operations and recovery path & Error matrix, page 29. \\
+Entry points and access binding & C++ service interface, page 30. \\
+Bring-up observations & Worksheet, page 31. \\
+\bottomrule\end{tabularx}\par
+\section*{Terminology}
+\textbf{Capture} retains high bits for a coherent read. \textbf{Stage} retains a pending write without changing the committed value. \textbf{Commit} installs a staged value or begins an explicitly delayed transition. \textbf{W1C} clears only bits written one. \textbf{Strobe} requests an action without persisting as a readable bit. \textbf{Quiescent} means the listed clock-driven functions are inactive for a clock change.
+\section*{Publication history}
+P6 expands the address catalog, field behavior, transaction ordering, code examples, error handling, timing-domain guidance and binding semantics. It does not change device identifier B8h, interface revision 03, register addresses, device timing or valid PLL factors. Earlier terse summaries are superseded by this reference's fuller description of the same interface.
+\begin{Notice}{BOUNDARY OF THIS PUBLICATION}
+This is the B8 register and programming reference. Package selection, electrical operating ratings, physical bus timing and board-level circuit design require the corresponding released hardware information; they are not inferred from a logical register address.
+\end{Notice}
+
+\end{document}

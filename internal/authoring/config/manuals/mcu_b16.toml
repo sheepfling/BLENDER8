@@ -1,0 +1,22 @@
+extends = "bad_xerox"
+name = "northstar_b16_follow_on"
+generation_depth = 3
+copier_id = "records-copier-n3"
+dpi = 220
+
+[handling]
+coffee = false
+fold = false
+staple = true
+punch_holes = false
+
+[tears]
+enabled = false
+
+[protection]
+regions = [{x0 = 0.066, y0 = 0.047, x1 = 0.938, y1 = 0.965}]
+max_delta = 0.085
+
+[output]
+encoding = "jpeg"
+jpeg_quality = 96

@@ -1,0 +1,358 @@
+{
+  "publication": "P5",
+  "authority": "P5 correspondence replaces the P4 product brief. B8 interface 03 is unchanged; chassis 04 adds a jar loop and dropout latch whose runtime implementation is pending.",
+  "grading_rule": "Only communicated outcomes and published hardware contracts determine acceptance. Delegated/owner details are not hidden requirements.",
+  "rows": [
+    {
+      "prior_id": "R-001",
+      "messages": [
+        "handoff-01"
+      ],
+      "treatment": "retained",
+      "disposition": "B8-only access is a Half-A/Labs handoff constraint."
+    },
+    {
+      "prior_id": "R-002",
+      "messages": [
+        "stop-04",
+        "temperature-04"
+      ],
+      "treatment": "mixed",
+      "disposition": "Fail-off startup retained; the former before-interrupt ordering is no longer a customer prescription."
+    },
+    {
+      "prior_id": "R-003",
+      "messages": [
+        "stop-04",
+        "temperature-04",
+        "interlock-04",
+        "interlock-05"
+      ],
+      "treatment": "mixed",
+      "disposition": "Cool two-second startup and released controls retained; exact 20 ms release counter delegated. The later interlock thread additionally requires jar permission and a NEW STOP at startup/recovery; it extends fault priority with IL and supersedes chassis-r3 drawings."
+    },
+    {
+      "prior_id": "R-004",
+      "messages": [
+        "panel-04",
+        "handoff-01"
+      ],
+      "treatment": "delegated",
+      "disposition": "Exact 8 ms scan and 16 ms debounce algorithm retired; meet outward response and supplier contracts."
+    },
+    {
+      "prior_id": "R-005",
+      "messages": [
+        "panel-04"
+      ],
+      "treatment": "retained",
+      "disposition": "40 ms after final stabilization; guaranteed PULSE holds at least 50 ms."
+    },
+    {
+      "prior_id": "R-006",
+      "messages": [
+        "panel-04"
+      ],
+      "treatment": "retained",
+      "disposition": "Two speed indications persisting for 40 ms stop with IF; no arbitrary transient winner."
+    },
+    {
+      "prior_id": "R-007",
+      "messages": [
+        "stop-04"
+      ],
+      "treatment": "retained",
+      "disposition": "10 ms STOP-to-firmware-output removal; no release or held-PULSE restart."
+    },
+    {
+      "prior_id": "R-008",
+      "messages": [
+        "panel-04"
+      ],
+      "treatment": "retained",
+      "disposition": "Seven equal RPM steps 3000..18000; at one second no-load error max(100 RPM,2%); loaded sag allowed."
+    },
+    {
+      "prior_id": "R-009",
+      "messages": [
+        "panel-04"
+      ],
+      "treatment": "retained",
+      "disposition": "PULSE +2000 RPM, capped 20000; 2000 from idle; restore selection on release."
+    },
+    {
+      "prior_id": "R-010",
+      "messages": [
+        "stop-04"
+      ],
+      "treatment": "retained",
+      "disposition": "Firmware output removal separate from the independent hardware gate."
+    },
+    {
+      "prior_id": "R-011",
+      "messages": [
+        "panel-04",
+        "temperature-04"
+      ],
+      "treatment": "retained",
+      "disposition": "0, 1..7, P, 1P..7P and fault display timing; boot artwork not required."
+    },
+    {
+      "prior_id": "R-012",
+      "messages": [
+        "handoff-01",
+        "temperature-04",
+        "supervision-04"
+      ],
+      "treatment": "mixed",
+      "disposition": "Target-bound execution and outward deadlines retained; a global 10 ms supervisor polling architecture is not required."
+    },
+    {
+      "prior_id": "R-013",
+      "messages": [
+        "handoff-01"
+      ],
+      "treatment": "supplier",
+      "disposition": "Coherent register access, acknowledgment and target timing belong to the B8 contract, not a customer coding recipe."
+    },
+    {
+      "prior_id": "R-014",
+      "messages": [
+        "motion-04"
+      ],
+      "treatment": "delegated",
+      "disposition": "Fixed rolling 200 ms tach window and last-change estimator explicitly delegated."
+    },
+    {
+      "prior_id": "R-015",
+      "messages": [
+        "temperature-04"
+      ],
+      "treatment": "retained",
+      "disposition": "Fresh completed temperature readings at least every 10 ms."
+    },
+    {
+      "prior_id": "R-016",
+      "messages": [
+        "temperature-02",
+        "temperature-04"
+      ],
+      "treatment": "supplier",
+      "disposition": "ADC and sensor transfers remain supplier facts; code representation and conversion implementation are open."
+    },
+    {
+      "prior_id": "R-017",
+      "messages": [
+        "temperature-04"
+      ],
+      "treatment": "retained",
+      "disposition": "Two successive plausible fresh readings >=85 C qualify TH; drive off within 10 ms thereafter."
+    },
+    {
+      "prior_id": "R-018",
+      "messages": [
+        "temperature-04"
+      ],
+      "treatment": "mixed",
+      "disposition": "Disconnected/grounded/railed channel and >100 ms without fresh sample stop with TS. Exact old ADC band 62..574 delegated, not hidden grading."
+    },
+    {
+      "prior_id": "R-019",
+      "messages": [
+        "motion-04"
+      ],
+      "treatment": "retained",
+      "disposition": "500 ms ordinary run-up only on actual commanded off-to-on; speed/PULSE does not renew it."
+    },
+    {
+      "prior_id": "R-020",
+      "messages": [
+        "motion-04"
+      ],
+      "treatment": "mixed",
+      "disposition": "750 ms blocked-start and 400 ms running-lock deadlines retained; 300 RPM/150 ms/200 ms estimator recipe delegated."
+    },
+    {
+      "prior_id": "R-021",
+      "messages": [
+        "motion-04",
+        "temperature-04"
+      ],
+      "treatment": "retained",
+      "disposition": "Cold jam and hot rotation are independent; intentional coastdown is not ST."
+    },
+    {
+      "prior_id": "R-022",
+      "messages": [
+        "temperature-04",
+        "supervision-04"
+      ],
+      "treatment": "mixed",
+      "disposition": "Keep qualified causes and agreed priority; old numeric bit assignments are implementation detail."
+    },
+    {
+      "prior_id": "R-023",
+      "messages": [
+        "temperature-04",
+        "supervision-04"
+      ],
+      "treatment": "retained",
+      "disposition": "100 ms visible fault response; reset labels within 100 ms after reset release. Later thread extends priority to CK WD DM TS TH IF ST."
+    },
+    {
+      "prior_id": "R-024",
+      "messages": [
+        "temperature-04",
+        "temperature-05",
+        "interlock-04",
+        "interlock-05"
+      ],
+      "treatment": "mixed",
+      "disposition": "<=65 C for two seconds, NEW STOP, release all, NEW selection. Fixed 20 ms acknowledgment/release counters delegated. The later interlock thread additionally requires jar permission and a NEW STOP at startup/recovery; it extends fault priority with IL and supersedes chassis-r3 drawings."
+    },
+    {
+      "prior_id": "R-025",
+      "messages": [
+        "stop-04",
+        "supervision-04",
+        "interlock-04",
+        "interlock-05"
+      ],
+      "treatment": "retained",
+      "disposition": "All resets requalify; latches, heat, motion and warm LCD state are not presumed erased. The later interlock thread additionally requires jar permission and a NEW STOP at startup/recovery; it extends fault priority with IL and supersedes chassis-r3 drawings."
+    },
+    {
+      "prior_id": "R-026",
+      "messages": [
+        "motion-04",
+        "temperature-04"
+      ],
+      "treatment": "retained",
+      "disposition": "No automatic retry, kick or restart from cooling, repairs or obstruction removal."
+    },
+    {
+      "prior_id": "R-027",
+      "messages": [
+        "stop-04",
+        "supervision-04"
+      ],
+      "treatment": "mixed",
+      "disposition": "Output/gate/coast distinction retained; exact trace-column format remains owner tooling."
+    },
+    {
+      "prior_id": "R-028",
+      "messages": [
+        "handoff-01"
+      ],
+      "treatment": "owner",
+      "disposition": "Repeatable evidence requested; exhaustive perturbation and seed protocol is owner conformance work, not secret customer criteria."
+    },
+    {
+      "prior_id": "R-029",
+      "messages": [
+        "stop-04"
+      ],
+      "treatment": "owner",
+      "disposition": "Independent plant behavior remains an owner architecture invariant; firmware-output evidence is in the agreed STOP response."
+    },
+    {
+      "prior_id": "R-030",
+      "messages": [
+        "handoff-01",
+        "supervision-04"
+      ],
+      "treatment": "mixed",
+      "disposition": "Source, local build/test command, clock plan and awkward-case traces; prior report template no longer prescribed."
+    },
+    {
+      "prior_id": "R-031",
+      "messages": [
+        "clock-04"
+      ],
+      "treatment": "retained",
+      "disposition": "XO8 external PLL, SYSCLK 8..32 MHz, PBCLK 1 MHz +/-0.1%; New Employee chooses legal factors."
+    },
+    {
+      "prior_id": "R-032",
+      "messages": [
+        "clock-04",
+        "handoff-01"
+      ],
+      "treatment": "mixed",
+      "disposition": "Clock calculation/margins and nominal PWM 3906.25 Hz retained; prescribed form and mandatory rejected-tuple example become owner suggestions."
+    },
+    {
+      "prior_id": "R-033",
+      "messages": [
+        "clock-04"
+      ],
+      "treatment": "retained",
+      "disposition": "Healthy run clock verified within 100 ms of first reset entry; drive off during settling; absent source CK/off; internal clock only startup/fault handling."
+    },
+    {
+      "prior_id": "R-034",
+      "messages": [
+        "clock-04"
+      ],
+      "treatment": "retained",
+      "disposition": "Active external clock loss inhibits within 1 ms; no automatic restart; local device timings not rescaled."
+    },
+    {
+      "prior_id": "R-035",
+      "messages": [
+        "clock-04",
+        "stop-04",
+        "supervision-04",
+        "interlock-04",
+        "interlock-05"
+      ],
+      "treatment": "retained",
+      "disposition": "Chassis-03 signal, power, switch, fuse-position and reset facts retained in two approved drawings. The later interlock thread additionally requires jar permission and a NEW STOP at startup/recovery; it extends fault priority with IL and supersedes chassis-r3 drawings."
+    },
+    {
+      "prior_id": "R-036",
+      "messages": [
+        "supervision-04"
+      ],
+      "treatment": "retained",
+      "disposition": "WDT configured/locked before drive; slowest timeout <=250 ms; qualified useful progress, not unconditional interrupt feed."
+    },
+    {
+      "prior_id": "R-037",
+      "messages": [
+        "supervision-02",
+        "supervision-04"
+      ],
+      "treatment": "mixed",
+      "disposition": "Fresh acquisition/protection/output evidence and no double-use retained; token structure and scheduler order not prescribed by the sketch."
+    },
+    {
+      "prior_id": "R-038",
+      "messages": [
+        "supervision-04",
+        "supervision-05"
+      ],
+      "treatment": "retained",
+      "disposition": "DMT configured/locked before drive; slowest-clock expiry <=100 ms; engineer chooses window. Detailed key fault injections are owner component tests."
+    },
+    {
+      "prior_id": "R-039",
+      "messages": [
+        "supervision-04",
+        "interlock-04",
+        "interlock-05"
+      ],
+      "treatment": "retained",
+      "disposition": "WD DM CK indication, full priority, capture causes, bounded display after release and deliberate recovery. The later interlock thread additionally requires jar permission and a NEW STOP at startup/recovery; it extends fault priority with IL and supersedes chassis-r3 drawings."
+    },
+    {
+      "prior_id": "R-040",
+      "messages": [
+        "supervision-04",
+        "handoff-01"
+      ],
+      "treatment": "mixed",
+      "disposition": "Agreed live-tick/lost-foreground, clock-loss and logic-brownout demonstrations. Other old edge cases remain owner verification ideas."
+    }
+  ]
+}

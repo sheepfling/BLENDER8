@@ -1,0 +1,439 @@
+{
+  "interface": 3,
+  "registers": [
+    {
+      "name": "SYS_ID",
+      "address": 0,
+      "access": "R",
+      "reset": 184,
+      "description": "Device identifier"
+    },
+    {
+      "name": "SYS_REV",
+      "address": 1,
+      "access": "R",
+      "reset": 3,
+      "description": "Interface revision"
+    },
+    {
+      "name": "RST_CAUSE",
+      "address": 2,
+      "access": "W1C",
+      "reset": 1,
+      "description": "POR/BOR/WDT/DMT/CLOCK/SOFT/EXTERNAL bits 0..6; warm-reset accumulation"
+    },
+    {
+      "name": "RST_DETAIL",
+      "address": 3,
+      "access": "W1C",
+      "reset": 0,
+      "description": "WDT bad key, DMT bad1/bad2/early/late, WDT timeout bits 0..5"
+    },
+    {
+      "name": "SW_RESET",
+      "address": 4,
+      "access": "W",
+      "reset": 0,
+      "description": "B6h requests software reset"
+    },
+    {
+      "name": "IRQ_GLOBAL",
+      "address": 16,
+      "access": "RW",
+      "reset": 0,
+      "description": "bit 0 global enable"
+    },
+    {
+      "name": "IRQ_ENABLE",
+      "address": 17,
+      "access": "RW",
+      "reset": 0,
+      "description": "bits 0..4 source enables"
+    },
+    {
+      "name": "IRQ_FLAGS",
+      "address": 18,
+      "access": "W1C",
+      "reset": 0,
+      "description": "TIMER0, TIMER1, TACH, VBLANK, ADC complete"
+    },
+    {
+      "name": "GPIOA_DIR",
+      "address": 32,
+      "access": "RW",
+      "reset": 0,
+      "description": "1 output, 0 input"
+    },
+    {
+      "name": "GPIOA_OUT",
+      "address": 33,
+      "access": "RW",
+      "reset": 0,
+      "description": "Output latch"
+    },
+    {
+      "name": "GPIOA_IN",
+      "address": 34,
+      "access": "R",
+      "reset": 0,
+      "description": "Resolved pad values; wiring determines reset read"
+    },
+    {
+      "name": "GPIOB_DIR",
+      "address": 40,
+      "access": "RW",
+      "reset": 0,
+      "description": "1 output, 0 input"
+    },
+    {
+      "name": "GPIOB_OUT",
+      "address": 41,
+      "access": "RW",
+      "reset": 0,
+      "description": "Output latch"
+    },
+    {
+      "name": "GPIOB_IN",
+      "address": 42,
+      "access": "R",
+      "reset": 0,
+      "description": "Resolved pad values; wiring determines reset read"
+    },
+    {
+      "name": "T0_CTRL",
+      "address": 64,
+      "access": "RW",
+      "reset": 0,
+      "description": "bit 0 enable, bit 1 periodic; writes reset counter and divider"
+    },
+    {
+      "name": "T0_PRESCALE",
+      "address": 65,
+      "access": "RW",
+      "reset": 0,
+      "description": "codes 0,1,2,3 = divide 1,8,64,256"
+    },
+    {
+      "name": "T0_COUNT_LO",
+      "address": 66,
+      "access": "R",
+      "reset": 0,
+      "description": "Read low to latch high"
+    },
+    {
+      "name": "T0_COUNT_HI",
+      "address": 67,
+      "access": "R",
+      "reset": 0,
+      "description": "Latched high; high-first returns stale latch"
+    },
+    {
+      "name": "T0_COMPARE_LO",
+      "address": 68,
+      "access": "RW",
+      "reset": 0,
+      "description": "Stage low byte while disabled"
+    },
+    {
+      "name": "T0_COMPARE_HI",
+      "address": 69,
+      "access": "RW",
+      "reset": 0,
+      "description": "Commit staged low and written high while disabled"
+    },
+    {
+      "name": "T1_CTRL",
+      "address": 80,
+      "access": "RW",
+      "reset": 0,
+      "description": "bit 0 enable, bit 1 periodic; writes reset counter and divider"
+    },
+    {
+      "name": "T1_PRESCALE",
+      "address": 81,
+      "access": "RW",
+      "reset": 0,
+      "description": "codes 0,1,2,3 = divide 1,8,64,256"
+    },
+    {
+      "name": "T1_COUNT_LO",
+      "address": 82,
+      "access": "R",
+      "reset": 0,
+      "description": "Read low to latch high"
+    },
+    {
+      "name": "T1_COUNT_HI",
+      "address": 83,
+      "access": "R",
+      "reset": 0,
+      "description": "Latched high; high-first returns stale latch"
+    },
+    {
+      "name": "T1_COMPARE_LO",
+      "address": 84,
+      "access": "RW",
+      "reset": 0,
+      "description": "Stage low byte while disabled"
+    },
+    {
+      "name": "T1_COMPARE_HI",
+      "address": 85,
+      "access": "RW",
+      "reset": 0,
+      "description": "Commit staged low and written high while disabled"
+    },
+    {
+      "name": "PWM_CTRL",
+      "address": 96,
+      "access": "RW",
+      "reset": 0,
+      "description": "bit 0 enable; clear drives low immediately"
+    },
+    {
+      "name": "PWM_DUTY",
+      "address": 97,
+      "access": "RW",
+      "reset": 0,
+      "description": "Shadow duty, applied at next 256-tick boundary"
+    },
+    {
+      "name": "TACH_COUNT_LO",
+      "address": 112,
+      "access": "R",
+      "reset": 0,
+      "description": "Low read latches high"
+    },
+    {
+      "name": "TACH_COUNT_HI",
+      "address": 113,
+      "access": "R",
+      "reset": 0,
+      "description": "Latched high"
+    },
+    {
+      "name": "XBUS_REG",
+      "address": 128,
+      "access": "RW",
+      "reset": 0,
+      "description": "External device register address, low 2 bits"
+    },
+    {
+      "name": "XBUS_DATA",
+      "address": 129,
+      "access": "RW",
+      "reset": 0,
+      "description": "One external byte-bus transaction"
+    },
+    {
+      "name": "ADC_CTRL",
+      "address": 144,
+      "access": "RW",
+      "reset": 0,
+      "description": "bit0 enable; bit1 START is write-only strobe"
+    },
+    {
+      "name": "ADC_CHANNEL",
+      "address": 145,
+      "access": "RW",
+      "reset": 0,
+      "description": "0 AN0; 1 AN1; writes while busy ignored with ERROR"
+    },
+    {
+      "name": "ADC_PRESCALE",
+      "address": 146,
+      "access": "RW",
+      "reset": 2,
+      "description": "codes 0..3 = div1,2,4,8; changes require idle"
+    },
+    {
+      "name": "ADC_STATUS",
+      "address": 147,
+      "access": "R/W1C",
+      "reset": 0,
+      "description": "bit0 BUSY; bit1 READY; bit2 OVERRUN W1C; bit3 ERROR W1C"
+    },
+    {
+      "name": "ADC_DATA_LO",
+      "address": 148,
+      "access": "R",
+      "reset": 0,
+      "description": "low read latches high and acknowledges READY"
+    },
+    {
+      "name": "ADC_DATA_HI",
+      "address": 149,
+      "access": "R",
+      "reset": 0,
+      "description": "bits0..1 latched high; high-first is stale"
+    },
+    {
+      "name": "CLK_SOURCE",
+      "address": 160,
+      "access": "RW",
+      "reset": 0,
+      "description": "Staged source: 0 FRC, 1 EC, 2 EC with PLL"
+    },
+    {
+      "name": "PLL_PREDIV",
+      "address": 161,
+      "access": "RW",
+      "reset": 2,
+      "description": "Staged literal divisor 1,2,4,8"
+    },
+    {
+      "name": "PLL_MULT",
+      "address": 162,
+      "access": "RW",
+      "reset": 8,
+      "description": "Staged literal multiplier 4..16"
+    },
+    {
+      "name": "PLL_POSTDIV",
+      "address": 163,
+      "access": "RW",
+      "reset": 2,
+      "description": "Staged literal divisor 1,2,4,8"
+    },
+    {
+      "name": "PB_DIV",
+      "address": 164,
+      "access": "RW",
+      "reset": 4,
+      "description": "Staged literal divisor 1,2,4,8,16,32"
+    },
+    {
+      "name": "CLK_STATUS",
+      "address": 165,
+      "access": "R/W1C",
+      "reset": 0,
+      "description": "EXT_READY bit0, PLL_LOCK bit1, BUSY bit2, ERROR W1C bit3"
+    },
+    {
+      "name": "CLK_ACTIVE",
+      "address": 166,
+      "access": "R",
+      "reset": 0,
+      "description": "Actual source; not the staged request"
+    },
+    {
+      "name": "CLK_KEY",
+      "address": 167,
+      "access": "W",
+      "reset": 0,
+      "description": "C3h then 3Ch then COMMIT without intervening access"
+    },
+    {
+      "name": "CLK_COMMIT",
+      "address": 168,
+      "access": "W",
+      "reset": 0,
+      "description": "A5h commits staged tuple when unlocked and quiescent"
+    },
+    {
+      "name": "PB_ACTIVE",
+      "address": 169,
+      "access": "R",
+      "reset": 4,
+      "description": "Actual peripheral bus divisor"
+    },
+    {
+      "name": "WDT_CTRL",
+      "address": 176,
+      "access": "RW",
+      "reset": 1,
+      "description": "Fused ON bit0, one-way configuration LOCK bit7"
+    },
+    {
+      "name": "WDT_SCALE",
+      "address": 177,
+      "access": "RW",
+      "reset": 3,
+      "description": "Literal code k 0..5; timeout 256*2^k independent LFRC ticks"
+    },
+    {
+      "name": "WDT_SERVICE",
+      "address": 178,
+      "access": "W",
+      "reset": 0,
+      "description": "A5h then 5Ah; second within fewer than 16 LFRC ticks"
+    },
+    {
+      "name": "WDT_STATUS",
+      "address": 179,
+      "access": "R",
+      "reset": 0,
+      "description": "First key armed bit0; configuration ERROR bit7"
+    },
+    {
+      "name": "DMT_CTRL",
+      "address": 192,
+      "access": "RW",
+      "reset": 0,
+      "description": "Enable bit0; one-way LOCK bit7"
+    },
+    {
+      "name": "DMT_LIMIT_LO",
+      "address": 193,
+      "access": "RW",
+      "reset": 0,
+      "description": "Staged low byte of maximum count"
+    },
+    {
+      "name": "DMT_LIMIT_HI",
+      "address": 194,
+      "access": "RW",
+      "reset": 4,
+      "description": "High write commits maximum count"
+    },
+    {
+      "name": "DMT_WINDOW_LO",
+      "address": 195,
+      "access": "RW",
+      "reset": 0,
+      "description": "Staged low byte of window-open count"
+    },
+    {
+      "name": "DMT_WINDOW_HI",
+      "address": 196,
+      "access": "RW",
+      "reset": 1,
+      "description": "High write commits window-open count"
+    },
+    {
+      "name": "DMT_STATUS",
+      "address": 197,
+      "access": "R/W1C",
+      "reset": 0,
+      "description": "OPEN bit0, ENABLED bit1, config ERROR W1C bit7"
+    },
+    {
+      "name": "DMT_COUNT_LO",
+      "address": 198,
+      "access": "R",
+      "reset": 0,
+      "description": "Count low; captures high byte"
+    },
+    {
+      "name": "DMT_COUNT_HI",
+      "address": 199,
+      "access": "R",
+      "reset": 0,
+      "description": "Captured count high byte"
+    },
+    {
+      "name": "DMT_PRECLR",
+      "address": 200,
+      "access": "W",
+      "reset": 0,
+      "description": "69h in open window; does not refresh counter"
+    },
+    {
+      "name": "DMT_CLR",
+      "address": 201,
+      "access": "W",
+      "reset": 0,
+      "description": "96h after PRECLR within fewer than 16 DMT ticks"
+    }
+  ]
+}

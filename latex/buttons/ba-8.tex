@@ -1,0 +1,99 @@
+\documentclass[10pt]{article}
+\usepackage{vendor-kestrel}
+\renewcommand{\DocID}{BTN-001}
+\renewcommand{\DocRev}{P4}
+\renewcommand{\RunningPart}{BA-8}
+\hypersetup{pdftitle={Kestrel BA-8 / Interlocked Command Assembly}}
+\begin{document}
+\VendorTitle{BA-8}{Interlocked command assembly}{Seven latching selections / one momentary command / independent STOP release}
+\MetaStrip{ASSEMBLY INTERFACE 02\hfill ISSUE P4\hfill 06 OCT 2026}
+\section*{Assembly description}
+The BA-8 contains seven mutually interlocked speed-selection buttons, a momentary PULSE button, a separate STOP button and a panel power switch. Eight command-sense contacts serve selections 1--7 and PULSE. STOP and power are separate functions; neither consumes a command channel.
+\begin{center}
+\begin{tikzpicture}[x=.75cm,y=.8cm,font=\small\ttfamily]
+\draw[VendorInk,fill=VendorTint](0,0)rectangle(16,2.5);
+\foreach \x/\t in {1.1/1,2.5/2,3.9/3,5.3/4,6.7/5,8.1/6,9.5/7,11.1/P}{\draw[fill=white](\x-.5,.5)rectangle(\x+.5,1.55);\node at(\x,1.02){\t};}
+\draw[fill=white](12.4,.5)rectangle(15.1,1.55);\node at(13.75,1.02){STOP};
+\draw[VendorInk,thick](.6,.25)--(10,.25);\node[above,font=\scriptsize]at(5.3,1.75){MECHANICALLY INTERLOCKED};
+\node[below,font=\scriptsize]at(8,-.1){Front arrangement / functional identification only};
+\end{tikzpicture}
+\end{center}
+\section*{Mechanical sequence}
+\par\noindent\begin{tabularx}{\linewidth}{@{}l Y@{}}
+\toprule\TableHead Operator action & Assembly response\\\midrule
+Press speed N & Latch N; release every other speed latch.\\
+Press PULSE & Close the momentary command without releasing the selected speed.\\
+Release PULSE & Open the PULSE command; retain the selected speed.\\
+Press STOP & Release all speed latches; cancel PULSE electrically; remove RUN\_PERMIT.\\
+Release STOP & Do not restore any previous command.\\\bottomrule
+\end{tabularx}
+\begin{Notice}{STOP TAKES PRECEDENCE}
+STOP dominates simultaneous speed and PULSE operation. A speed pressed while STOP is held is ignored. A PULSE held through STOP remains blocked after STOP release until PULSE is released and freshly pressed.
+\end{Notice}
+\section*{Panel power}
+The rear switch contacts may make and break during the first 5 ms of an actuation. This contact envelope is not the downstream supply rise time, reset delay or clock startup time. The switch assembly provides a separate auxiliary indication for power qualification.
+
+The panel power switch is mechanically independent of the command latches. Removing electrical power does not release a latched selection. A retained selection is present at the contacts when electrical sensing resumes; the assembly does not generate a new press-and-release sequence on power restoration.
+\vfill\Caption{DOCUMENT CONTROL / P4. Assembly behavior revision 02 retained. This sheet specifies the supplied command assembly.}
+\clearpage
+\Continuation{Contacts and interlock signals}{Command sense and independent run permission are separate circuits.}
+\MetaStrip{BA-8\hfill CONTACT ASSIGNMENT\hfill BTN-001 / P4}
+\par\noindent\begin{tabularx}{\linewidth}{@{}l l Y@{}}
+\toprule\TableHead Signal & State/polarity & Description\\\midrule
+C0--C6 & Active low & Speed 1--7 sense contacts; close to common/ground.\\
+C7 & Active low & Momentary PULSE sense contact.\\
+STOP\_N & Active low & Dedicated STOP indication to the controller.\\
+RUN\_PERMIT & Active high & STOP released and at least one physical command active.\\
+Panel power & Separate & Electrical supply and overall drive permission.\\\bottomrule
+\end{tabularx}
+Released command contacts are high impedance. Provide external pull-ups on the board. The assembly contains no address decoder and no multiplexer; C0--C7 are individual contact connections.
+\begin{center}
+\begin{tikzpicture}[font=\scriptsize,>=Stealth]
+\node[draw,minimum width=35mm,minimum height=17mm,align=center](m)at(0,0){Mechanical state\\speed / PULSE / STOP};
+\node[draw,minimum width=31mm,minimum height=14mm,align=center](c)at(5,1){Eight command\\sense contacts};
+\node[draw,minimum width=31mm,minimum height=14mm,align=center](g)at(5,-1){Independent\\RUN\_PERMIT};
+\draw[->](m.east)--++(.6,0)|-(c.west);\draw[->](m.east)--++(.6,0)|-(g.west);
+\draw[->](c.east)--++(2,0)node[right]{to input scan};
+\draw[->](g.east)--++(2,0)node[right]{to drive gate};
+\end{tikzpicture}
+\end{center}
+\section*{Contact transition envelope}
+Command contacts may make and break repeatedly during the first 5 ms after a mechanical transition. After that interval they assume the final state. The detailed sequence is not prescribed. The envelope applies to make and break transitions; it is not a fixed series of edges or a guaranteed number of transitions.
+\begin{center}
+\begin{tikzpicture}[x=1.1cm,y=.7cm,font=\scriptsize]
+\fill[VendorTint](0,-.2)rectangle(5,1.6);
+\draw[thick](-.4,1.2)--(0,1.2)--(0,.3)--(.3,.3)--(.3,1.2)--(.8,1.2)--(.8,.3)--(1.8,.3)--(1.8,1.2)--(3.2,1.2)--(3.2,.3)--(4.7,.3)--(4.7,1.2)--(5,1.2)--(5,.3)--(8,.3);
+\draw[<->](0,1.95)--node[above]{5 ms envelope}(5,1.95);
+\node[left]at(-.5,1.2){OPEN};\node[left]at(-.5,.3){CLOSED};
+\foreach \x in {0,5,8}{\node[below]at(\x,-.3){\x};}\node[right]at(8.3,-.3){ms};
+\end{tikzpicture}
+\end{center}
+\Caption{Illustrative contact transition. Intermediate edges are not a specified waveform.}
+\vfill\begin{Notice}{INDEPENDENT PERMISSION CIRCUIT}
+STOP assertion removes RUN\_PERMIT independently of the eight command-sense contacts. Command-contact bounce does not delay or pulse this independent permission output. STOP\_N is the separate indication of STOP state.
+\end{Notice}
+\clearpage
+\Continuation{Assembly operation and service}{Mechanical position, sense contacts and run permission are distinct observations.}
+\section*{State at the assembly boundary}
+The command contacts report closure to the common return, not a decoded operating request. The assembly does not assign a shaft speed, generate a drive waveform or maintain a display. Printed button legends identify the supplied panel controls.
+
+A PULSE press operates its momentary contact subject to the specified transition envelope. There is no built-in minimum-hold timer or qualified-event output. Any minimum actuation duration accepted by the finished equipment is outside this assembly specification.
+\section*{Sense-circuit failures}
+A stuck-closed contact can indicate a selection without the associated mechanical latch. A stuck-open contact can conceal an actual selection. An electrical fault in a command-sense contact does not, by itself, change the underlying latch or the independent RUN\_PERMIT state.
+
+Consequently, two speed contacts can read closed under wiring or contact faults even though the healthy interlock permits only one speed latch. Sequential observations during a transition can also contain samples taken from different mechanical states.
+\begin{tabularx}{\linewidth}{@{}p{.39\linewidth} Y@{}}
+\toprule\TableHead Observation & Component-level interpretation\\\midrule
+More than one speed contact closed & Inspect contacts, bias wiring and the mechanical interlock. Non-simultaneous observations need not represent one instant.\\
+PULSE held across STOP & PULSE stays electrically suppressed after STOP release until released and freshly pressed.\\
+Selection retained after power interruption & Normal mechanical retention; power loss is not a latch-release operation.\\
+Command sense disagrees with permission & Inspect the two circuits independently; a sense contact is not proof of the permission state.\\\bottomrule
+\end{tabularx}
+\section*{Bench acceptance}
+With defined bias on the contacts, operate each latching selection and verify mutual release. Check PULSE both alone and with a selected speed. PULSE must leave the speed latch unchanged.
+
+Hold PULSE, press STOP, then release STOP while continuing to hold PULSE. The suppressed PULSE command must not return. Release and freshly press PULSE to restore its normal momentary action. A speed press while STOP is held must not establish a latch.
+
+Interrupt electrical power with a speed latched, then restore sensing. Verify that the mechanical selection is retained. Press STOP and verify release of all speed latches, the STOP\_N indication and removal of RUN\_PERMIT as separate observations.
+\vfill\Caption{Kestrel Appliance Systems / Engineering file BTN-001. Signal identifiers are functional, not connector cavity numbers. Mechanical dimensions and manufacturing tolerances require the assembly drawing.}
+\end{document}

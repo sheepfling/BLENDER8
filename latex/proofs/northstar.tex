@@ -1,0 +1,32 @@
+\documentclass[10pt]{article}
+\usepackage{vendor-northstar}
+\renewcommand{\DocID}{NMD-DESIGN-01}
+\renewcommand{\RunningPart}{B8 MCU}
+\hypersetup{pdftitle={northstar / Vendor identity proof}}
+\begin{document}
+\VendorTitle{B8 MCU}{Register-level discipline}{Conservative semiconductor documentation}
+\MetaStrip{VISUAL IDENTITY PROOF\hfill DESIGN EDITION P1\hfill NOT A COMPONENT RELEASE}
+\begin{Notice}{PROGRAMMER REFERENCE}
+The engineer trusts this vendor because every bit has an address, an access mode and a reset value. The page should feel older than the software, but better controlled.
+\end{Notice}
+\section*{Documentation culture}
+\begin{tabularx}{\linewidth}{@{}p{.22\linewidth}Y@{}}
+\toprule\TableHead Element & House convention\\\midrule
+Document voice & General description; register summary; operating modes.\\
+Page structure & Formal serif paragraphs under compact sans-serif headings. Blue-gray bands, dense tables and restrained block diagrams.\\
+Signature detail & A small compass-star mark, narrow rule, disciplined document number and revision fields.\\
+Expected wear & Archive scan: slight skew, binder shadow and punch holes. The register map remains legible.\\
+\bottomrule
+\end{tabularx}
+\section*{Specimen section rhythm}
+\begin{minipage}[t]{.31\linewidth}\textbf{01\quad Interrupt sources}\par\small Establish the signal meaning and the applicable scope.\end{minipage}\hfill
+\begin{minipage}[t]{.31\linewidth}\textbf{02\quad Timer operation}\par\small Define conditions before presenting a table or diagram.\end{minipage}\hfill
+\begin{minipage}[t]{.31\linewidth}\textbf{03\quad Register access}\par\small Separate component guarantees from application decisions.\end{minipage}
+\vspace{16pt}
+{\color{VendorInk}\hrule height .5pt}\vspace{10pt}
+{\large\itshape Registers first. Marketing last.}\par\vspace{8pt}
+\section*{Release boundary}
+Reserve the complete register map for the MCU release. This is a visual proof, not a replacement programmer reference.
+\vfill
+{\small\color{Muted}Identity and document language are original fictional design proposals for the Blender-8 exercise. No affiliation with a real manufacturer or Zachtronics is claimed.}
+\end{document}

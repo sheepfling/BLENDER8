@@ -1,0 +1,11 @@
+extends = "shop_copy"
+name = "kestrel_board_bench"
+generation_depth = 2
+[handling]
+coffee = true
+fold = true
+stamp = "RETURN TO ASSEMBLY"
+[placement]
+rotation_deg = { min = 0.3, max = 0.9 }
+[protection]
+max_delta = 0.09

@@ -1,0 +1,31 @@
+schema_version = 2
+name = "lab_copy"
+generation_depth = 1
+copier_id = "engineering-copier-02"
+[placement]
+rotation_deg = { min = -0.45, max = 0.45 }
+translate_x_mm = { min = -0.8, max = 0.8 }
+translate_y_mm = { min = -1.0, max = 1.0 }
+shear_deg = { min = -0.03, max = 0.03 }
+inset_mm = 0.7
+[vignette]
+strength = { min = 0.04, max = 0.08 }
+width_mm = { min = 3.0, max = 7.0 }
+corner_strength = 0.03
+[streaks]
+horizontal = { min = 0, max = 1 }
+vertical = { min = 1, max = 1 }
+opacity = { min = 0.025, max = 0.055 }
+roller_opacity = 0.004
+[repro]
+blur_mm = { min = 0.01, max = 0.025 }
+resample = { min = 0.97, max = 1.0 }
+threshold_mix = 0.03
+toner_bloom = 0.02
+grain_sigma = 0.3
+[handling]
+staple = true
+dust_count = 20
+stamp = "LAB FILE / COPY 02"
+[protection]
+max_delta = 0.07

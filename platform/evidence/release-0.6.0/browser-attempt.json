@@ -1,0 +1,9 @@
+{
+  "target": "native animated preview at loopback 8091",
+  "browser": "Chromium via Playwright",
+  "navigation_result": "net::ERR_BLOCKED_BY_ADMINISTRATOR",
+  "result": "blocked, not passed",
+  "wasm_browser_execution": "not run; no real compiler outputs",
+  "visual_evidence": "PPM/PNG/GIF from actual native C++ renderer, inspected directly",
+  "http_evidence": "scene_transport.native_http tests exercise the real service and C++ child independently"
+}

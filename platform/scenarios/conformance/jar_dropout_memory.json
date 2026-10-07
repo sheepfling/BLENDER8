@@ -1,0 +1,134 @@
+{
+  "version": 1,
+  "name": "jar_dropout_memory",
+  "mode": "bench",
+  "profile": "chassis04",
+  "events": [
+    {
+      "at_us": 60000,
+      "command": "stop 1"
+    },
+    {
+      "at_us": 61000,
+      "command": "stop 0"
+    },
+    {
+      "at_us": 62000,
+      "command": "speed 4"
+    },
+    {
+      "at_us": 62000,
+      "command": "write 0x28 1"
+    },
+    {
+      "at_us": 62000,
+      "command": "write 0x29 1"
+    },
+    {
+      "at_us": 62000,
+      "command": "write 0x61 255"
+    },
+    {
+      "at_us": 62000,
+      "command": "write 0x60 1"
+    },
+    {
+      "at_us": 100000,
+      "command": "write 0xB2 165"
+    },
+    {
+      "at_us": 100000,
+      "command": "write 0xB2 90"
+    },
+    {
+      "at_us": 200000,
+      "command": "write 0xB2 165"
+    },
+    {
+      "at_us": 200000,
+      "command": "write 0xB2 90"
+    },
+    {
+      "at_us": 300000,
+      "command": "write 0xB2 165"
+    },
+    {
+      "at_us": 300000,
+      "command": "write 0xB2 90"
+    },
+    {
+      "at_us": 400000,
+      "command": "write 0xB2 165"
+    },
+    {
+      "at_us": 400000,
+      "command": "write 0xB2 90"
+    },
+    {
+      "at_us": 500000,
+      "command": "write 0xB2 165"
+    },
+    {
+      "at_us": 500000,
+      "command": "write 0xB2 90"
+    },
+    {
+      "at_us": 600000,
+      "command": "write 0xB2 165"
+    },
+    {
+      "at_us": 600000,
+      "command": "write 0xB2 90"
+    },
+    {
+      "at_us": 400000,
+      "command": "jar_bounce 0"
+    },
+    {
+      "at_us": 500000,
+      "command": "jar 0"
+    },
+    {
+      "at_us": 500001,
+      "command": "jar 1"
+    }
+  ],
+  "checks": [
+    {
+      "at_us": 400000,
+      "field": "drive_enabled",
+      "op": "eq",
+      "value": true
+    },
+    {
+      "at_us": 500001,
+      "field": "jar_ok",
+      "op": "eq",
+      "value": true
+    },
+    {
+      "at_us": 500001,
+      "field": "jar_permit",
+      "op": "eq",
+      "value": false
+    },
+    {
+      "at_us": 500001,
+      "field": "drive_enabled",
+      "op": "eq",
+      "value": false
+    },
+    {
+      "at_us": 550000,
+      "field": "motor.rpm",
+      "op": "gt",
+      "value": 0
+    },
+    {
+      "at_us": 650000,
+      "field": "drive_enabled",
+      "op": "eq",
+      "value": false
+    }
+  ]
+}

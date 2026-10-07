@@ -1,0 +1,32 @@
+\documentclass[10pt]{article}
+\usepackage{vendor-thermasense}
+\renewcommand{\DocID}{TSC-DESIGN-01}
+\renewcommand{\RunningPart}{AVT10}
+\hypersetup{pdftitle={thermasense / Vendor identity proof}}
+\begin{document}
+\VendorTitle{AVT10}{A quiet analog note}{Sensor applications documentation}
+\MetaStrip{VISUAL IDENTITY PROOF\hfill DESIGN EDITION P1\hfill NOT A COMPONENT RELEASE}
+\begin{Notice}{ANALOG COMPONENT NOTE}
+The sensor company is small and precise. Its pages are serif-led, modestly colored and explicit about transfer relationships, errors and the distinction between sensor and converter.
+\end{Notice}
+\section*{Documentation culture}
+\begin{tabularx}{\linewidth}{@{}p{.22\linewidth}Y@{}}
+\toprule\TableHead Element & House convention\\\midrule
+Document voice & Transfer characteristics; response; application interface.\\
+Page structure & Palatino body text, plum-gray accents and a restrained identity. Equations receive clean space and clear units.\\
+Signature detail & A two-point transfer-line mark, small tables and careful note numbering.\\
+Expected wear & Almost-clean lab copy. One folded corner can be added later; there is no need to weather every page heavily.\\
+\bottomrule
+\end{tabularx}
+\section*{Specimen section rhythm}
+\begin{minipage}[t]{.31\linewidth}\textbf{01\quad Transfer relationship}\par\small Establish the signal meaning and the applicable scope.\end{minipage}\hfill
+\begin{minipage}[t]{.31\linewidth}\textbf{02\quad Thermal response}\par\small Define conditions before presenting a table or diagram.\end{minipage}\hfill
+\begin{minipage}[t]{.31\linewidth}\textbf{03\quad Application interface}\par\small Separate component guarantees from application decisions.\end{minipage}
+\vspace{16pt}
+{\color{VendorInk}\hrule height .5pt}\vspace{10pt}
+{\large\itshape Measure the voltage. Understand the temperature.}\par\vspace{8pt}
+\section*{Release boundary}
+Do not add thermistor behavior to a linear-sensor sheet. Alternate sensor types require separate component contracts.
+\vfill
+{\small\color{Muted}Identity and document language are original fictional design proposals for the Blender-8 exercise. No affiliation with a real manufacturer or Zachtronics is claimed.}
+\end{document}

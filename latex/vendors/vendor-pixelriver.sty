@@ -1,0 +1,9 @@
+\ProvidesPackage{vendor-pixelriver}[2026/10/06 PixelRiver identity]
+\RequirePackage{datasheet-core}\RequirePackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\renewcommand{\VendorName}{PixelRiver Display Technologies}
+\renewcommand{\VendorDivision}{DISPLAY MODULE / TECHNICAL DATA}
+\renewcommand{\VendorWordmark}{{\sffamily\bfseries\fontsize{23}{25}\selectfont PixelRiver}}
+\renewcommand{\VendorMark}{\tikz[baseline=-.6ex]{\foreach \x/\y in {0/0,0/.14,0/.28,.14/0,.14/.14,.14/.28,.28/0,.28/.14,.42/0}{\fill[VendorInk] (\x,\y) rectangle +( .10,.10);}}}
+\definecolor{VendorInk}{HTML}{126D70}\definecolor{VendorTint}{HTML}{E8F4F2}
+\renewcommand{\VendorMasthead}{\noindent\colorbox{VendorInk}{\parbox{\dimexpr\linewidth-2\fboxsep\relax}{\vspace{7pt}\color{white}\hspace{8pt}\VendorWordmark\hfill\scriptsize DISPLAY TECHNOLOGIES\hspace{8pt}\vspace{7pt}}}\par\vspace{6pt}{\sffamily\scriptsize\color{VendorInk}\VendorDivision\hfill\DocID}\par\vspace{12pt}}

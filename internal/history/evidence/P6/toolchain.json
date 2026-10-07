@@ -1,0 +1,20 @@
+{
+  "b8docs": "0.7.0",
+  "python": "3.13.5",
+  "platform": "Linux",
+  "machine": "x86_64",
+  "zlib": "1.3.1",
+  "engine_sha256": "e56b987bf05b9bc9327415627ba92b8c73ea5b1168c89a64a83389a72726235a",
+  "numpy": "2.3.5",
+  "Pillow": "12.3.0",
+  "pydantic": "2.13.4",
+  "typer": "0.26.3",
+  "pypdfium2": "5.8.0",
+  "pypdf": "5.9.0",
+  "reportlab": "4.4.9",
+  "g++": "g++ (Debian 14.2.0-19) 14.2.0",
+  "clang++": "clang version 17.0.0 (https://github.com/swiftlang/llvm-project.git 10999b6d034fe318f3d56c83bddb6572593a8bb0)",
+  "cmake": "cmake version 3.31.6",
+  "pdflatex": "pdfTeX 3.141592653-2.6-1.40.26 (TeX Live 2025/dev/Debian)",
+  "latexmk": "Latexmk, John Collins, 11 Dec. 2024. Version 4.86"
+}

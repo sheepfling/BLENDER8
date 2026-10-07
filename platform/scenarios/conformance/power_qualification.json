@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "name": "power_qualification",
+  "mode": "bench",
+  "profile": "chassis04",
+  "events": [],
+  "checks": [
+    {
+      "at_us": 0,
+      "field": "powered",
+      "op": "eq",
+      "value": false
+    },
+    {
+      "at_us": 20000,
+      "field": "ready",
+      "op": "eq",
+      "value": false
+    },
+    {
+      "at_us": 60000,
+      "field": "ready",
+      "op": "eq",
+      "value": true
+    },
+    {
+      "at_us": 60000,
+      "field": "mcu.clock_source",
+      "op": "eq",
+      "value": 0
+    },
+    {
+      "at_us": 60000,
+      "field": "drive_enabled",
+      "op": "eq",
+      "value": false
+    }
+  ]
+}

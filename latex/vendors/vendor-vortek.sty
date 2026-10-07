@@ -1,0 +1,10 @@
+\ProvidesPackage{vendor-vortek}[2026/10/06 Vortek identity]
+\RequirePackage{datasheet-core}\RequirePackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\renewcommand{\VendorName}{Vortek Motion}
+\renewcommand{\VendorDivision}{MOTOR SYSTEMS / APPLICATION ENGINEERING}
+\renewcommand{\VendorWordmark}{{\sffamily\bfseries\itshape\fontsize{26}{27}\selectfont VORTEK}\;{\sffamily\scriptsize MOTION}}
+\renewcommand{\VendorMark}{\tikz[baseline=-.7ex]{\draw[VendorInk,line width=1.3pt](.2,.2)circle(.2);\foreach \a in {0,120,240}{\fill[VendorInk,rotate around={\a:(.2,.2)}](.2,.2)--(.36,.23)--(.25,.35)--cycle;}}}
+\definecolor{VendorInk}{HTML}{A5492E}\definecolor{VendorTint}{HTML}{F6EDE7}
+\renewcommand{\headrulewidth}{1.2pt}
+\titleformat{\section}{\sffamily\bfseries\large\color{VendorInk}}{\thesection}{.6em}{}

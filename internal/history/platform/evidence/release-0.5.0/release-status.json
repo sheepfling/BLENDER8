@@ -1,0 +1,17 @@
+{
+  "platform": "0.5.0",
+  "b8_interface": "03",
+  "chassis": "04",
+  "native_gcc_tests": 192,
+  "native_clang_tests": 192,
+  "sanitizer_tests_excluding_long_stress": 191,
+  "javascript_worker_unit_tests": 15,
+  "python_static_tooling_tests": 7,
+  "fresh_archive_tests": 192,
+  "wasm_compiler_available": false,
+  "wasm_compiled": false,
+  "wasm_execution_verified": false,
+  "browser_wasm_tested": false,
+  "binaries_included": false,
+  "remaining_gate": "Compile with emsdk, run wasm-test, then inspect actual browser execution."
+}

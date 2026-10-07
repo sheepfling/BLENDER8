@@ -1,0 +1,19 @@
+# Partial custom recipe; named preset is loaded first.
+extends = "bad_xerox"
+name = "mux_returned_copy"
+generation_depth = 2
+copier_id = "service-room-1979"
+[placement]
+rotation_deg = { min = -1.4, max = 1.4 }
+translate_x_mm = { min = -2.0, max = 2.0 }
+[handling]
+coffee = false
+stamp = "RETURN TO LOGIC FILE"
+# Page 2 has small timing labels. Keep cosmetic changes more restrained.
+[[page_overrides]]
+pages = [2]
+[page_overrides.patch.protection]
+max_delta = 0.075
+[page_overrides.patch.repro]
+toner_bloom = 0.04
+threshold_mix = 0.06

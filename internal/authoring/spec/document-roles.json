@@ -1,0 +1,218 @@
+{
+  "publication_issue": "P5",
+  "required_recipient_count": 7,
+  "product_authority": "requirements",
+  "sources": {
+    "requirements": {
+      "role": "customer_correspondence",
+      "owns": [
+        "Mara customer decisions",
+        "Rick Half-A/Labs confirmations and clarifications",
+        "New Employee handoff",
+        "chassis wiring attachments",
+        "jar-engagement scope and restart agreement",
+        "r4 S2/U_IL latch and PB3/PB4 assignment"
+      ]
+    },
+    "mcu": {
+      "role": "generic_component",
+      "owns": [
+        "B8 register ABI",
+        "peripheral timing",
+        "interrupt behavior"
+      ]
+    },
+    "mux": {
+      "role": "generic_component",
+      "owns": [
+        "channel selection",
+        "settling",
+        "logic interface"
+      ]
+    },
+    "lcd": {
+      "role": "generic_component",
+      "owns": [
+        "pixel layout",
+        "local registers",
+        "scan timing"
+      ]
+    },
+    "motor": {
+      "role": "generic_component",
+      "owns": [
+        "drive inputs",
+        "RPM characteristic",
+        "tach output",
+        "thermal plant",
+        "absence of autonomous protection"
+      ]
+    },
+    "temperature": {
+      "role": "generic_component",
+      "owns": [
+        "voltage transfer",
+        "thermal lag",
+        "sensor signal limitations"
+      ]
+    },
+    "buttons": {
+      "role": "company_assembly",
+      "owns": [
+        "latching mechanics",
+        "contacts",
+        "bounce",
+        "independent run permission"
+      ]
+    },
+    "oscillator": {
+      "role": "generic_component",
+      "owns": [
+        "clock output frequency",
+        "startup",
+        "supply",
+        "output enable",
+        "load and layout notes"
+      ]
+    },
+    "mcu_b16": {
+      "role": "generic_component",
+      "owns": [
+        "B16 interface 04 extensions",
+        "bounded SRAM and DMAC",
+        "pin-function matrix and routing",
+        "transfer ownership and completion semantics",
+        "B8/B16 firmware numeric profiles",
+        "binary32 FPU format and arithmetic limits"
+      ]
+    }
+  },
+  "prohibited_terms": {
+    "mcu": [
+      "BLENDER-8",
+      "BA-8",
+      "Kestrel",
+      "MD20",
+      "AVT10",
+      "MX8-1",
+      "PX32-16",
+      "STOP_N",
+      "MOTOR_EN",
+      "JAR_OK",
+      "JAR_PERMIT",
+      "U_IL",
+      "S2 jar"
+    ],
+    "mux": [
+      "BLENDER-8",
+      "BA-8",
+      "Kestrel",
+      "Northstar",
+      "PA0",
+      "PA3",
+      "PB2",
+      "PULSE button",
+      "JAR_OK",
+      "JAR_PERMIT",
+      "U_IL",
+      "S2 jar"
+    ],
+    "lcd": [
+      "BLENDER-8",
+      "Kestrel",
+      "MD20",
+      "AVT10",
+      "BA-8",
+      "STOP_N",
+      "MOTOR_EN",
+      "JAR_OK",
+      "JAR_PERMIT",
+      "U_IL",
+      "S2 jar"
+    ],
+    "motor": [
+      "BLENDER-8",
+      "B8 controller",
+      "PWM_CTRL",
+      "PWM_DUTY",
+      "STOP_N",
+      "MOTOR_EN",
+      "65 $",
+      "85 $",
+      "500 ms",
+      "750 ms",
+      "JAR_OK",
+      "JAR_PERMIT",
+      "U_IL",
+      "S2 jar"
+    ],
+    "temperature": [
+      "BLENDER-8",
+      "B8",
+      "AN0",
+      "AN1",
+      "ADC_CTRL",
+      "DATA_LO",
+      "DATA_HI",
+      "52 ",
+      "16 ",
+      "65 &",
+      "85 &",
+      "JAR_OK",
+      "JAR_PERMIT",
+      "U_IL",
+      "S2 jar"
+    ],
+    "buttons": [
+      "BLENDER-8",
+      "B8",
+      "PA0",
+      "PA3",
+      "PB2",
+      "50 ms",
+      "65 $",
+      "85 $",
+      "RPM",
+      "controller must",
+      "fault state",
+      "BOARD-001"
+    ],
+    "oscillator": [
+      "B8",
+      "Blender-8",
+      "PA0",
+      "PLL_MULT",
+      "Jordan",
+      "Kestrel",
+      "JAR_OK",
+      "JAR_PERMIT",
+      "U_IL",
+      "S2 jar"
+    ],
+    "mcu_b16": [
+      "BLENDER-8",
+      "BA-8",
+      "Kestrel",
+      "MD20",
+      "AVT10",
+      "MX8-1",
+      "PX32-16",
+      "STOP_N",
+      "MOTOR_EN",
+      "JAR_OK",
+      "JAR_PERMIT",
+      "U_IL",
+      "S2 jar"
+    ]
+  },
+  "prohibited_in_all_published_sources": [
+    "teaching",
+    "fictional",
+    "hypothetical",
+    "instructor",
+    "student",
+    "simulator",
+    "Jordan"
+  ],
+  "limitations": "Declared lexical boundary checks are regression guards, not a proof of semantic completeness or hardware acceptance."
+}

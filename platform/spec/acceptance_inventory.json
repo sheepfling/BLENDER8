@@ -1,0 +1,321 @@
+{
+  "contract": "correspondence P5 / chassis04",
+  "case_count": 63,
+  "cases": [
+    {
+      "name": "startup.outputs_off",
+      "source_messages": "stop-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "startup.external_clock",
+      "source_messages": "clock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "supervision.config_before_drive",
+      "source_messages": "supervision-04",
+      "kind": "observed"
+    },
+    {
+      "name": "panel.speed_1",
+      "source_messages": "panel-04",
+      "kind": "observed"
+    },
+    {
+      "name": "panel.speed_2",
+      "source_messages": "panel-04",
+      "kind": "observed"
+    },
+    {
+      "name": "panel.speed_3",
+      "source_messages": "panel-04",
+      "kind": "observed"
+    },
+    {
+      "name": "panel.speed_4",
+      "source_messages": "panel-04",
+      "kind": "observed"
+    },
+    {
+      "name": "panel.speed_5",
+      "source_messages": "panel-04",
+      "kind": "observed"
+    },
+    {
+      "name": "panel.speed_6",
+      "source_messages": "panel-04",
+      "kind": "observed"
+    },
+    {
+      "name": "panel.speed_7",
+      "source_messages": "panel-04",
+      "kind": "observed"
+    },
+    {
+      "name": "panel.pulse_idle",
+      "source_messages": "panel-04",
+      "kind": "observed"
+    },
+    {
+      "name": "panel.pulse_boost_restore",
+      "source_messages": "panel-04",
+      "kind": "observed"
+    },
+    {
+      "name": "stop.cutoff_and_release",
+      "source_messages": "stop-04",
+      "kind": "observed"
+    },
+    {
+      "name": "stop.held_pulse",
+      "source_messages": "stop-04",
+      "kind": "observed"
+    },
+    {
+      "name": "jar.removal",
+      "source_messages": "interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "jar.reseat",
+      "source_messages": "interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "jar.quick_dropout",
+      "source_messages": "interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "jar.broken_wire",
+      "source_messages": "interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "motion.blocked_start",
+      "source_messages": "motion-04",
+      "kind": "observed"
+    },
+    {
+      "name": "motion.running_jam",
+      "source_messages": "motion-04",
+      "kind": "observed"
+    },
+    {
+      "name": "motion.no_grace_renewal",
+      "source_messages": "motion-04",
+      "kind": "observed"
+    },
+    {
+      "name": "motion.tach_missing",
+      "source_messages": "motion-04",
+      "kind": "observed"
+    },
+    {
+      "name": "motion.permitted_load",
+      "source_messages": "panel-04/motion-04",
+      "kind": "observed"
+    },
+    {
+      "name": "panel.invalid_combination",
+      "source_messages": "panel-04",
+      "kind": "observed"
+    },
+    {
+      "name": "thermal.trip",
+      "source_messages": "temperature-04",
+      "kind": "observed"
+    },
+    {
+      "name": "thermal.stale_adc",
+      "source_messages": "temperature-04",
+      "kind": "observed"
+    },
+    {
+      "name": "thermal.sampling_after_stop",
+      "source_messages": "temperature-04",
+      "kind": "observed"
+    },
+    {
+      "name": "recovery.no_queued_ack",
+      "source_messages": "temperature-04",
+      "kind": "observed"
+    },
+    {
+      "name": "clock.missing_at_boot",
+      "source_messages": "clock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "clock.loss_during_run",
+      "source_messages": "clock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "power.logic_brownout",
+      "source_messages": "clock-04/supervision-04",
+      "kind": "observed"
+    },
+    {
+      "name": "power.retained_selection",
+      "source_messages": "stop-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "supervision.halted_core",
+      "source_messages": "supervision-04",
+      "kind": "observed"
+    },
+    {
+      "name": "supervision.lost_foreground",
+      "source_messages": "supervision-04",
+      "kind": "observed"
+    },
+    {
+      "name": "thermal.sensor_open",
+      "source_messages": "temperature-04",
+      "kind": "observed"
+    },
+    {
+      "name": "thermal.sensor_ground",
+      "source_messages": "temperature-04",
+      "kind": "observed"
+    },
+    {
+      "name": "thermal.sensor_supply",
+      "source_messages": "temperature-04",
+      "kind": "observed"
+    },
+    {
+      "name": "display.0",
+      "source_messages": "panel-04/temperature-04/supervision-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "display.1",
+      "source_messages": "panel-04/temperature-04/supervision-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "display.2",
+      "source_messages": "panel-04/temperature-04/supervision-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "display.3",
+      "source_messages": "panel-04/temperature-04/supervision-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "display.4",
+      "source_messages": "panel-04/temperature-04/supervision-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "display.5",
+      "source_messages": "panel-04/temperature-04/supervision-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "display.6",
+      "source_messages": "panel-04/temperature-04/supervision-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "display.7",
+      "source_messages": "panel-04/temperature-04/supervision-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "display.P",
+      "source_messages": "panel-04/temperature-04/supervision-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "display.1P",
+      "source_messages": "panel-04/temperature-04/supervision-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "display.2P",
+      "source_messages": "panel-04/temperature-04/supervision-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "display.3P",
+      "source_messages": "panel-04/temperature-04/supervision-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "display.4P",
+      "source_messages": "panel-04/temperature-04/supervision-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "display.5P",
+      "source_messages": "panel-04/temperature-04/supervision-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "display.6P",
+      "source_messages": "panel-04/temperature-04/supervision-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "display.7P",
+      "source_messages": "panel-04/temperature-04/supervision-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "display.IL",
+      "source_messages": "panel-04/temperature-04/supervision-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "display.TS",
+      "source_messages": "panel-04/temperature-04/supervision-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "display.TH",
+      "source_messages": "panel-04/temperature-04/supervision-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "display.ST",
+      "source_messages": "panel-04/temperature-04/supervision-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "display.IF",
+      "source_messages": "panel-04/temperature-04/supervision-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "display.CK",
+      "source_messages": "panel-04/temperature-04/supervision-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "display.WD",
+      "source_messages": "panel-04/temperature-04/supervision-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "display.DM",
+      "source_messages": "panel-04/temperature-04/supervision-04/interlock-04",
+      "kind": "observed"
+    },
+    {
+      "name": "review.progress_authorization",
+      "source_messages": "supervision-04",
+      "kind": "review"
+    },
+    {
+      "name": "review.fault_priority_retention",
+      "source_messages": "temperature-04/supervision-04/interlock-04",
+      "kind": "review"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+\begin{tikzpicture}[font=\scriptsize,>=Stealth,box/.style={draw,minimum height=7mm,align=center}]
+\node[box](a)at(0,0){Drive requested};\node[box](b)at(4,0){Give it time to start};\node[box](c)at(8,0){Still no verified motion?};\node[box](d)at(12,0){Drive off / retain fault};
+\draw[->](a)--(b);\draw[->](b)--(c);\draw[->](c)--(d);
+\end{tikzpicture}

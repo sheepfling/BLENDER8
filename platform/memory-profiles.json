@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "devices": {
+    "B8": {
+      "standard": {
+        "ram": 2048,
+        "program": 16384
+      },
+      "plus": {
+        "ram": 4096,
+        "program": 32768
+      },
+      "free": {
+        "ram": null,
+        "program": null
+      }
+    },
+    "B16": {
+      "standard": {
+        "ram": 8192,
+        "program": 65536
+      },
+      "plus": {
+        "ram": 16384,
+        "program": 131072
+      },
+      "free": {
+        "ram": null,
+        "program": null
+      }
+    }
+  }
+}

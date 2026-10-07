@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "name": "fused_motor_branch",
+  "mode": "bench",
+  "profile": "chassis04",
+  "events": [
+    {
+      "at_us": 60000,
+      "command": "stop 1"
+    },
+    {
+      "at_us": 61000,
+      "command": "stop 0"
+    },
+    {
+      "at_us": 62000,
+      "command": "speed 4"
+    },
+    {
+      "at_us": 62000,
+      "command": "write 0x28 1"
+    },
+    {
+      "at_us": 62000,
+      "command": "write 0x29 1"
+    },
+    {
+      "at_us": 62000,
+      "command": "write 0x61 255"
+    },
+    {
+      "at_us": 62000,
+      "command": "write 0x60 1"
+    },
+    {
+      "at_us": 150000,
+      "command": "fuse motor 0"
+    }
+  ],
+  "checks": [
+    {
+      "at_us": 100000,
+      "field": "drive_enabled",
+      "op": "eq",
+      "value": true
+    },
+    {
+      "at_us": 150001,
+      "field": "powered",
+      "op": "eq",
+      "value": true
+    },
+    {
+      "at_us": 150001,
+      "field": "drive_enabled",
+      "op": "eq",
+      "value": false
+    },
+    {
+      "at_us": 150001,
+      "field": "mcu.gpiob_out",
+      "op": "eq",
+      "value": 1
+    }
+  ]
+}

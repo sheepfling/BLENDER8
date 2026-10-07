@@ -1,0 +1,15 @@
+{
+  "gcc": "g++ (Debian 14.2.0-19) 14.2.0",
+  "clang": "clang version 17.0.0 (https://github.com/swiftlang/llvm-project.git 10999b6d034fe318f3d56c83bddb6572593a8bb0)",
+  "cmake": "cmake version 3.31.6",
+  "python": "Python 3.13.5",
+  "native_executable_sha256": "af3d6fc65360773a7fee87b2c4c3c2a683a2cea97d2e75f9c4fcd13ccf8ad167",
+  "sanitizer_configuration": "Clang Debug; ASan+UBSan; detect_leaks=1; logical timing unchanged; host CTest cap180s",
+  "not_run": [
+    "physical HWIL",
+    "Windows/macOS builds",
+    "ruff",
+    "pyright",
+    "clang-format"
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "name": "sensor_faults",
+  "mode": "bench",
+  "profile": "chassis04",
+  "events": [
+    {
+      "at_us": 70000,
+      "command": "sensor open"
+    },
+    {
+      "at_us": 80000,
+      "command": "sensor ground"
+    },
+    {
+      "at_us": 90000,
+      "command": "sensor healthy"
+    }
+  ],
+  "checks": [
+    {
+      "at_us": 60000,
+      "field": "analog_v",
+      "op": "eq",
+      "value": 0.75
+    },
+    {
+      "at_us": 70001,
+      "field": "analog_v",
+      "op": "eq",
+      "value": 3.3
+    },
+    {
+      "at_us": 80001,
+      "field": "analog_v",
+      "op": "eq",
+      "value": 0.0
+    },
+    {
+      "at_us": 90001,
+      "field": "analog_v",
+      "op": "eq",
+      "value": 0.75
+    }
+  ]
+}

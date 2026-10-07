@@ -1,0 +1,250 @@
+\documentclass[10pt]{article}
+\usepackage{datasheet-core}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\renewcommand{\VendorName}{Kestrel Appliance Systems}
+\renewcommand{\DocID}{KAS-REQ-008}
+\renewcommand{\DocRev}{P4}
+\renewcommand{\RunningPart}{Engineering correspondence}
+\definecolor{VendorInk}{HTML}{303030}
+\definecolor{VendorTint}{HTML}{F0F0F0}
+\fancyhead[L]{\scriptsize Kestrel Appliance Systems / Product Engineering}
+\fancyhead[R]{\scriptsize KAS-REQ-008 / Issue P4}
+\fancyfoot[L]{\scriptsize Engineering correspondence and retained attachments}
+\fancyfoot[R]{\scriptsize\thepage\,/\,\pageref*{LastPage}}
+\hypersetup{pdftitle={Kestrel / Blender-8 Firmware Brief and Attachments}}
+\newcommand{\Clause}[2]{\par\noindent\textbf{#1}\quad #2\par}
+\newcommand{\Attachment}[2]{{\Large\bfseries #1\par}\vspace{4pt}{\small\color{Muted}#2\par}\vspace{9pt}\hrule\vspace{9pt}}
+\begin{document}
+{\small\color{Muted}MAIL / PRINTED MESSAGE WITH ATTACHMENTS\par}\vspace{7pt}
+{\LARGE\bfseries Blender-8 firmware: release brief\par}\vspace{12pt}
+
+\begin{tabularx}{\linewidth}{@{}p{18mm} Y@{}}
+\textbf{From:} & Mara Ellis, Engineering Manager \textless mara.ellis@kestrel.example\textgreater\\
+\textbf{To:} & Jordan, Product Firmware\\
+\textbf{Cc:} & Rick, Controls Engineering\\
+\textbf{Date:} & 06 October 2026\\
+\textbf{Subject:} & Blender-8 controls --- requirements and supplied component file\\
+\end{tabularx}
+
+\vspace{9pt}\hrule\vspace{12pt}
+Jordan,
+
+Please take the Blender-8 firmware through bench acceptance against the attached release criteria. The control chassis and its component selection are fixed for this build. Use the supplier manuals for what each part does; use this message and its attachments for what we need the assembled machine to do.
+
+The front panel has seven latched speed selections, momentary PULSE, STOP, and a separate power switch. We need evenly spaced nominal speed steps, a temporary speed increase while PULSE is held, and a small pixel display that shows the selected mode or the dominant fault. Loaded speed sag is acceptable. A closed-loop speed regulator is not required for this release.
+
+The machine must refuse unintended starts. Power restoration, a retained button, clearing an obstruction, or cooling down must not bring the motor back on by itself. STOP has an independent hardware path, but that does not excuse the firmware from dropping its own outputs. A cold motor with no verified motion and a hot motor that is still rotating are separate shutdown cases.
+
+The implementation is yours. I am not prescribing a debounce class, interrupt layout, drawing library or control-loop design. Respect the component timing and the measurable limits in Attachment A. Access the equipment through the B8 controller interface; the test bench is not a shortcut around it.
+
+The rear power switch, supply qualification and external oscillator are now included in the chassis release. Please select and justify the PLL and divider settings rather than assuming the old fixed clock. Use the independent watchdog; qualify its service from completed work. Include the deadman window in the final reliability evidence.
+
+Please return the C++ source, a local build-and-test command, and the acceptance evidence. Report a discrepancy between a supplier interface and this brief rather than quietly changing either one. Keep optional animation and speed-regulation work out of the acceptance path.
+
+Thanks,\\[3pt]
+\textbf{Mara}\\
+Product Engineering / Kestrel Appliance Systems
+\vfill
+\MetaStrip{RETAINED ATTACHMENTS\hfill REQUIREMENTS RELEASE 03\hfill PUBLICATION P4}
+\textbf{A. Acceptance criteria and evidence} --- pages 2--5.\par
+\textbf{B. Chassis interconnection schedule} --- pages 6--7.\par
+\textbf{C. Clock and execution supervision} --- pages 8--9.\par
+The accompanying reference file contains the B8, MX8-1, PX32-16, MD20 with AVT10 papers, and BA-8 assembly documents, plus the XO8-33 oscillator paper. The MD20 and AVT10 retain their separate supplier identities within one motor-and-sensing packet.
+\clearpage
+\Attachment{Attachment A1 / Operating acceptance}{Blender-8 product behavior. Numbered R-clauses retain the release-02 requirement identifiers.}
+\Clause{R-002, R-003 / Startup}{Before enabling interrupts or indicating readiness, set the firmware-owned motor-enable request, PWM enable and pending duty to zero. Keep drive disabled until fresh, plausible temperature readings remain at or below 65 $^\circ$C for 2 s, STOP is released, and all eight command contacts have been released for at least 20 ms. Only a later qualified command may start motion.}
+\Clause{R-004, R-005 / Input acquisition}{Observe each of the eight command contacts at least once every 8 ms, respecting the MX8-1 settling specification. A complete scan is not an instantaneous snapshot. Accept a change only after consistent observations span at least 16 ms. Recognize final stable commands within 40 ms. PULSE taps shorter than 50 ms need not be recognized.}
+\Clause{R-006 / Conflicting inputs}{Zero or one speed contact, optionally accompanied by PULSE, is legal. Two or more speed indications observed continuously for at least 40 ms qualify IF. Short bounce or scan-skew transients must not choose an arbitrary winning speed.}
+\Clause{R-007, R-010 / Stop and drive removal}{Within 10 ms of STOP\_N assertion, clear the firmware motor-enable request, PWM enable and pending duty independently of the hardware inhibit. A pending-duty write alone is insufficient. STOP release must not restore a previous run request.}
+\section*{R-008 / Nominal speed selections}
+\begin{center}
+\begin{tabular}{@{}c r c r@{}}
+\toprule\TableHead Selection & Target RPM & Selection & Target RPM\\\midrule
+1 & 3,000 & 5 & 13,000\\
+2 & 5,500 & 6 & 15,500\\
+3 & 8,000 & 7 & 18,000\\
+4 & 10,500 & Idle & Drive off\\\bottomrule
+\end{tabular}
+\end{center}
+Establish drive from the MD20 nominal unloaded characteristic, not equal PWM increments. At nominal no load, 1 s after selection, speed error must be no greater than the larger of 100 RPM or 2\% of target. Loaded speed sag is allowed; closed-loop regulation is not required.
+\Clause{R-009 / PULSE}{While held, add 2,000 RPM to the selected request, capped at 20,000 RPM. From idle request 2,000 RPM. Release restores the selected speed or idle. STOP cancels the request, including held-through-STOP PULSE. PULSE is not 10\% PWM or a periodic chopping mode.}
+\Clause{R-011, R-027 / Indication}{Write pixel data to display 0 for idle, 1--7 for selection, P for standalone PULSE, and 1P--7P for a boosted selection. A boot graphic is allowed while not ready. Fault indications follow A3. Normal command response is measured from final contact stabilization; shutdown is measured at commanded enable/PWM outputs, not zero shaft speed.}
+\vfill\Caption{Equipment operating criteria are owned by Kestrel. Component settling, register behavior, pixel packing and physical transfer characteristics remain supplier specifications.}
+\clearpage
+\Attachment{Attachment A2 / Measurement and qualification}{Motion, analog acquisition and independent protective observations.}
+\Clause{R-014 / Motion observation}{Use hardware tach-count differences over a rolling 200 ms interval. Apply the edge count per revolution specified by the MD20 and the counter modulus specified by the B8. Track the time of the last observed count change. Missing verified motion is not proof of a unique mechanical cause.}
+\Clause{R-015, R-016 / Temperature acquisition}{Start AN0 conversions at intervals no greater than 10 ms. Use the B8 conversion-completion status, acquisition timing and coherent result sequence. Reconstruct voltage using the nominal controller reference and its published transfer, then apply the AVT10 voltage-to-temperature relation. Keep codes, volts and degrees Celsius distinct. Negative temperatures must not cause unsigned underflow. Re-reading an old result is not a fresh measurement.}
+\section*{R-017, R-018 / Temperature qualification}
+
+\begin{tabularx}{\linewidth}{@{}p{.26\linewidth} Y@{}}
+\toprule\TableHead Condition & Qualifying observation\\\midrule
+Thermal trip, TH & Two consecutive fresh, plausible acquired temperatures at or above 85 $^\circ$C.\\
+Signal fault, TS & Any completed AN0 code below 62 or above 574, or more than 100 ms without a fresh completed sample. Codes 62--574 are inclusive plausibility limits.\\\bottomrule
+\end{tabularx}
+
+Remove commanded drive within 10 ms after qualification. Temperature protection applies during startup, idle, run and faulted operation. A constant but plausible value is not by itself proof of sensor failure. An implausible rail value is not also trustworthy evidence for a thermal trip.
+\Clause{R-019 / Start grace}{Allow 500 ms of no-motion grace only after an actual commanded off-to-on transition. Changing speed or adding PULSE while already running must not restart grace. Temperature and signal-validity protection remain active throughout grace.}
+\Clause{R-020 / Unverified motion}{After grace, while operation is requested and the driver is commanded enabled, a candidate exists when the rolling speed estimate is below 300 RPM \textbf{or} no tach-count change has been observed for at least 150 ms. A candidate persisting for 200 ms qualifies ST. Remove commanded drive within 10 ms after qualification.}
+
+\begin{tabularx}{\linewidth}{@{}p{.50\linewidth} Y@{}}
+\toprule\TableHead Acceptance condition & Maximum command-to-disable interval\\\midrule
+Full startup with the shaft locked & 750 ms from the run command.\\
+Sudden lock after established normal running & 400 ms from the lock.\\\bottomrule
+\end{tabularx}
+
+\Clause{R-021 / Independent causes}{A cold no-motion condition must shut down without waiting for heating. A rotating hot motor must shut down without waiting for lost motion. Intentional disable and coastdown do not qualify a new ST. Preserve all causes that independently qualify in the same evaluation.}
+\vfill\Caption{Acceptance uses acquired signals and firmware-owned outputs. A package-temperature measurement is not a direct winding-hotspot measurement.}
+\clearpage
+\Attachment{Attachment A3 / Faults and recovery}{Latched reasons, visible priority and deliberate operator acknowledgment.}
+\section*{R-022, R-023 / Retained causes and indication}
+
+\begin{tabularx}{\linewidth}{@{}c c c Y@{}}
+\toprule\TableHead Priority & Label & Retained bit & Meaning\\\midrule
+1 & TS & 04h & Temperature signal or acquisition freshness fault.\\
+2 & TH & 02h & Thermal shutdown; not reduced-power operation.\\
+3 & IF & 08h & Persistent invalid speed-input combination.\\
+4 & ST & 01h & Commanded motion not verified.\\\bottomrule
+\end{tabularx}
+
+Retain every independently qualified cause. Display the highest-priority retained label within 100 ms of qualification, measured at the scanned pixels, without postponing drive removal. Subordinate cause bits remain available in software.
+
+Continue temperature acquisition and fault indication after shutdown. A later thermal trip may become dominant over a prior ST. A prior thermal shutdown does not acquire ST merely because the unpowered rotor subsequently stops. Restored tach pulses, repaired wiring, release of PULSE or falling temperature alone do not clear a fault.
+\section*{R-024 / Deliberate recovery sequence}
+While faulted, establish fresh, plausible temperature at or below 65 $^\circ$C continuously for 2 s and no currently invalid speed-input combination. Only a \textbf{new STOP press beginning after those conditions qualify}, held stable for 20 ms, may acknowledge the retained faults.
+
+STOP must then be released, and all command contacts must be released for at least 20 ms, before readiness. A later new command is required to run. STOP held while cooling is not a queued acknowledgment or queued restart.
+\begin{Notice}{THE MOTOR DOES NOT OWN THE LOCKOUT}
+The drive responds to its ENABLE and PWM inputs. Removing an obstruction does not prove that those inputs are safe to assert. Maintain the product's lockout in firmware until the complete acknowledgment and new-command sequence has occurred.
+\end{Notice}
+\Clause{R-025 / Power cycle}{Repeat the startup qualification after electrical reset. Controller reset does not release mechanical latches, remove rotor momentum or erase retained case and sensor heat. Cycling power must not cause a warm or still-selected machine to restart.}
+\Clause{R-026 / No autonomous recovery}{Do not implement automatic jam retries, reverse kicks, automatic fault resets or restart merely because temperature falls. The available signals do not verify obstruction removal with drive off; clearing an obstruction remains an operator responsibility.}
+\Clause{R-027 / Timing observation}{Record the firmware motor-enable request and PWM enable separately from the downstream hardware-gated enable. Distinguish the time of fault qualification, removal of commanded drive, visible label update and final mechanical coastdown.}
+\vfill\Caption{Temperature limits and recovery rules in this attachment are product decisions. They are not built-in behavior or guaranteed ratings of the MD20, AVT10 or B8.}
+\clearpage
+\Attachment{Attachment A4 / Delivery and bench evidence}{Implementation constraints and evidence required before firmware acceptance.}
+\Clause{R-001 / Controller boundary}{Firmware may use its own headers, approved standard C++ facilities and the B8 SDK. Equipment access must be through B8 registers, interrupts and the supplied access binding. It must not read fixture controls, direct shaft-speed or case-temperature instrumentation, workstation clocks or workstation threads.}
+\Clause{R-012, R-013 / Scheduling and access}{Foreground steps and interrupt handlers must return. Evaluate protection at least every 10 ms. Do not depend on wall-clock sleeping or busy delays outside the target clock service. Observe the B8 rules for timer configuration, byte-pair ownership, interrupt acknowledgment and wrap-safe elapsed time. Coalesced interrupt flags are not an event queue.}
+\Clause{R-028 / Repeatable acceptance}{Pass the nominal and slow-contact-transition cases within the published 5 ms contact envelope, together with bounded, recorded test disturbances. Record randomized-test seeds and configuration. Results must not depend on workstation execution speed. An acceptance case may not demand component behavior outside the supplied interface contract.}
+\Clause{R-029 / Independent evidence}{The fixture's physical drive, thermal and sensor behavior must not perform the firmware's fault decisions. Verify shutdown at firmware-owned outputs as well as the independent STOP gate. An independently removed hardware permission is not proof that the firmware responded.}
+\Clause{R-030 / Return package}{Supply source, a local build command, unit tests and an acceptance report. Include scan qualification, inverse speed mapping, wrap-safe motion estimation, ADC scaling, fault arbitration and rearm tests. Provide traces for the cases below; do not claim firmware acceptance from component-only tests.}
+
+\begin{tabularx}{\linewidth}{@{}p{.34\linewidth} Y@{}}
+\toprule\TableHead Bench case & Required evidence\\\midrule
+Reset with a retained speed & No unintended start; outputs fail off; later command requires full qualification.\\
+Bounce and speed changes & Recognition deadlines; no arbitrary winning speed or false persistent conflict.\\
+STOP with held PULSE & Independent gate and firmware outputs both turn off; no held-through-STOP restart.\\
+All nominal selections & Target error after settling; temporary PULSE boost and restoration.\\
+Cold startup lock / running lock & ST qualification and output-removal deadlines.\\
+Hot rotating motor & TH without requiring loss of motion.\\
+Rail fault / stale acquisition & TS from signal validity or freshness; no invented thermal conclusion.\\
+Multiple causes / recovery & Priority, retained causes, delayed sensor heating and deliberate acknowledgment.\\
+Counter wrap / delayed interrupts & Coherent measurements and bounded progress.\\
+Pixel writes and visible output & Correct modes, fault labels and visible-response timing.\\\bottomrule
+\end{tabularx}
+
+\vfill\Caption{Enhanced graphics, closed-loop speed regulation, alternative peripheral implementations and additional hardware are later work, not prerequisites for this delivery.}
+\clearpage
+\Attachment{Attachment B / Chassis interconnection}{Fixed board configuration for the Blender-8 release. Functional signal assignment, chassis 03.}
+The chassis uses the Northstar B8 controller, TriAxis MX8-1 selector, PixelRiver PX32-16 display, Vortek MD20 drive, ThermaSense AVT10 sensor and Kestrel BA-8 command assembly. This attachment assigns the connections; the supplier documents define the ports.
+\begin{center}
+\begin{tikzpicture}[font=\scriptsize,>=Stealth]
+\node[draw,fill=VendorTint,minimum width=27mm,minimum height=12mm,align=center](m)at(0,0){B8\\controller};
+\node[draw,minimum width=25mm,minimum height=12mm,align=center](mx)at(-4.5,0){MX8-1\\selector};
+\node[draw,minimum width=25mm,minimum height=12mm,align=center](ba)at(-4.5,2){BA-8\\commands};
+\node[draw,minimum width=27mm,minimum height=12mm,align=center](lcd)at(4.5,2){PX32-16\\display};
+\node[draw,minimum width=27mm,minimum height=12mm,align=center](motor)at(4.5,-1){MD20\\motor/driver};
+\node[draw,minimum width=27mm,minimum height=12mm,align=center](temp)at(0,-2.7){AVT10\\case sensor};
+\draw[->](ba)--node[left]{C0--C7}(mx);
+\draw[->](mx.east)--node[above]{Y / PA3}(m.west);
+\draw[->](m.south west)--++(-.3,-.3)-|node[pos=.42,below]{PA0--PA2 / S0--S2}(mx.south);
+\draw[<->](m.north east)--node[above,sloped]{XBUS / VBLANK}(lcd.south west);
+\draw[->](m.east)--node[above,sloped]{PWM / enable gate}(motor.west);
+\draw[->](motor.north)--(4.5,1.0)--(0,1.0)--(m.north);
+\node[above]at(.6,1.02){TACH / PB1};
+\draw[->](ba.east)--(-1.4,2.0)--(-1.4,.65)--(m.north west);
+\node[above]at(-2.3,2.0){STOP\_N / PB2};
+\draw[->](temp)--node[right]{VOUT / AN0}(m);
+\draw[dashed](motor.south)|-node[pos=.7,below]{case attachment}(temp.east);
+\end{tikzpicture}
+\end{center}
+
+\begin{tabularx}{\linewidth}{@{}p{.28\linewidth} Y@{}}
+\toprule\TableHead Board signal & Assigned connection\\\midrule
+PA0, PA1, PA2 & B8 outputs to MX8-1 S0, S1, S2; S0 is least significant.\\
+PA3 & B8 input from MX8-1 Y. Do not enable an opposing GPIO output.\\
+C0--C6 / C7 & BA-8 speed 1--7 / PULSE contacts to X0--X7; active-low with board pull-ups.\\
+PB2 & Dedicated STOP\_N input, separate from the mux.\\
+PB0 & Firmware motor-enable request; board pull-down while the pad is released.\\
+Dedicated PWM & B8 waveform output to MD20 PWM.\\
+PB1 / TACH & MD20 tach signal to the B8 edge counter.\\
+AN0 / AN1 & AVT10 VOUT with board diagnostic pull-up / grounded spare.\\
+XBUS / VBLANK & Display register transactions / display blanking output to B8 blanking-edge input.\\\bottomrule
+\end{tabularx}
+
+\begin{Notice}{INDEPENDENT DRIVER PERMISSION}
+MD20 ENABLE = MOTOR\_SUPPLY\_OK AND PGOOD AND RESET\_RELEASED AND BA-8 RUN\_PERMIT AND PB0. STOP removes hardware permission independently of firmware. Observe the PB0 request, PWM output and downstream ENABLE separately.
+\end{Notice}
+The AVT10 uses the 3.3 V supply and analog return. Its package attaches thermally to the motor case. An open signal connection is pulled high by this board's diagnostic bias; that bias is not an intrinsic sensor output state.
+\vfill\Caption{Attachment B is part of the product brief, not a generic MCU pin-use rule. The next sheet defines the power, reset and clock connections. It is a functional schematic, not a PCB fabrication drawing.}
+\clearpage
+\Attachment{Attachment B2 / Power, reset and clock}{Control chassis revision 03 / functional schematic and circuit ownership.}
+\begin{center}
+\begin{tikzpicture}[font=\scriptsize,>=Stealth,box/.style={draw,minimum height=8mm,align=center}]
+\node[box](j)at(0,0){J1\\24 V DC};
+\node[box,minimum width=10mm](f)at(2,0){};\draw (f.west)--(f.east);\node[above]at(f.north){F1 / input fuse};
+\node[minimum width=14mm,minimum height=8mm](sw)at(4.2,0){};\draw(sw.west)--(3.85,0);\draw(4.55,0)--(sw.east);\draw(3.85,0)--(4.5,.32);\fill(3.85,0)circle(1pt);\fill(4.55,0)circle(1pt);\node[above]at(sw.north){SW1 rear};
+\coordinate(t)at(6,0);
+\node[box](fm)at(7.9,1.5){F2\\motor branch};
+\node[box](mot)at(11.1,1.5){MD20 power\\motor stage};
+\node[box](fl)at(7.9,-.6){F3\\logic branch};
+\node[box](reg)at(11.1,-.6){3.3 V regulator\\logic rail};
+\draw[->](j)--(f);\draw[->](f)--(sw);\draw(sw)--(t);\fill(t)circle(1.5pt);
+\draw[->](t)|-(fm);\draw[->](fm)--(mot);\draw[->](t)|-(fl);\draw[->](fl)--(reg);
+\node[box](sup)at(11.1,-2.5){Supply / switch\\qualification};\draw[->](reg)--(sup);
+\draw[->,dashed](sw.south)--(4.2,-2.5)--node[above]{auxiliary inhibit / reset}(sup.west);
+\node[box](logic)at(3.2,-4.5){B8 / MX8-1 / PX32-16\\AVT10 / contact pull-ups};
+\draw[->](reg.east)--(12.6,-.6)--(12.6,-3.5)--(3.2,-3.5)--node[left]{3.3 V}(logic.north);
+\node[box](xo)at(8.0,-4.5){XO8-33\\OE = PGOOD};
+\draw[->](sup.south)--(11.1,-3.8)--(8,-3.8)--(xo.north);
+\draw[->](xo.west)--node[above]{OUT to B8 CLKIN}(logic.east);
+\draw[->,dashed](sup.west)--(5.5,-2.5)--(5.5,-3.9)--(logic.north east);
+\node[align=center]at(6.7,-2.9){PGOOD / reset hold};
+\end{tikzpicture}
+\end{center}
+\textbf{Return paths:} J1 return is the DC reference. Motor current returns directly to the power-entry return; logic and analog returns join there through a separate branch. No fuse is inserted in the common return. Protective earth and mains wiring are outside this DC chassis interface.
+
+\begin{tabularx}{\linewidth}{@{}p{.29\linewidth}Y@{}}
+\toprule\TableHead Circuit / signal & Defined behavior or connection\\\midrule
+Rear SW1 & Contact transition envelope 5 ms. Opening removes the independent motor request path without waiting for firmware. Auxiliary qualification asserts reset during interrupted make.\\
+3.3 V qualification & Assert reset below 2.9 V or on lost switch/logic supply. Release only after at least 10 ms continuously at or above 3.0 V, followed by the B8's 1 ms local reset hold.\\
+Nominal rail profile & 20 ms zero-to-3.3 V rise and 5 ms discharge; motor branch can remain live during a logic brownout. These are rail-profile values, not software delays.\\
+Clock / bypass & XO8-33 supply from 3.3 V; OE driven by PGOOD; OUT to B8 CLKIN; local 100 nF bypass. No other component clock input is tied to this net.\\
+Local timing & LCD scanout and mux settling retain their own timing. CLKOUT test-point loading is included in the clock-load budget.\\
+Enable pull-down & PB0 released level is low. Gate output is low unless all permissions in B1 are true.\\\bottomrule
+\end{tabularx}
+
+\textbf{Fusing:} F1 protects the incoming distribution; F2 the motor branch; F3 the regulator/logic branch. CLKIN, control signals and contact sense lines have no series fuses. Fuse current, voltage, interrupt rating and time-current curves require the final supply, conductor, inrush and fault-current study; values are not released by this functional drawing. A fuse is not stall supervision or firmware execution supervision.
+\vfill\Caption{Board layout release must add connector cavities, copper geometry, regulator/current ratings, decoupling and suppression detail. Operate a hardware bench only from an appropriately limited, isolated DC source and a guarded low-energy load.}
+\clearpage
+\Attachment{Attachment C1 / Clock and startup acceptance}{R-031 through R-035 / select a legal plan; demonstrate the timing.}
+\Clause{R-031 / Clock plan}{Use the supplied XO8-33 as the run-time source through the B8 EC/PLL path. Select legal PLL input division, multiplication, output division and peripheral division. Nominal SYSCLK may be 8--32 MHz. The run peripheral clock shall be 1.000 MHz within $\pm0.1\%$. Do not copy a prescribed register tuple: submit the derived frequency of every clock-tree node and proof that each is inside its operating range.}
+\Clause{R-032 / Timing evidence}{Derive both timer periods, the PWM carrier, ADC acquisition/conversion times, watchdog bounds and the deadman window from their actual source clocks. The required PWM carrier is 3,906.25 Hz within $\pm0.1\%$. Preserve the acquisition and product-response requirements in Attachment A. Include oscillator tolerance, independent LFRC tolerance and register quantization in the margin calculation. Equal frequency does not imply phase alignment.}
+\Clause{R-033 / Bounded startup}{Keep all drive requests off through power qualification, reset release, external-clock startup and PLL switching. Establish and verify the active run clock within 100 ms of the first reset-entry execution with a healthy supplied oscillator. A source that fails to qualify must leave the drive disabled; there must be no unbounded wait that evades watchdog service policy. Internal FRC is permitted for startup and fault reporting, not normal drive operation.}
+\Clause{R-034 / Clock loss}{A loss of the active external source must result in drive inhibition within 1 ms of continuous absence. Read and retain the reset cause on restart. Recovered clock edges do not authorize an automatic restart. Show that mux delay, display timing, motor inertia and thermal evolution have not accidentally been rescaled with the processor clock.}
+\Clause{R-035 / Power and reset}{Opening SW1 or losing qualified logic power must inhibit drive independently of firmware. On any new execution after POR, brownout, external reset, WDT, DMT or clock-fail reset, discard stale command authorization and apply the startup/rearm criteria again. Retain physical button latches, case heat and shaft momentum as external state. A warm B8 reset does not guarantee LCD reset: reinitialize its interface explicitly.}
+\section*{Required calculation sheet}
+Record oscillator part and frequency; $P$, $M$, $Q$, $B$; PLL reference, VCO, SYSCLK and PBCLK; each compare/prescaler pair; ADC divider; WDT source/code with fastest and slowest timeout; DMT count/window with clock tolerance; and maximum expected service gaps. Give at least one rejected clock plan and the violated range.
+\vfill\Caption{The clock plan is part of the firmware design submission. This attachment fixes the board source and acceptance envelope, not the implementation tuple or scheduler architecture.}
+\clearpage
+\Attachment{Attachment C2 / Execution supervision}{R-036 through R-040 / independent elapsed time and qualified progress.}
+\Clause{R-036 / Independent watchdog}{Keep the fused-on watchdog enabled. Select a period whose slowest permitted timeout does not exceed 250 ms; lock the configuration before permitting drive. Service only after checking that required application work is current. No unconditional service in a timer ISR, idle loop, clock-wait loop or display poll is acceptable. Include startup and faulted operation in the service design.}
+\Clause{R-037 / Progress evidence}{Authorize service using new evidence from command acquisition, completed temperature acquisition, protection evaluation and output-state application. One full supervisory epoch must not be counted twice. A timer interrupt firing is not evidence that foreground work finished. Explain which failure each monitored milestone reveals and how stale or missing evidence blocks renewal.}
+\Clause{R-038 / Windowed deadman}{Enable and lock DMT after the run clock is established and before permitting drive. Choose a window and maximum count giving no more than 100 ms to expiry at the slowest approved run clock. Service within the published window after the required work completes. Demonstrate early service, missing first key, repeated first key, late second key and missing renewal. The independent watchdog remains required when the core or main clock stops.}
+\Clause{R-039 / Reset indication and recovery}{After WDT or DMT reset, display WD or DM; after clock-fail reset or failed source qualification display CK. These new latched reasons rank CK, WD, DM ahead of TS, TH, IF and ST. Capture all reset-cause bits before acknowledging them. These diagnostic latches clear only after the same cooling, new STOP acknowledgment, released-control and fresh-command sequence in A3. While held in reset, no immediate display update is assumed; after reset release show the diagnostic within 100 ms.}
+\Clause{R-040 / Reliability acceptance}{Return traces for absent oscillator, worst-case startup, legal and illegal PLL plans, masked interrupts, stalled foreground with live tick ISR, uncontrolled feed loop, genuine core halt, clock failure during drive, warm reset inside an ISR, switch bounce, brownout with the motor rail still energized, and each fused branch open. Distinguish hardware tests from completed-firmware acceptance. A reset, or an exception caught by the host, is not evidence of correct rearm by itself.}
+\begin{Notice}{REVIEW EXPECTATION}
+A watchdog is not permission to ignore a failed task for the whole watchdog interval. Normal protection still uses the tighter deadlines in Attachment A. The windowed service mechanism observes keys and timing; your progress checks must give those keys meaning.
+\end{Notice}
+\vfill\Caption{WDT is the first reliability milestone; DMT is the subsequent window/sequencing milestone. Both are required for this release's final reliability acceptance. No operator-held deadman control is added to the product.}
+\end{document}

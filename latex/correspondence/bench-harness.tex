@@ -1,0 +1,55 @@
+\DrawingTitle{bench-harness-r4.pdf}{harness}
+{\small Functional signal assignment / chassis 04.}\par
+The chassis uses the Northstar B8 controller, TriAxis MX8-1 selector, PixelRiver PX32-16 display, Vortek MD20 drive, ThermaSense AVT10 sensor and Kestrel BA-8 command assembly. This attachment assigns the connections; the supplier documents define the ports.
+\begin{center}
+\begin{tikzpicture}[font=\scriptsize,>=Stealth]
+\node[draw,fill=black!4,minimum width=27mm,minimum height=12mm,align=center](m)at(0,0){B8\\controller};
+\node[draw,minimum width=25mm,minimum height=12mm,align=center](mx)at(-4.5,0){MX8-1\\selector};
+\node[draw,minimum width=25mm,minimum height=12mm,align=center](ba)at(-4.5,2){BA-8\\commands};
+\node[draw,minimum width=27mm,minimum height=12mm,align=center](lcd)at(4.5,2){PX32-16\\display};
+\node[draw,minimum width=27mm,minimum height=12mm,align=center](motor)at(4.5,-1){MD20\\motor/driver};
+\node[draw,minimum width=27mm,minimum height=12mm,align=center](temp)at(0,-2.7){AVT10\\case sensor};
+\draw[->](ba)--node[left]{C0--C7}(mx);
+\draw[->](mx.east)--node[above]{Y / PA3}(m.west);
+\draw[->](m.south west)--++(-.3,-.3)-|node[pos=.42,below]{PA0--PA2 / S0--S2}(mx.south);
+\draw[<->](m.north east)--node[above,sloped]{XBUS / VBLANK}(lcd.south west);
+\draw[->](m.east)--node[above,sloped]{PWM}(motor.west);
+\draw[->](motor.north)--(4.5,1.0)--(0,1.0)--(m.north);
+\node[above]at(.6,1.02){TACH / PB1};
+\draw[->](ba.east)--(-1.4,2.0)--(-1.4,.65)--(m.north west);
+\node[above]at(-2.3,2.0){STOP\_N / PB2};
+\draw[->](temp)--node[right]{VOUT / AN0}(m);
+\draw[dashed](motor.south)|-node[pos=.7,below]{case attachment}(temp.east);
+\node[draw,minimum width=25mm,minimum height=11mm,align=center](jar)at(-4.5,-2.7){S2 jar loop\\U\_IL dropout latch};
+\draw[->](jar.east)--(-2,-2.7)--(-2,-1.0)--node[above,sloped]{PB3 / PB4}(m.south west);
+\node[draw,minimum width=26mm,minimum height=8mm,align=center](gate)at(4.5,-4.15){AND permission gate};
+\draw[->](jar.south)--(-4.5,-4.15)--node[above]{JAR\_OK + JAR\_PERMIT / independent path}(gate.west);
+\draw[->](gate.east)--(6.3,-4.15)--(6.3,-1.0)--node[above]{ENABLE}(motor.east);
+\draw[->](4.5,-5.0)--node[right]{PB0 + other permissions listed below}(gate.south);
+
+
+\end{tikzpicture}
+\end{center}
+
+\begin{tabularx}{\linewidth}{@{}p{.28\linewidth} Y@{}}
+\toprule Board signal & Assigned connection\\\midrule
+PA0, PA1, PA2 & B8 outputs to MX8-1 S0, S1, S2; S0 is least significant.\\
+PA3 & B8 input from MX8-1 Y. Do not enable an opposing GPIO output.\\
+C0--C6 / C7 & BA-8 speed 1--7 / PULSE contacts to X0--X7; active-low with board pull-ups.\\
+PB3 / PB4 & JAR\_OK raw loop / JAR\_PERMIT latched permission, both inputs.\\
+PB2 & Dedicated STOP\_N input, separate from the mux.\\
+PB0 & Firmware motor-enable request; board pull-down while the pad is released.\\
+Dedicated PWM & B8 waveform output to MD20 PWM.\\
+PB1 / TACH & MD20 tach signal to the B8 edge counter.\\
+AN0 / AN1 & AVT10 VOUT with board diagnostic pull-up / grounded spare.\\
+XBUS / VBLANK & Display register transactions / display blanking output to B8 blanking-edge input.\\\bottomrule
+\end{tabularx}
+
+\medskip\textbf{Independent driver permission}\par\small
+MD20 ENABLE = MOTOR\_SUPPLY\_OK AND PGOOD AND RESET\_RELEASED AND BA-8 RUN\_PERMIT AND JAR\_OK AND JAR\_PERMIT AND PB0. STOP and the jar loop remove permission independently of firmware. Observe the PB0 request, PWM output and downstream ENABLE separately.
+\normalsize\par\medskip
+\textbf{Jar-loop interface / S2 and U\_IL}\par
+{\small The S2 loop is closed only when the jug is fully seated and locked. Opening or a broken lead pulls JAR\_OK low and clears U\_IL within 1 ms. JAR\_PERMIT is its latched output: a new STOP assertion may set it only after 20 ms continuously closed. Reset/power loss clears it; opening dominates setting. STOP already held when closure qualifies does not set it. Contact transitions may bounce for 5 ms; every opening drops permission. This is a low-energy control circuit, not a series motor-current switch.}\par\medskip
+
+The AVT10 uses the 3.3 V supply and analog return. Its package attaches thermally to the motor case. An open signal connection is pulled high by this board's diagnostic bias; that bias is not an intrinsic sensor output state.
+\vfill\small{r4 supersedes the two r3 drawings mentioned in the clock email. Functional schematic, not a PCB fabrication drawing. Supply and reset details are on rear-switch-r4.pdf.}

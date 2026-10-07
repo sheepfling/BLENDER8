@@ -1,0 +1,32 @@
+schema_version = 2
+name = "shop_copy"
+generation_depth = 2
+copier_id = "kestrel-workshop-01"
+[placement]
+rotation_deg = { min = -0.9, max = 0.9 }
+translate_x_mm = { min = -1.8, max = 1.8 }
+translate_y_mm = { min = -2.2, max = 2.2 }
+shear_deg = { min = -0.10, max = 0.10 }
+inset_mm = 1.0
+[vignette]
+strength = { min = 0.09, max = 0.17 }
+width_mm = { min = 4.0, max = 11.0 }
+edge = "left"
+corner_strength = 0.09
+[streaks]
+horizontal = { min = 1, max = 3 }
+vertical = { min = 1, max = 2 }
+opacity = { min = 0.04, max = 0.12 }
+roller_opacity = 0.014
+[paper]
+monochrome = false
+rgb = [249, 244, 233]
+bed_rgb = [231, 229, 218]
+[handling]
+coffee = true
+fold = true
+staple = true
+stage = "before_copy"
+stamp = "BENCH COPY / RETURN"
+[protection]
+max_delta = 0.11

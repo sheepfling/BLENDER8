@@ -1,0 +1,8 @@
+{
+  "fresh_extraction": true,
+  "python_tests_passed": 203,
+  "python_skipped": 0,
+  "ctest_passed": 116,
+  "b8_latex_rebuild_in_new_directory": true,
+  "b8_clean_sha256_matches": true
+}

@@ -1,0 +1,52 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{datasheet-core}[2026/10/06 Supplier technical document system]
+\RequirePackage[T1]{fontenc}
+\RequirePackage{lmodern}
+\RequirePackage[letterpaper,left=18mm,right=16mm,top=18mm,bottom=19mm,headheight=13pt,headsep=7mm,footskip=9mm]{geometry}
+\RequirePackage[table]{xcolor}
+\RequirePackage{graphicx,tikz,tabularx,booktabs,array,amsmath}
+\usetikzlibrary{arrows.meta,calc,positioning,patterns}
+\RequirePackage{fancyhdr,lastpage,titlesec,microtype,enumitem,tcolorbox}
+\RequirePackage[hidelinks,pdfencoding=auto]{hyperref}
+\ifdefined\pdfinfoomitdate\pdfinfoomitdate=1\fi
+\ifdefined\pdftrailerid\pdftrailerid{}\fi
+\ifdefined\pdfsuppressptexinfo\pdfsuppressptexinfo=15\fi
+\definecolor{VendorInk}{HTML}{171717}
+\definecolor{VendorTint}{HTML}{EFEFEF}
+\definecolor{Muted}{HTML}{555555}
+\newcommand{\VendorName}{Component Division}
+\newcommand{\VendorDivision}{COMPONENT DATA}
+\newcommand{\DocID}{STYLE PROOF}
+\newcommand{\DocRev}{P3}
+\newcommand{\RunningPart}{MX8-1}
+\newcommand{\VendorWordmark}{{\sffamily\bfseries\Large\VendorName}}
+\newcommand{\VendorMark}{\tikz[baseline=-0.5ex]{\draw[fill=VendorInk] (0,0) rectangle (.28,.28);}}
+\newcommand{\VendorMasthead}{%
+  \noindent\begin{minipage}[c]{.69\linewidth}\color{VendorInk}\VendorMark\hspace{.6em}\VendorWordmark\end{minipage}\hfill
+  \begin{minipage}[c]{.28\linewidth}\raggedleft\scriptsize\sffamily\VendorDivision\\[2pt]\textbf{\DocID}\end{minipage}\par
+  \vspace{7pt}{\color{VendorInk}\hrule height 1.5pt}\vspace{10pt}}
+\newcommand{\VendorTitle}[3]{\VendorMasthead{\color{VendorInk}\sffamily\bfseries\fontsize{25}{27}\selectfont #1\par}\vspace{4pt}{\sffamily\bfseries\large #2\par}\vspace{5pt}{\small\color{Muted}#3\par}\vspace{10pt}}
+\newcommand{\MetaStrip}[1]{\noindent\colorbox{VendorTint}{\parbox{\dimexpr\linewidth-2\fboxsep\relax}{\sffamily\scriptsize\strut #1\strut}}\par\vspace{7pt}}
+\newcommand{\Continuation}[2]{\VendorMasthead{\sffamily\bfseries\fontsize{19}{21}\selectfont\color{VendorInk}#1\par}\vspace{4pt}{\small\color{Muted}#2\par}\vspace{10pt}}
+\newenvironment{Notice}[1]{\begin{tcolorbox}[colback=VendorTint,colframe=VendorInk,boxrule=.45pt,arc=0pt,left=7pt,right=7pt,top=5pt,bottom=5pt]\sffamily\small\textbf{#1}\par\vspace{2pt}}{\end{tcolorbox}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\TableHead}{\rowcolor{VendorTint}}
+\newcommand{\Signal}[1]{\texttt{#1}}
+\newcommand{\Caption}[1]{\par\vspace{4pt}{\scriptsize\sffamily\color{Muted}#1\par}}
+\titleformat{\section}{\sffamily\bfseries\normalsize\color{VendorInk}}{\thesection}{.6em}{}
+\titlespacing*{\section}{0pt}{11pt}{5pt}
+\titleformat{\subsection}{\sffamily\bfseries\small\color{VendorInk}}{}{0pt}{}
+\titlespacing*{\subsection}{0pt}{7pt}{3pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.20}
+\setlist[itemize]{leftmargin=1.2em,itemsep=2pt,topsep=3pt,parsep=0pt}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\sffamily\scriptsize\color{Muted}\VendorName}
+\fancyhead[R]{\sffamily\scriptsize\RunningPart\enspace /\enspace\DocID\enspace /\enspace\DocRev}
+\fancyfoot[L]{\sffamily\tiny\VendorName\quad\textbullet\quad TECHNICAL DOCUMENTATION\quad\textbullet\quad ISSUE \DocRev}
+\fancyfoot[R]{\sffamily\scriptsize\thepage\,/\,\pageref*{LastPage}}
+\renewcommand{\headrulewidth}{.3pt}
+\renewcommand{\footrulewidth}{.3pt}
+\AtBeginDocument{\hypersetup{pdfauthor={\VendorName},pdfsubject={\DocID\space / \RunningPart\space / Issue \DocRev}}}

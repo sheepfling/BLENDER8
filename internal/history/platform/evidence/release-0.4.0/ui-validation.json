@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "pixel_probe_lit_pixels": 60,
+  "javascript_errors": [],
+  "browser": "system Chromium / Playwright",
+  "viewport": [
+    1440,
+    1120
+  ],
+  "mode": "in-memory HTML plus native command bridge; HTTP server independently tested. Managed Chromium URL blocklist prevented localhost navigation."
+}

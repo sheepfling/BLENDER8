@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "compilation": [
+    {
+      "directory": "/mnt/data/b8-custom",
+      "command": "/usr/bin/c++ -I/mnt/data/b8-work/HalfALabs-Blender8/reference-platform/examples/pixel_probe -I/mnt/data/b8-work/HalfALabs-Blender8/reference-platform/sdk/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -o CMakeFiles/student_firmware.dir/examples/pixel_probe/firmware.cpp.o -c /mnt/data/b8-work/HalfALabs-Blender8/reference-platform/examples/pixel_probe/firmware.cpp",
+      "file": "/mnt/data/b8-work/HalfALabs-Blender8/reference-platform/examples/pixel_probe/firmware.cpp",
+      "output": "CMakeFiles/student_firmware.dir/examples/pixel_probe/firmware.cpp.o"
+    }
+  ],
+  "lit_pixels": 60,
+  "drive_enabled": false
+}

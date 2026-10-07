@@ -1,0 +1,299 @@
+\documentclass[10pt]{article}
+\usepackage{vendor-northstar}
+\renewcommand{\DocID}{B16-004}
+\renewcommand{\DocRev}{P1}
+\renewcommand{\RunningPart}{B16}
+\hypersetup{pdftitle={Northstar B8/B16 / arithmetic and peripheral follow-on manual}}
+\newcommand{\NextSheet}[2]{\clearpage\Continuation{#1}{#2}}
+\begin{document}
+\VendorTitle{B8 / B16}{Arithmetic and peripheral follow-on manual}{B8 numeric profile / B16 peripheral interface 04 / supplement to the B8 interface 03 manual}
+\MetaStrip{B16-004\hfill ISSUE P1\hfill 07 OCT 2026}
+\section*{Device selection and scope}
+The family has two choices: B8 with eight-bit integer arithmetic, and B16 with eight/sixteen-bit integer arithmetic plus a binary32 floating-point unit. B16 also adds a byte-wide direct memory access controller, 1 KiB of addressable data SRAM, and constrained peripheral pin selection. It retains the B8 clock tree, timers, ADC, PWM, edge counter, external byte bridge, watchdog and deadman timer.
+
+Read SYS\_ID, then SYS\_REV before using an extension address. B8 returns B8h/03h; B16 returns 16h/04h. On B16, SYS\_CAPS at 0005h reads 0Fh: bit 0 = SRAM, bit 1 = DMAC, bit 2 = pin selection, bit 3 = binary32 FPU. Bits 7:4 read zero. Do not probe SYS\_CAPS on B8.
+\begin{center}
+\begin{tikzpicture}[font=\small,>=Stealth,box/.style={draw=VendorInk,fill=VendorTint,align=center,minimum height=11mm}]
+\node[box](cpu)at(0,1.1){C++ service\\binding};
+\node[box](ram)at(4.0,1.1){1 KiB SRAM\\1000h--13FFh};
+\node[box](dma)at(4.0,-.8){One-channel DMAC\\byte cells / paced};
+\node[box](xb)at(9.2,-.8){External byte bridge\\fixed destination};
+\draw[<->](cpu)--(ram);\draw[<->](ram)--(dma);\draw[->](dma)--(xb);
+\draw[->](dma.west)--++(-1.5,0)|-(cpu.south);
+\node[font=\scriptsize,anchor=east] at (.9,-.1){status / IRQ};
+\end{tikzpicture}
+\end{center}
+\par
+\begin{tabularx}{\linewidth}{@{}l Y@{}}
+\toprule\TableHead Capability & Interface-04 contract\\\midrule
+Arithmetic & Eight/sixteen-bit integers and binary32; no double or wider integer scalar.\\
+Transfer paths & SRAM to SRAM; SRAM to the selected external register.\\
+Transfer unit & One eight-bit byte per cell; one job at a time.\\
+Addressing & Independent fixed/incrementing source and destination.\\
+Requests & Software-paced block, timer-0 cell request, external DREQ cell request, or external VBLANK block start.\\
+Notification & Completion, error and abort causes; optional shared DMAC interrupt.\\
+Pin functions & Separate direction, analog-input selection and legal digital routes.\\\bottomrule
+\end{tabularx}
+\par
+\begin{Notice}{VARIANT BOUNDARY}
+The original 62 register addresses remain assigned. Identity, the sixth interrupt source, ADC pad qualification and selectable PWM/input paths differ on B16. B8 firmware must not assume that its fixed peripheral connections exist on B16. DMA is optional; CPU-driven transfers remain available. Neither device has a 32-bit integer ALU or a binary64 unit.
+\end{Notice}
+\vfill\Caption{Logical pad names and register addresses are defined here. Package lead numbers, production electrical ratings and instruction timing are not assigned by this publication.}
+
+\NextSheet{Two arithmetic profiles}{Core arithmetic width is distinct from peripheral counter width and address encoding.}
+\par
+\begin{tabularx}{\linewidth}{@{}l Y Y@{}}
+\toprule\TableHead Capability & B8 / interface 03 & B16 / interface 04\\\midrule
+Integer scalar data & Signed and unsigned eight-bit. & Signed and unsigned eight- and sixteen-bit.\\
+Floating-point scalar & None in the firmware profile. & IEEE 754 binary32, C++ float only.\\
+Double / long double & Forbidden. & Forbidden, even if a compiler makes double 32 bits.\\
+Integer wider than 16 bits & No native support; forbidden scalar. & No native support; forbidden scalar.\\
+Sixteen-bit peripheral values & Explicit low/high byte handling. & Low/high bus access; word arithmetic available.\\
+Transfer width & Eight-bit register transactions. & Eight-bit register transactions and DMA cells.\\
+Expanded peripherals & Base fixed connections. & SRAM, DMAC, pin selection and FPU.\\\bottomrule
+\end{tabularx}
+\par
+For B8, sixteen-bit integer scalars are also outside the profile. Four-byte float storage on B16 is the explicit floating-point exception; it does not authorize a four-byte integer. Both signed and unsigned 32-, 64- and 128-bit integer types are excluded. A record, image or byte array may occupy more than two bytes without being a wider integer scalar.
+\section*{Integer results and exceptional cases}
+Unsigned ranges are 0--255 and, on B16, 0--65,535. Signed ranges are $-128$--127 and $-32,768$--32,767 in two's complement. Width-preserving add, subtract and multiply retain the low eight or sixteen result bits. Thus unsigned byte 255 + 1 gives 0; signed byte 127 + 1 gives $-128$. A word multiplication does not return a hidden 32-bit product.
+
+The numeric binding's division returns quotient, remainder, divide-by-zero and overflow fields. Division truncates toward zero. A zero divisor returns zero quotient and remainder with divide-by-zero set. Signed minimum divided by $-1$ returns the signed minimum, remainder zero and overflow set. No C++ exception is used for these cases.
+
+Binding shifts operate on the stored bit pattern. Right shift is logical, including a signed operand. A count at least as large as the operand width returns zero. Signed comparisons use signed ordering; unsigned comparisons use unsigned ordering. Test exceptional flags before consuming a division result.
+\begin{Notice}{WIDER PERIPHERALS DO NOT ENLARGE THE ALU}
+B8's 10-bit ADC result and 16-bit timers remain valid. Use separate byte values, explicit carry/borrow and the documented low/high transaction order. Register-address enums and function pointers are transport/ABI values, not permission for wider data arithmetic.
+\end{Notice}
+\vfill\Caption{These profiles constrain accepted firmware scalar operations. Algorithms can represent larger quantities with several bytes; that is software composition, not an additional native integer instruction.}
+
+\NextSheet{Binary32 and the C++ binding}{B16 permits float. B8 permits no floating-point scalar or expression.}
+B16's floating-point format has one sign bit, eight exponent bits and 23 stored fraction bits, with 24 bits of precision for normal values. Basic addition, subtraction, multiplication, division and comparisons use binary32 operands/results. Round to nearest, ties to even; preserve signed zeros and subnormal values. Infinities and NaNs follow the IEEE arithmetic rules. Comparisons involving a NaN are unordered, except inequality is true.
+
+Every eight- and sixteen-bit integer is exactly representable in binary32. The reverse conversion need not be valid: check finiteness, range and the intended rounding rule before converting a float to an integer. Do not rely on an out-of-range C++ cast to clamp or wrap. No binary64 arithmetic or 32-bit integer conversion destination is provided.
+\section*{Literals and intermediate types}
+Use a suffix such as 1.25f for a float literal. An unsuffixed 1.25 is double and is rejected by both profiles. Variadic calls can promote float to double; a final cast does not erase the unsupported intermediate operation.
+
+C++ promotes ordinary small integer arithmetic to int. On a native or WebAssembly host that is commonly a wider type. Declaring an eight-bit destination does not make an expression such as a + b an eight-bit operation. Use the width-preserving numeric binding for arithmetic, bit operations, shifts and comparisons when the built-in operation would promote its operands.
+\begin{Notice}{BINDING EXAMPLE}
+\textsf{std::uint8\_t a = 250, b = 10;}\par
+\textsf{a = b8::numeric::add(a, b);}\par
+The result is an eight-bit 4. On B16, the same helper family also accepts sixteen-bit arguments. Both operands must have the intended matching type. Floating-point expressions on B16 use float operands and float literals throughout.
+\end{Notice}
+\section*{Build contract and scope}
+Select the B8 or B16 numeric profile before checking firmware. The checker inspects semantic declaration and expression types, including aliases, inferred types, casts, macro expansions and promoted intermediates. Firmware headers are included. Byte arrays and structural compile-time metadata are not wider scalar arithmetic. The paired \texttt{access.hpp} helpers return sixteen-bit data and are consequently B16-only under this policy; B8 uses explicit \texttt{read8}/\texttt{write8} transactions.
+
+The binding and its libraries may use wider host intermediates to implement a defined byte/word result. This does not assign those types to firmware. Source checks are not a security barrier or proof that a byte-array algorithm never emulates another numeric format. FPU exception registers, traps and instruction latency are not assigned here. A concrete target binding must qualify binary32 behavior and execution timing separately; ordinary C++ arithmetic between service calls has no assigned B8/B16 instruction time.
+\vfill\Caption{The numeric profile is a language/binding contract, not a claim that a host executable is executing a B8/B16 instruction set. The byte-wide peripheral service contract remains in force.}
+
+\NextSheet{Pad-function matrix}{Legal combinations are constrained by the device, not chosen arbitrarily at run time.}
+\MetaStrip{PA/PB = LOGICAL PAD NAMES\hfill GPIO DIR: 0 INPUT / 1 OUTPUT}
+\par
+\begin{tabularx}{\linewidth}{@{}l l Y@{}}
+\toprule\TableHead Pad & Fixed analog function & Selectable digital function in addition to GPIO\\\midrule
+PA0 & -- & None.\\
+PA1 & -- & None.\\
+PA2 & -- & None.\\
+PA3 & -- & None.\\
+PA4 & AN0 & PWM output, route code 1.\\
+PA5 & AN1 & TACH input, route code 2.\\
+PA6 & -- & DREQ input, route code 1.\\
+PA7 & -- & VBLANK input, route code 2.\\
+PB0 & -- & None.\\
+PB1 & -- & TACH input, route code 1.\\
+PB2 & -- & None.\\
+PB3 & -- & None.\\
+PB4 & -- & None.\\
+PB5 & -- & PWM output, route code 2.\\
+PB6 & -- & VBLANK input, route code 1.\\
+PB7 & -- & DREQ input, route code 2.\\\bottomrule
+\end{tabularx}
+\par
+\section*{Three independent decisions}
+GPIOA\_DIR and GPIOB\_DIR select digital driver direction. The OUT latch is distinct from sampled IN. An unused pad should have a deliberate direction and an external bias appropriate to its wiring.
+
+ANSELA bits 4 and 5 enable the fixed AN0 and AN1 input paths. Reset is 30h. Other bits read zero and ignore writes. An analog-selected pad reads zero in GPIOA\_IN; its digital input buffer is disabled. ANSEL does not move an ADC channel to another pad, and does not by itself clear GPIO DIR or the OUT latch.
+
+Peripheral route registers choose one legal digital pad per function. Code zero disconnects the function. Digital inputs require DIR = 0 and ANSEL = 0. PWM requires DIR = 1 and ANSEL = 0; the peripheral then owns the pad driver instead of OUT. An enabled PWM with no route has no pad output. There is no dedicated legacy PWM connection on B16.
+\begin{Notice}{ANALOG INPUT IS NOT DIGITAL OUTPUT CONFIGURATION}
+For ADC use, set the associated DIR bit to input and set ANSEL. A START with either condition false sets ADC STATUS.ERROR and starts no conversion. An output driver on an analog-wired pad can contend with external circuitry; pin selection is not electrical isolation.
+\end{Notice}
+\vfill\Caption{DMAC transfers are internal bus operations. DREQ is an optional external request input; there are no general-purpose ``DMA data pins.'' XBUS remains a separate peripheral interface.}
+
+\NextSheet{Pin-selection registers and startup}{Configure inactive peripherals, select legal pads, then lock the routing.}
+\par
+\begin{tabularx}{\linewidth}{@{}l l l l Y@{}}
+\toprule\TableHead Address & Register & Access & Reset & Meaning\\\midrule
+0023h & ANSELA & RW & 30h & Analog enable on PA4/PA5 only.\\
+00E8h & PIN\_KEY & W & 00h & Consecutive 5Ah, A5h unlock sequence.\\
+00E9h & PIN\_LOCK & R/W1S & 01h & Bit 0: routing locked. Write 1 to lock.\\
+00EAh & PIN\_STATUS & R/W1C & 00h & Illegal selection, live change, locked write.\\
+00EBh & PWM\_ROUTE & RW & 00h & 0 off; 1 PA4; 2 PB5.\\
+00ECh & TACH\_ROUTE & RW & 00h & 0 off; 1 PB1; 2 PA5.\\
+00EDh & VBLANK\_ROUTE & RW & 00h & 0 off; 1 PB6; 2 PA7.\\
+00EEh & DREQ\_ROUTE & RW & 00h & 0 off; 1 PA6; 2 PB7.\\\bottomrule
+\end{tabularx}
+\par
+PIN\_KEY reads zero. A register transaction between the two keys cancels the sequence; ordinary peripheral time progression does not. An invalid key does not unlock routing. Unlock is accepted only while PWM is disabled, ADC is disabled, and DMAC is idle. A later valid sequence may unlock again; there is no one-time fuse in this interface.
+
+PIN\_STATUS bit 0 marks an unsupported code or incompatible direction/analog setting; bit 1 marks a forbidden live change; bit 2 marks a write while locked. Only bits 2:0 are implemented. A rejected write leaves the old value unchanged. Write only the causes being acknowledged. Pin errors have no interrupt source.
+
+ANSELA, route registers and DIR changes affecting a selected peripheral require an unlocked, quiescent pin configuration. These checks do not apply to unrelated ordinary GPIO bits. Enabling PWM or ADC, or starting DMA, with PIN\_LOCK = 0 is rejected; PIN\_STATUS bit 1 is set. DMA additionally reports CONFIG error. ADC reports ERROR; PWM remains disabled.
+\section*{Example configuration order}
+\begin{enumerate}[leftmargin=1.5em,itemsep=3pt]
+\item Leave PWM, ADC and DMAC inactive. Mask interrupts around the key pair.
+\item Write PIN\_KEY = 5Ah followed immediately by A5h; verify PIN\_LOCK reads zero.
+\item Establish output latch values before enabling digital drivers.
+\item Set pad directions and ANSELA. For example, AN0 on PA4 can coexist with PWM on PB5 and TACH on PB1.
+\item Write the desired legal route codes. Clear and check PIN\_STATUS deliberately.
+\item Write PIN\_LOCK = 01h, verify it, then enable the required peripherals.
+\end{enumerate}
+Selecting a new TACH, VBLANK or DREQ input initializes its remembered level to the current pad level. Remapping a high input does not manufacture a rising edge. Subsequent edges are observed at one-microsecond service boundaries, as with the base edge counter; transitions between observations can be missed.
+\vfill\Caption{Pin selection changes internal routing. External board wires do not move when a route register changes. Consult the board connection drawing separately.}
+
+\NextSheet{SRAM and DMAC register map}{All addresses are device addresses; none is a native pointer or a WebAssembly pointer.}
+\MetaStrip{SRAM: 1000h--13FFh\hfill BYTE ACCESS\hfill ONE CHANNEL}
+SRAM occupies 1,024 bytes. CPU byte accesses use the same ordered service-transaction model as registers. Out-of-range addresses do not alias or wrap into SRAM. POR and brownout clear SRAM; watchdog, deadman and software resets retain it. SRAM is the only DMA source region. Destinations are SRAM or XBUS\_DATA at 0081h; other peripheral destinations are unsupported.
+\begingroup\small\renewcommand{\arraystretch}{1.10}
+\par
+\begin{tabularx}{\linewidth}{@{}l l l l Y@{}}
+\toprule\TableHead Address & Register & Access & Reset & Meaning\\\midrule
+00D0h & DMA\_CMD & W & 00h & Bit 0 START; bit 1 ABORT; self-clearing strobes.\\
+00D1h & DMA\_CONFIG & RW & 01h & Bit 0 SRC\_INC; bit 1 DST\_INC.\\
+00D2h & DMA\_SRC\_LO & RW & 00h & Source address, staged low byte.\\
+00D3h & DMA\_SRC\_HI & RW & 00h & Commit source address.\\
+00D4h & DMA\_DST\_LO & RW & 00h & Destination address, staged low byte.\\
+00D5h & DMA\_DST\_HI & RW & 00h & Commit destination address.\\
+00D6h & DMA\_LEN\_LO & RW & 00h & Transfer length, staged low byte.\\
+00D7h & DMA\_LEN\_HI & RW & 00h & Commit length, 1--1,024 bytes.\\
+00D8h & DMA\_TRIGGER & RW & 00h & Request/start selection, codes 0--3.\\
+00D9h & DMA\_PACE & RW & 08h & Minimum cell spacing, 1--255 PB ticks.\\
+00DAh & DMA\_STATUS & R/W1C & 00h & Live state and sticky terminal causes.\\
+00DBh & DMA\_IEN & RW & 00h & Enable terminal causes, status bits 4:2.\\
+00DCh & DMA\_ERROR & R & 00h & First terminal error reason for the job.\\
+00DDh & DMA\_DONE\_LO & R & 00h & Bytes issued; capture high byte.\\
+00DEh & DMA\_DONE\_HI & R & 00h & Captured high byte.\\
+00DFh & Reserved & -- & -- & Unmapped.\\
+00E0h & DMA\_LEFT\_LO & R & 00h & Bytes remaining; capture high byte.\\
+00E1h & DMA\_LEFT\_HI & R & 00h & Captured high byte.\\\bottomrule
+\end{tabularx}
+\par
+\endgroup
+\section*{Descriptor and counter ownership}
+Each low-address write stages a byte; its matching high write commits the pair. High-first writes commit the previously staged low byte. Descriptor reads return committed bytes. Counter low reads capture their matching high byte. A shared foreground/ISR owner must protect the complete pair. START takes one coherent snapshot of the committed descriptor and the current XBUS selector; partially staged values are not used.
+
+START from idle clears previous terminal causes, requests and error reason, sets DONE to zero and LEFT to LEN. A rejected START records ERROR with DONE = 0 and performs no data transaction. DMA\_CMD reads zero. Reserved command bits and configuration bits must be zero. SRAM is live storage: changing a source byte before its cell executes changes what is sent. There is no hidden copy of the buffer.
+\vfill\Caption{The SRAM window does not specify a CPU stack, program memory, native executable layout or cache. Host arrays are not automatically DMA-visible.}
+
+\NextSheet{Request timing and transfer state}{One indivisible cell reads one byte and issues one destination write.}
+\par
+\begin{tabularx}{\linewidth}{@{}l l Y@{}}
+\toprule\TableHead Code & DMA\_TRIGGER & Behavior after START\\\midrule
+0 & Software block & Run the complete block, paced by DMA\_PACE.\\
+1 & Timer-0 cells & Wait for timer-0 compare events; one byte per event.\\
+2 & DREQ cells & Wait for rising edges on the selected DREQ input; one byte per edge.\\
+3 & VBLANK block & Wait for the next rising edge on the selected VBLANK input, then run a paced block.\\\bottomrule
+\end{tabularx}
+\par
+Requests come from hardware events, independently of IRQ flags, source masks and global interrupt enable. A VBLANK level already high at START does not count as a new edge. A VBLANK-started block is not automatically suspended when blanking ends.
+
+The first cell cannot execute until DMA\_PACE PB ticks after START. Every subsequent cell is separated from the previous cell by at least that many PB ticks. A cell-triggered request may wait for the next allowed slot. There is room for one pending request; a second request while that slot is occupied terminates the job with REQUEST error. Requests during idle are ignored.
+\begin{center}
+\begin{tikzpicture}[font=\scriptsize,>=Stealth,box/.style={draw,align=center,minimum height=8mm}]
+\node[box](i)at(0,0){Idle};\node[box](v)at(2.5,0){Validate /\\capture};\node[box](w)at(5.4,0){Wait for request\\and pacing};\node[box](c)at(9,0){Read / write\\one byte};
+\draw[->](i)--node[above]{START}(v);\draw[->](v)--(w);\draw[->](w)--(c);
+\draw[->](c.south)--++(0,-.65)-|node[pos=.2,below]{bytes remain}(w.south);
+\draw[->](c.north)--++(0,.7)--node[above]{last byte / DONE}++(-8.9,0)--(i.north);
+\end{tikzpicture}
+\end{center}
+\section*{Validation before the first byte}
+LEN must be 1--1,024 and PACE nonzero. DREQ and VBLANK modes require a nonzero, input-qualified route; otherwise START reports CONFIG. A stopped timer may leave a timer-requested job waiting. The complete source span and any SRAM destination span must fit within 1000h--13FFh, without arithmetic wrap. With an increment disabled, only the fixed byte is accessed repeatedly. Overlapping SRAM transfers execute forward, one byte at a time; they do not provide memmove semantics. If several START checks fail, report LENGTH, then CONFIG, then SOURCE, then DESTINATION in that priority.
+
+For XBUS\_DATA, DST\_INC must be zero. The selected external register index is captured at START. The bridge and the external device's address pointer are exclusively owned by DMA until a terminal state. A CPU XBUS select/data access during BUSY aborts the job with OWNERSHIP error and performs no conflicting external transaction.
+
+Writing a DMA descriptor register or START while BUSY aborts with CONFIG error; the attempted descriptor write is not applied. Status acknowledgment and DMA\_IEN remain accessible during BUSY. ABORT dominates START if both command bits are written together.
+\vfill\Caption{BUSY includes an armed job waiting for its first request. A missing request does not complete the job. Firmware may abort it; normal watchdog supervision remains independent.}
+
+\NextSheet{Terminal status and interrupt handling}{A completed bus write and a completed peripheral operation are separate events.}
+\par
+\begin{tabularx}{\linewidth}{@{}c l l Y@{}}
+\toprule\TableHead Bit & DMA\_STATUS & Access & Meaning\\\midrule
+0 & BUSY & R & A valid job is armed or transferring.\\
+1 & WAIT & R & BUSY, with no currently eligible cell.\\
+2 & DONE & R/W1C & All LEN destination writes have been issued.\\
+3 & ERROR & R/W1C & Validation or an active transfer failed.\\
+4 & ABORTED & R/W1C & Software ABORT terminated the job.\\
+7:5 & Reserved & R & Read zero; writes ignored.\\\bottomrule
+\end{tabularx}
+\par
+Only one terminal cause is produced by a job. Terminal states clear BUSY and WAIT and preserve DONE/LEFT counters. ABORT while idle has no effect. Reset clears all DMA state and pending interrupts; it does not report a normal completion or a software abort.
+\par
+\begin{tabularx}{\linewidth}{@{}l l Y@{}}
+\toprule\TableHead DMA\_ERROR & Name & Cause\\\midrule
+00h & NONE & No error recorded.\\
+01h & SOURCE & Source or source span outside SRAM.\\
+02h & DESTINATION & Invalid destination or destination span.\\
+03h & LENGTH & LEN outside 1--1,024.\\
+04h & CONFIG & Invalid mode/pace, unlocked pins, or descriptor access while active.\\
+05h & BUS & An external bridge transaction explicitly reported failure.\\
+06h & OWNERSHIP & CPU attempted an XBUS transaction while DMA owned it.\\
+07h & REQUEST & A pending cell request was overwritten by another request.\\\bottomrule
+\end{tabularx}
+\par
+\section*{Sixth interrupt source}
+IRQ\_FLAGS and IRQ\_ENABLE add bit 5, DMAC, below ADC in fixed priority. The vector order is T0, T1, TACH, VBLANK, ADC, DMAC. Global enable and non-nesting behavior are unchanged. DMA\_IEN uses bits 4:2 in the same positions as terminal status. A masked terminal cause remains readable and is not lost.
+
+Enabled terminal status reasserts IRQ\_FLAGS.DMAC at each PB tick. In the handler, read status, error reason and the counter pairs; acknowledge the intended DMA\_STATUS causes; then acknowledge IRQ\_FLAGS bit 5. Clearing only the controller flag permits reassertion. Reading status clears nothing. Clearing ERROR does not erase DMA\_ERROR; the next START or reset clears the reason. START does not acknowledge an old IRQ\_FLAGS bit.
+\begin{Notice}{MEANING OF DONE}
+DONE means the DMA engine issued the full block. XBUS has no universal downstream acceptance acknowledgment. A peripheral may reject an otherwise completed bus write. Its own BUSY/ERROR indication must be checked separately. Bytes already issued cannot be rolled back.
+\end{Notice}
+\vfill\Caption{A bridge fault identifies failure before a completed transaction. DMA\_DONE counts issued destination writes, not bytes proven consumed by an external module.}
+
+\NextSheet{Paced transfer to a display register}{Application example: 64 bytes, auto-incrementing display RAM, eight-microsecond write recovery.}
+The CPU prepares an image in SRAM in the display's required pixel layout. DMA does not render text, rotate pixels or generate display commands. An incrementing source and fixed destination deliver the prepared bytes without changing their interpretation.
+\par
+\begin{tabularx}{\linewidth}{@{}l Y@{}}
+\toprule\TableHead Setup step & Required operation\\\midrule
+Clock & Establish the run clock. For this example PBCLK is 1.000 MHz.\\
+Image & Fill 64 SRAM bytes at 1000h--103Fh; keep the buffer unchanged until terminal status.\\
+Display & With CPU ownership, wait until not busy, establish display ADDRESS = 0 and enable its RAM auto-increment.\\
+Bridge & Select the display's DATA register with XBUS\_REG.\\
+Descriptor & SRC = 1000h, DST = 0081h, LEN = 64; SRC\_INC = 1, DST\_INC = 0.\\
+Timing & PACE = 8 PB ticks gives 8 $\mu$s minimum write spacing at 1 MHz.\\
+Start & Select software-paced block, or VBLANK block with its legal input route, and write START.\\
+Finish & Consume terminal status and counters. After the final recovery interval, check the display's own ERROR/STATUS before treating the image as accepted.\\\bottomrule
+\end{tabularx}
+\par
+\section*{Timing budget}
+With an immediately eligible software block, writes occur at 8, 16, \ldots, 512 PB ticks after START. DMA DONE occurs after the last write. At 1 MHz the destination's last eight-microsecond recovery ends at 520 $\mu$s. Register setup, any initial destination recovery, request delay, service quantization and interrupt latency add to this budget.
+
+For a display with a four-millisecond vertical blank, this transfer can fit if it starts with sufficient blanking time remaining. A delayed VBLANK interrupt flag does not create a new blanking interval. Display RAM completion is not an atomic visible-frame swap; the display's independent scanout contract still applies.
+\begin{Notice}{PACE IS CLOCK-DEPENDENT}
+PACE = 8 is not universally eight microseconds. At 2 MHz it is four microseconds and can overrun this example display. Choose the number of PB ticks from the active clock and the destination's worst-case recovery limit; include clock tolerance and service-boundary margin.
+\end{Notice}
+\section*{Recovery after an incomplete image}
+On ERROR or ABORTED, preserve the issued-byte count for diagnosis. The external device may retain a partial image, current RAM pointer and BUSY/ERROR state. After DMA releases ownership, establish a known display address and deliberately retransmit. Do not append the remaining bytes on the assumption that every earlier bus write was accepted.
+\vfill\Caption{The eight-microsecond recovery and four-millisecond blank are properties of the example destination, not new universal XBUS timing guarantees.}
+
+\NextSheet{Reset, clock and integration conditions}{The expanded peripheral set does not replace ordinary protection or useful-progress supervision.}
+\par
+\begin{tabularx}{\linewidth}{@{}l Y@{}}
+\toprule\TableHead Condition & B16 behavior\\\midrule
+Power-on / brownout & Clear SRAM, abort DMA, disconnect all digital routes, set ANSELA = 30h and lock pin selection. All GPIO directions remain inputs.\\
+Other controller reset & Watchdog, deadman, software, clock-failure and external controller resets retain SRAM. Clear DMA and interrupt state, disconnect routes and restore analog/direction defaults. External device state is not presumed reset.\\
+Core halted & DMA and PB-clocked peripherals continue while PBCLK is running. Ordinary watchdog behavior still applies.\\
+Global interrupts masked & DMA progresses; terminal causes remain latched. No interrupt callback is delivered until eligible.\\
+Peripheral clock stopped & Pacing and DMA cells stop. No bytes are manufactured from elapsed host time. Independent reset/clock-failure mechanisms remain active as specified in the base manual.\\
+Clock reconfiguration & A clock COMMIT requires DMA idle in addition to the base quiescence conditions. An armed, waiting job is not idle.\\
+Pin-route change & Requires the documented unlock and quiescence conditions; a rejected change leaves the old wiring selection intact.\\
+Reset during a transfer & Cancel the old job. Already issued external writes survive according to the attached device. No automatic DMA restart after reset.\\\bottomrule
+\end{tabularx}
+\par
+\section*{Data ownership and supervision}
+DMA completion proves data movement under the stated bus semantics. It does not prove that foreground control, fresh sensor acquisition or protection decisions have progressed. A DMA interrupt alone is insufficient evidence to renew execution monitors.
+
+Use separate buffers when the CPU must draw while DMA transmits. Ownership changes only after terminal status is observed. A CPU write to live source SRAM is permitted and can produce mixed old/new data; the controller does not provide automatic double buffering, cache management or image consistency.
+\section*{Driver validation cases}
+Check fixed and incrementing addressing, first/last SRAM byte, whole-span validation, zero and excessive length, a zero pace, a wrong digital route, missing analog qualification, a masked completion interrupt, and repeated acknowledgment. Exercise abort and controller reset at different byte offsets; inspect the retained destination rather than assuming rollback.
+
+For external transfers, check source-buffer mutation, CPU/ISR bridge contention, a too-fast request stream, a clock change while armed, a late blanking start and a destination that drops a too-early write. Completion and peripheral acceptance must remain distinguishable in the evidence.
+\vfill\Caption{B16 peripheral interface 04 / B16-004 / P1. Base peripheral behavior not explicitly amended here remains defined by the B8 interface 03 manual.}
+\end{document}

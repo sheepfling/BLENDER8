@@ -1,0 +1,53 @@
+[recipes.lab_copy]
+monochrome = true
+rotation_deg = 0.32
+inset = 0.009
+blur_px_at_300dpi = 0.12
+toner_strength = 0.95
+paper_rgb = [249, 249, 249]
+noise_sigma = 0.4
+bands = 1
+edge_shadow = 0.08
+staple = true
+stamp = "LAB FILE / COPY 02"
+
+[recipes.shop_copy]
+monochrome = false
+rotation_deg = 0.72
+inset = 0.014
+blur_px_at_300dpi = 0.21
+toner_strength = 0.93
+paper_rgb = [246, 239, 220]
+noise_sigma = 0.7
+bands = 2
+edge_shadow = 0.15
+coffee = true
+fold = true
+staple = true
+stamp = "BENCH COPY / RETURN"
+
+[recipes.archive_scan]
+monochrome = true
+rotation_deg = 0.48
+inset = 0.011
+blur_px_at_300dpi = 0.17
+toner_strength = 0.93
+paper_rgb = [245, 245, 245]
+noise_sigma = 0.6
+bands = 1
+edge_shadow = 0.16
+punch_holes = true
+stamp = "ARCHIVE / FILE COPY"
+
+[recipes.bad_xerox]
+monochrome = true
+rotation_deg = 0.88
+inset = 0.017
+blur_px_at_300dpi = 0.30
+toner_strength = 1.05
+paper_rgb = [249, 249, 249]
+noise_sigma = 1.0
+bands = 3
+edge_shadow = 0.20
+staple = true
+stamp = "DUPLICATE / LOGIC"

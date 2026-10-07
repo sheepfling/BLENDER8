@@ -1,0 +1,10 @@
+\begin{tikzpicture}[x=1cm,y=1cm,font=\scriptsize,>=Stealth,
+box/.style={draw,align=center,minimum height=7mm}]
+\node[box](s)at(1.0,0){S2 jar loop\\closed only when locked};
+\node[box](l)at(5.4,0){dropout latch\\fresh STOP to re-arm};
+\node[box](g)at(10.3,0){drive permission\\AND existing conditions};
+\draw[->](s)--(l);\draw[->](l)--(g);
+\draw[->](s.south)--(1,-.70)--node[below]{raw loop / PB3}(4.2,-.70);
+\draw[->](l.south)--(5.4,-.70)--node[below]{latched permission / PB4}(8.7,-.70);
+\node[below]at(6.4,-1.08){Reseating does not restore permission. Neither signal carries motor current.};
+\end{tikzpicture}

@@ -1,0 +1,11 @@
+\ProvidesPackage{vendor-kestrel}[2026/10/06 Kestrel engineering identity]
+\RequirePackage{datasheet-core}\RequirePackage{courier}\RequirePackage{kestrel-identity}
+\renewcommand{\familydefault}{\ttdefault}
+\renewcommand{\VendorName}{Kestrel Appliance Systems}
+\renewcommand{\VendorDivision}{ENGINEERING / CONTROLLED ASSEMBLY}
+\renewcommand{\VendorWordmark}{{\ttfamily\bfseries\Large KESTREL}\;{\ttfamily\scriptsize APPLIANCE SYSTEMS}}
+\renewcommand{\VendorMark}{\KestrelMark}
+\colorlet{VendorInk}{KestrelInk}\definecolor{VendorTint}{HTML}{EDF0E8}
+\renewcommand{\VendorMasthead}{\noindent\fcolorbox{VendorInk}{white}{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}{\vspace{5pt}\color{VendorInk}\VendorMark\hspace{7pt}\VendorWordmark\par\vspace{5pt}\hrule\vspace{4pt}\scriptsize\VendorDivision\hfill\DocID\vspace{3pt}}}\par\vspace{12pt}}
+
+\AtBeginDocument{\raggedright\fontsize{9.5}{11.1}\selectfont\setlength{\parskip}{4pt}}

@@ -1,0 +1,60 @@
+extends = "bad_xerox"
+name = "kestrel_control_file"
+generation_depth = 3
+copier_id = "kestrel-shop-02"
+dpi = 220
+
+[placement]
+rotation_deg = {min = -1.40, max = 1.40}
+shear_deg = {min = -0.08, max = 0.08}
+translate_x_mm = {min = -1.4, max = 1.6}
+translate_y_mm = {min = -1.5, max = 1.5}
+
+[vignette]
+strength = {min = 0.08, max = 0.15}
+edge = "left"
+width_mm = {min = 4.0, max = 9.0}
+
+[repro]
+blur_mm = {min = 0.017, max = 0.028}
+resample = {min = 0.965, max = 0.990}
+threshold_mix = 0.045
+toner_bloom = 0.045
+grain_sigma = 0.22
+
+[handling]
+stage = "after_copy"
+coffee = true
+fold = true
+staple = false
+punch_holes = true
+preserve_color_after_copy = true
+dust_count = 22
+opacity = 0.48
+stamp = "SERVICE BENCH"
+
+[handling.coffee_profile]
+radius_mm = {min = 21.0, max = 27.0}
+center_x = {min = 0.965, max = 1.025}
+center_y = {min = 0.77, max = 0.87}
+rim_width_mm = 0.60
+irregularity = 0.07
+broken_rim = 0.50
+droplets = {min = 2, max = 5}
+
+[tears]
+enabled = true
+stage = "after_copy"
+count = {min = 1, max = 3}
+edges = ["right", "bottom"]
+depth_mm = {min = 1.5, max = 4.0}
+length_mm = {min = 5.0, max = 13.0}
+clearance_mm = 1.0
+
+[protection]
+regions = [{x0 = 0.066, y0 = 0.047, x1 = 0.938, y1 = 0.965}]
+max_delta = 0.105
+
+[output]
+encoding = "jpeg"
+jpeg_quality = 96

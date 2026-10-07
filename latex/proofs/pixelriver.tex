@@ -1,0 +1,35 @@
+\documentclass[10pt]{article}
+\usepackage{vendor-pixelriver}
+\renewcommand{\DocID}{PRD-DESIGN-01}
+\renewcommand{\RunningPart}{PX32-16}
+\hypersetup{pdftitle={pixelriver / Vendor identity proof}}
+\begin{document}
+\VendorTitle{PX32-16}{Pixels, not strings}{Display-module engineering}
+\MetaStrip{VISUAL IDENTITY PROOF\hfill DESIGN EDITION P1\hfill NOT A COMPONENT RELEASE}
+\begin{Notice}{MODULE SPECIFICATION}
+The display supplier has a slightly better art department. Whitespace and diagrams explain the memory organization; a pixel motif belongs in the identity, not behind the specification table.
+\end{Notice}
+\section*{Documentation culture}
+\begin{tabularx}{\linewidth}{@{}p{.22\linewidth}Y@{}}
+\toprule\TableHead Element & House convention\\\midrule
+Document voice & Module overview; display RAM; scan timing.\\
+Page structure & Clean sans-serif text, a teal nameplate and generous diagram space. Light grid references echo the pixel array.\\
+Signature detail & A stepped pixel mark, generous figure captions and explicit row/column orientation.\\
+Expected wear & Lab copy: mild toner drift and one staple shadow. Usually the newest sheet in the binder.\\
+\bottomrule
+\end{tabularx}
+\section*{Specimen section rhythm}
+\begin{minipage}[t]{.31\linewidth}\textbf{01\quad Memory organization}\par\small Establish the signal meaning and the applicable scope.\end{minipage}\hfill
+\begin{minipage}[t]{.31\linewidth}\textbf{02\quad Scan timing}\par\small Define conditions before presenting a table or diagram.\end{minipage}\hfill
+\begin{minipage}[t]{.31\linewidth}\textbf{03\quad Interface transactions}\par\small Separate component guarantees from application decisions.\end{minipage}
+\vspace{16pt}
+\begin{center}\begin{tikzpicture}[x=.31cm,y=.31cm]
+\draw[step=1,VendorInk!22] (0,0)grid(24,5);
+\foreach \x/\y in {1/1,1/2,1/3,2/3,3/3,3/2,2/2,2/1,3/1,7/1,7/2,7/3,8/3,9/2,8/1,13/1,13/2,13/3,14/3,15/3,14/2,14/1,19/3,20/3,21/3,20/2,20/1}{\fill[VendorInk] (\x,\y)rectangle+(.84,.84);}
+\end{tikzpicture}\end{center}
+\Caption{Decorative pixel specimen only; not a framebuffer map.}
+\section*{Release boundary}
+Do not invent a physical connector or bus timing while illustrating the style. The actual module release must follow LCD-001.
+\vfill
+{\small\color{Muted}Identity and document language are original fictional design proposals for the Blender-8 exercise. No affiliation with a real manufacturer or Zachtronics is claimed.}
+\end{document}

@@ -1,0 +1,80 @@
+{
+  "kind": "native pre/post refactor regression, NOT WASM",
+  "conformance": [
+    {
+      "name": "contact_fault_observation",
+      "passed": true,
+      "commands": 5,
+      "assertions": 2
+    },
+    {
+      "name": "fused_motor_branch",
+      "passed": true,
+      "commands": 10,
+      "assertions": 4
+    },
+    {
+      "name": "invalid_pll_tuple",
+      "passed": true,
+      "commands": 6,
+      "assertions": 2
+    },
+    {
+      "name": "jar_dropout_memory",
+      "passed": true,
+      "commands": 26,
+      "assertions": 6
+    },
+    {
+      "name": "jar_held_stop",
+      "passed": true,
+      "commands": 7,
+      "assertions": 3
+    },
+    {
+      "name": "lcd_vertical_pixels",
+      "passed": true,
+      "commands": 7,
+      "assertions": 1
+    },
+    {
+      "name": "motor_load_coast",
+      "passed": true,
+      "commands": 12,
+      "assertions": 4
+    },
+    {
+      "name": "power_qualification",
+      "passed": true,
+      "commands": 2,
+      "assertions": 5
+    },
+    {
+      "name": "sensor_faults",
+      "passed": true,
+      "commands": 7,
+      "assertions": 4
+    },
+    {
+      "name": "watchdog_unserviced",
+      "passed": true,
+      "commands": 2,
+      "assertions": 3
+    }
+  ],
+  "trajectories": [
+    {
+      "seed": 4815,
+      "passed": true,
+      "actions": 128,
+      "precondition_motion": true
+    },
+    {
+      "seed": 90210,
+      "passed": true,
+      "actions": 128,
+      "precondition_motion": true
+    }
+  ],
+  "passed": true
+}

@@ -1,0 +1,41 @@
+schema_version = 2
+name = "bad_xerox"
+generation_depth = 3
+copier_id = "triaxis-service-room-03"
+[placement]
+rotation_deg = { min = -1.6, max = 1.6 }
+translate_x_mm = { min = -2.0, max = 2.0 }
+translate_y_mm = { min = -2.5, max = 2.5 }
+shear_deg = { min = -0.16, max = 0.16 }
+inset_mm = 1.0
+[vignette]
+strength = { min = 0.14, max = 0.25 }
+width_mm = { min = 6.0, max = 13.0 }
+asymmetry = 0.75
+edge = "left"
+corner_strength = 0.14
+[streaks]
+horizontal = { min = 2, max = 4 }
+vertical = { min = 2, max = 3 }
+opacity = { min = 0.05, max = 0.15 }
+width_mm = { min = 0.09, max = 0.45 }
+roller_opacity = 0.022
+roller_pitch_mm = 23.0
+[repro]
+blur_mm = { min = 0.028, max = 0.055 }
+resample = { min = 0.88, max = 0.95 }
+contrast = { min = 1.02, max = 1.10 }
+threshold_mix = 0.13
+toner_bloom = 0.10
+grain_sigma = 0.65
+[paper]
+monochrome = true
+rgb = [249, 249, 249]
+bed_rgb = [228, 228, 228]
+[handling]
+staple = true
+dust_count = 70
+stamp = "DUPLICATE / LOGIC"
+[protection]
+max_delta = 0.12
+min_cumulative_scale = 0.78

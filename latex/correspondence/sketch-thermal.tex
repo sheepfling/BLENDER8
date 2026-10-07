@@ -1,0 +1,4 @@
+\begin{tikzpicture}[font=\scriptsize,>=Stealth,box/.style={draw,minimum height=7mm,align=center}]
+\node[box](a)at(0,0){Trip / drive off};\node[box](b)at(3.5,0){Cool + valid signal};\node[box](c)at(7.0,0){NEW STOP press};\node[box](d)at(10.5,0){Release all};\node[box](e)at(13.0,0){NEW selection};
+\draw[->](a)--(b);\draw[->](b)--(c);\draw[->](c)--(d);\draw[->](d)--(e);
+\end{tikzpicture}

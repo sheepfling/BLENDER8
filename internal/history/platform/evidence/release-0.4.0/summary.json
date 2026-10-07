@@ -1,0 +1,48 @@
+{
+  "platform_version": "0.4.0",
+  "owner_package": "0.8.0",
+  "b8_interface": "03",
+  "chassis": "04",
+  "ctest": {
+    "gcc": 185,
+    "clang": 185,
+    "clang_asan_ubsan": 185,
+    "failed": 0
+  },
+  "protocol_unittest_subcases": 22,
+  "document_tests": 203,
+  "acceptance": {
+    "cases": 63,
+    "pass": 2,
+    "fail": 56,
+    "review": 5,
+    "accepted": false,
+    "image": "unfinished starter"
+  },
+  "stress": {
+    "seeds": [
+      4815,
+      90327
+    ],
+    "episodes_per_seed": 128,
+    "replays_per_episode": 2,
+    "actions_per_episode": 256,
+    "checked_microsteps_total": 131072000
+  },
+  "physical_hwil_validated": false,
+  "firmware_solution_included": false,
+  "source_preservation_files": 102,
+  "ui": "Chromium render/interaction against native command bridge; actual local HTTP checked independently; managed URL policy blocked integrated browser navigation",
+  "not_run": [
+    "physical HWIL",
+    "Windows/macOS",
+    "Ruff",
+    "Pyright",
+    "clang-format"
+  ],
+  "fresh_extracted_gcc_release": {
+    "passed": true,
+    "ctest_entries": 185,
+    "source_manifest_verified": true
+  }
+}

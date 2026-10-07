@@ -1,0 +1,28 @@
+schema_version = 2
+name = "archive_scan"
+generation_depth = 2
+copier_id = "records-flatbed-07"
+[placement]
+rotation_deg = { min = -0.55, max = 0.55 }
+translate_x_mm = { min = -1.2, max = 1.2 }
+translate_y_mm = { min = -1.5, max = 1.5 }
+inset_mm = 0.9
+[vignette]
+strength = { min = 0.13, max = 0.23 }
+width_mm = { min = 7.0, max = 14.0 }
+edge = "left"
+asymmetry = 0.85
+corner_strength = 0.10
+[streaks]
+horizontal = { min = 0, max = 2 }
+vertical = { min = 1, max = 2 }
+roller_opacity = 0.01
+[paper]
+monochrome = true
+rgb = [246, 246, 246]
+bed_rgb = [225, 225, 225]
+[handling]
+punch_holes = true
+stamp = "ARCHIVE / FILE COPY"
+[protection]
+max_delta = 0.10

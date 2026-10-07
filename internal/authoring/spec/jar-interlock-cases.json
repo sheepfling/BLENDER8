@@ -1,0 +1,92 @@
+{
+  "status": "specified_only_not_executable",
+  "component_interface": "B8-03 unchanged",
+  "chassis": "04 proposed",
+  "runtime_baseline": "0.3.0 does not implement jar interlock",
+  "cases": [
+    {
+      "id": "J01",
+      "stimulus": "Power/reset release with jar absent, then assert a speed",
+      "expected": "Hardware gate remains off; no start; IL visible when running firmware can report.",
+      "passed": null
+    },
+    {
+      "id": "J02",
+      "stimulus": "Remove jar during an established run",
+      "expected": "Q and final enable drop within 1 ms; firmware PB0/PWM requests clear within 10 ms; inertia continues.",
+      "passed": null
+    },
+    {
+      "id": "J03",
+      "stimulus": "Reseat with speed latch still down",
+      "expected": "Q remains zero; no motor restart until qualified STOP, release and new command.",
+      "passed": null
+    },
+    {
+      "id": "J04",
+      "stimulus": "Hold PULSE through withdrawal and replacement",
+      "expected": "No held-through restart; release and a new command are required.",
+      "passed": null
+    },
+    {
+      "id": "J05",
+      "stimulus": "Open and reclose before the next firmware poll",
+      "expected": "Latch retains lost permission; a bare AND gate is not sufficient.",
+      "passed": null
+    },
+    {
+      "id": "J06",
+      "stimulus": "Inject several opens/closes inside 5 ms",
+      "expected": "Every opening clears Q; only final continuous 20 ms closure can qualify rearming.",
+      "passed": null
+    },
+    {
+      "id": "J07",
+      "stimulus": "Break the loop wire while the jar is in place",
+      "expected": "Raw JAR_OK is low; no qualified permission.",
+      "passed": null
+    },
+    {
+      "id": "J08",
+      "stimulus": "Hold STOP while reseating, then wait beyond 20 ms",
+      "expected": "Q must remain zero until a subsequent new STOP assertion.",
+      "passed": null
+    },
+    {
+      "id": "J09",
+      "stimulus": "Reset or brownout with jar mechanically seated",
+      "expected": "Q disarms; physical jar/latches/heat/momentum are not erased.",
+      "passed": null
+    },
+    {
+      "id": "J10",
+      "stimulus": "Open while core halted or interrupts masked",
+      "expected": "Hardware latch/gate must still clear without firmware execution; CPU recovery is a separate test.",
+      "passed": null
+    },
+    {
+      "id": "J11",
+      "stimulus": "Warm motor reaches TH after IL shutdown",
+      "expected": "Retain appropriate causes; no fake ST from coastdown; apply declared priority.",
+      "passed": null
+    },
+    {
+      "id": "J12",
+      "stimulus": "Weld/bypass contact or force raw node high with jar absent",
+      "expected": "Record unobservable single-channel fault; do NOT assert guaranteed detection or safe permission.",
+      "passed": null
+    },
+    {
+      "id": "J13",
+      "stimulus": "Fresh STOP after closure qualifies while old speed remains latched",
+      "expected": "STOP releases speed and blocks physical RUN_PERMIT; Q setting alone cannot energize drive.",
+      "passed": null
+    },
+    {
+      "id": "J14",
+      "stimulus": "Contact opens at the same instant as a rearm request",
+      "expected": "Clear must dominate set; no single-step enabling pulse.",
+      "passed": null
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+\begin{tikzpicture}[font=\scriptsize,>=Stealth,box/.style={draw,minimum height=7mm,align=center}]
+\node[box](a)at(0,0){XO8-33 / 8 MHz};\node[box](b)at(3.9,0){divide / multiply / divide};\node[box](c)at(8,0){SYSCLK / 8--32 MHz};\node[box](d)at(12,0){divide to PBCLK / 1 MHz};
+\draw[->](a)--(b);\draw[->](b)--(c);\draw[->](c)--(d);
+\end{tikzpicture}

@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "name": "invalid_pll_tuple",
+  "mode": "bench",
+  "profile": "chassis04",
+  "events": [
+    {
+      "at_us": 60000,
+      "command": "write 0xA0 2"
+    },
+    {
+      "at_us": 60000,
+      "command": "write 0xA1 0"
+    },
+    {
+      "at_us": 60000,
+      "command": "write 0xA7 195"
+    },
+    {
+      "at_us": 60000,
+      "command": "write 0xA7 60"
+    },
+    {
+      "at_us": 60000,
+      "command": "write 0xA8 165"
+    }
+  ],
+  "checks": [
+    {
+      "at_us": 60001,
+      "field": "mcu.clock_source",
+      "op": "eq",
+      "value": 0
+    },
+    {
+      "at_us": 60001,
+      "field": "mcu.clock_status",
+      "op": "eq",
+      "value": 9
+    }
+  ]
+}

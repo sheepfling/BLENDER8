@@ -1,0 +1,39 @@
+\DrawingTitle{rear-switch-r4.pdf}{power}
+{\small Chassis 04 / power, reset and clock connections.}\par
+\begin{center}
+\begin{tikzpicture}[font=\scriptsize,>=Stealth,box/.style={draw,minimum height=8mm,align=center}]
+\node[box](j)at(0,0){J1\\24 V DC};
+\node[box,minimum width=10mm](f)at(2,0){};\draw (f.west)--(f.east);\node[above]at(f.north){F1 / input fuse};
+\node[minimum width=14mm,minimum height=8mm](sw)at(4.2,0){};\draw(sw.west)--(3.85,0);\draw(4.55,0)--(sw.east);\draw(3.85,0)--(4.5,.32);\fill(3.85,0)circle(1pt);\fill(4.55,0)circle(1pt);\node[above]at(sw.north){SW1 rear};
+\coordinate(t)at(6,0);
+\node[box](fm)at(7.9,1.5){F2\\motor branch};
+\node[box](mot)at(11.1,1.5){MD20 power\\motor stage};
+\node[box](fl)at(7.9,-.6){F3\\logic branch};
+\node[box](reg)at(11.1,-.6){3.3 V regulator\\logic rail};
+\draw[->](j)--(f);\draw[->](f)--(sw);\draw(sw)--(t);\fill(t)circle(1.5pt);
+\draw[->](t)|-(fm);\draw[->](fm)--(mot);\draw[->](t)|-(fl);\draw[->](fl)--(reg);
+\node[box](sup)at(11.1,-2.5){Supply / switch\\qualification};\draw[->](reg)--(sup);
+\draw[->,dashed](sw.south)--(4.2,-2.5)--node[above]{auxiliary inhibit / reset}(sup.west);
+\node[box](logic)at(3.2,-4.5){B8 / MX8-1 / PX32-16\\AVT10 / contact pull-ups};
+\draw[->](reg.east)--(12.6,-.6)--(12.6,-3.5)--(3.2,-3.5)--node[left]{3.3 V}(logic.north);
+\node[box](xo)at(8.0,-4.5){XO8-33\\OE = PGOOD};
+\draw[->](sup.south)--(11.1,-3.8)--(8,-3.8)--(xo.north);
+\draw[->](xo.west)--node[above]{OUT to B8 CLKIN}(logic.east);
+\draw[->,dashed](sup.west)--(5.5,-2.5)--(5.5,-3.9)--(logic.north east);
+\node[align=center]at(6.7,-2.9){PGOOD / reset hold};
+\end{tikzpicture}
+\end{center}
+\textbf{Return paths:} J1 return is the DC reference. Motor current returns directly to the power-entry return; logic and analog returns join there through a separate branch. No fuse is inserted in the common return. Protective earth and mains wiring are outside this DC chassis interface.
+
+\begin{tabularx}{\linewidth}{@{}p{.29\linewidth}Y@{}}
+\toprule Circuit / signal & Defined behavior or connection\\\midrule
+Rear SW1 & Contact transition envelope 5 ms. Opening removes the independent motor request path without waiting for firmware. Auxiliary qualification asserts reset during interrupted make.\\
+3.3 V qualification & Assert reset below 2.9 V or on lost switch/logic supply. Release only after at least 10 ms continuously at or above 3.0 V, followed by the B8's 1 ms local reset hold.\\
+Nominal rail profile & 20 ms zero-to-3.3 V rise and 5 ms discharge; motor branch can remain live during a logic brownout. These are rail-profile values, not software delays.\\
+Clock / bypass & XO8-33 supply from 3.3 V; OE driven by PGOOD; OUT to B8 CLKIN; local 100 nF bypass. No other component clock input is tied to this net.\\
+Local timing & LCD scanout and mux settling retain their own timing. CLKOUT test-point loading is included in the clock-load budget.\\
+Enable pull-down & PB0 released level is low. Gate output is low unless every permission on bench-harness-r4.pdf is true.\\\bottomrule
+\end{tabularx}
+
+\textbf{Fusing:} F1 protects the incoming distribution; F2 the motor branch; F3 the regulator/logic branch. CLKIN, control signals and contact sense lines have no series fuses. Fuse current, voltage, interrupt rating and time-current curves require the final supply, conductor, inrush and fault-current study; values are not released by this functional drawing. A fuse is not stall supervision, jar detection or execution supervision. The jar loop and dropout latch use qualified 3.3 V logic power and remain separate from the motor-current branch.
+\vfill\small{Board layout release must add connector cavities, copper geometry, regulator/current ratings, decoupling and suppression detail. Operate a hardware bench only from an appropriately limited, isolated DC source and a guarded low-energy load.}

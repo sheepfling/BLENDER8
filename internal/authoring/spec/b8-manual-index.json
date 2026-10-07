@@ -1,0 +1,198 @@
+{
+  "publication": "P6",
+  "interface": 3,
+  "pages": [
+    {
+      "page": 1,
+      "title": "B8 microcontroller user manual"
+    },
+    {
+      "page": 2,
+      "title": "Reference navigation"
+    },
+    {
+      "page": 3,
+      "title": "Register transactions and access conventions"
+    },
+    {
+      "page": 4,
+      "title": "Complete map: system, GPIO and timers"
+    },
+    {
+      "page": 5,
+      "title": "Complete map: waveform, bus and ADC"
+    },
+    {
+      "page": 6,
+      "title": "Complete map: clocks and supervision"
+    },
+    {
+      "page": 7,
+      "title": "Identification and reset-cause fields"
+    },
+    {
+      "page": 8,
+      "title": "Reset, release and state retention"
+    },
+    {
+      "page": 9,
+      "title": "GPIO port programming"
+    },
+    {
+      "page": 10,
+      "title": "Interrupt sources and register fields"
+    },
+    {
+      "page": 11,
+      "title": "Interrupt entry, return and shared state"
+    },
+    {
+      "page": 12,
+      "title": "Compare timers: registers and counting"
+    },
+    {
+      "page": 13,
+      "title": "Compare timers: programming and observation"
+    },
+    {
+      "page": 14,
+      "title": "Multi-byte data and ownership"
+    },
+    {
+      "page": 15,
+      "title": "PWM waveform generator"
+    },
+    {
+      "page": 16,
+      "title": "PB1 edge counter and external events"
+    },
+    {
+      "page": 17,
+      "title": "External byte-register bridge"
+    },
+    {
+      "page": 18,
+      "title": "ADC register fields"
+    },
+    {
+      "page": 19,
+      "title": "ADC acquisition and conversion timing"
+    },
+    {
+      "page": 20,
+      "title": "ADC transfer characteristic and result handling"
+    },
+    {
+      "page": 21,
+      "title": "Clock sources and clock domains"
+    },
+    {
+      "page": 22,
+      "title": "Clock plan: staging and legal operating ranges"
+    },
+    {
+      "page": 23,
+      "title": "Clock commit and status"
+    },
+    {
+      "page": 24,
+      "title": "Clock interruptions and timing continuity"
+    },
+    {
+      "page": 25,
+      "title": "Independent watchdog: configuration"
+    },
+    {
+      "page": 26,
+      "title": "Independent watchdog: service and margins"
+    },
+    {
+      "page": 27,
+      "title": "Windowed deadman: registers and counting"
+    },
+    {
+      "page": 28,
+      "title": "Windowed deadman: service state machine"
+    },
+    {
+      "page": 29,
+      "title": "Reset and status error matrix"
+    },
+    {
+      "page": 30,
+      "title": "C++ service interface and portability"
+    },
+    {
+      "page": 31,
+      "title": "Bring-up and diagnostic worksheet"
+    },
+    {
+      "page": 32,
+      "title": "Quick reference and publication notes"
+    }
+  ],
+  "register_names": [
+    "SYS_ID",
+    "SYS_REV",
+    "RST_CAUSE",
+    "RST_DETAIL",
+    "SW_RESET",
+    "IRQ_GLOBAL",
+    "IRQ_ENABLE",
+    "IRQ_FLAGS",
+    "GPIOA_DIR",
+    "GPIOA_OUT",
+    "GPIOA_IN",
+    "GPIOB_DIR",
+    "GPIOB_OUT",
+    "GPIOB_IN",
+    "T0_CTRL",
+    "T0_PRESCALE",
+    "T0_COUNT_LO",
+    "T0_COUNT_HI",
+    "T0_COMPARE_LO",
+    "T0_COMPARE_HI",
+    "T1_CTRL",
+    "T1_PRESCALE",
+    "T1_COUNT_LO",
+    "T1_COUNT_HI",
+    "T1_COMPARE_LO",
+    "T1_COMPARE_HI",
+    "PWM_CTRL",
+    "PWM_DUTY",
+    "TACH_COUNT_LO",
+    "TACH_COUNT_HI",
+    "XBUS_REG",
+    "XBUS_DATA",
+    "ADC_CTRL",
+    "ADC_CHANNEL",
+    "ADC_PRESCALE",
+    "ADC_STATUS",
+    "ADC_DATA_LO",
+    "ADC_DATA_HI",
+    "CLK_SOURCE",
+    "PLL_PREDIV",
+    "PLL_MULT",
+    "PLL_POSTDIV",
+    "PB_DIV",
+    "CLK_STATUS",
+    "CLK_ACTIVE",
+    "CLK_KEY",
+    "CLK_COMMIT",
+    "PB_ACTIVE",
+    "WDT_CTRL",
+    "WDT_SCALE",
+    "WDT_SERVICE",
+    "WDT_STATUS",
+    "DMT_CTRL",
+    "DMT_LIMIT_LO",
+    "DMT_LIMIT_HI",
+    "DMT_WINDOW_LO",
+    "DMT_WINDOW_HI",
+    "DMT_STATUS",
+    "DMT_COUNT_LO",
+    "DMT_COUNT_HI",
+    "DMT_PRECLR",
+    "DMT_CLR"
+  ]
+}

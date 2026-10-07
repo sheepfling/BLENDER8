@@ -1,0 +1,63 @@
+# pixelriver_service_file: physical wear is page-specific; copier defects are machine-specific.
+extends = "bad_xerox"
+name = "pixelriver_service_file"
+generation_depth = 3
+copier_id = "display-service-p7"
+dpi = 220
+
+[placement]
+rotation_deg = {min = -0.65, max = 0.65}
+shear_deg = {min = -0.06, max = 0.06}
+translate_x_mm = {min = -1.3, max = 1.5}
+translate_y_mm = {min = -1.4, max = 1.6}
+
+[vignette]
+strength = {min = 0.04, max = 0.09}
+edge = "top"
+width_mm = {min = 4.0, max = 9.0}
+
+[repro]
+blur_mm = {min = 0.018, max = 0.025}
+resample = {min = 0.968, max = 0.994}
+threshold_mix = 0.025
+toner_bloom = 0.025
+grain_sigma = 0.13
+
+[handling]
+stage = "after_copy"
+coffee = false
+fold = false
+staple = false
+punch_holes = false
+preserve_color_after_copy = true
+dust_count = 16
+opacity = 0.2
+stamp = ""
+
+[tears]
+enabled = false
+stage = "before_copy"
+count = {min = 1, max = 1}
+edges = ["right", "bottom"]
+depth_mm = {min = 1.5, max = 3.5}
+length_mm = {min = 5.0, max = 13.0}
+clearance_mm = 1.0
+
+[protection]
+regions = [{x0 = 0.066, y0 = 0.047, x1 = 0.938, y1 = 0.965}]
+max_delta = 0.075
+
+[output]
+encoding = "jpeg"
+jpeg_quality = 96
+
+[streaks]
+horizontal = {min = 0, max = 1}
+vertical = {min = 1, max = 2}
+opacity = {min = 0.02, max = 0.055}
+roller_opacity = 0.009
+
+[[page_overrides]]
+pages = [5]
+[page_overrides.patch.handling]
+fold = true

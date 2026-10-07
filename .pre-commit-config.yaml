@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: quality
+        name: Python and Markdown quality
+        entry: python -m scripts.ci --static
+        language: system
+        pass_filenames: false
+        always_run: true

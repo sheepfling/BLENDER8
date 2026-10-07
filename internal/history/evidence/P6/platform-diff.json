@@ -1,0 +1,14 @@
+{
+  "added": [
+    "examples/manual_snippets.inc",
+    "tests/manual_examples.cpp"
+  ],
+  "removed": [],
+  "changed": [
+    "CMakeLists.txt",
+    "README.md",
+    "firmware/firmware.cpp",
+    "sdk/include/blender8/device.hpp"
+  ],
+  "unchanged_files": 78
+}

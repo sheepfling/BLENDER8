@@ -1,0 +1,11 @@
+part = "MX8-1"
+document = "MUX-001"
+behavior_revision = "0.2.0"
+presentation_revision = "P3"
+date = "2026-10-06"
+input_count = 8
+select_count = 3
+output_count = 1
+settling_us = 2
+source_file = "internal/authoring/source_inputs/MUX8-v0.2.0.md"
+source_sha256 = "5ef1e7a5dba2d1f18930e39aa7335186b22e2d1e40771273c6890a290a25edca"

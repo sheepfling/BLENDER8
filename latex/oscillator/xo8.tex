@@ -1,0 +1,70 @@
+\documentclass[10pt]{article}
+\usepackage{vendor-meridion}
+\renewcommand{\DocID}{MFP-008}\renewcommand{\DocRev}{A}\renewcommand{\RunningPart}{XO8-33}
+\begin{document}
+\VendorTitle{XO8-33}{Crystal-controlled clock oscillator}{8.000 MHz / 3.3 V CMOS output / output-enable control}
+\MetaStrip{INDUSTRIAL CLOCK MODULE\hfill PRODUCT ISSUE A\hfill 06 OCT 2026}
+\section*{Description}
+The XO8-33 contains a quartz resonator, sustaining amplifier and logic-output buffer. It produces a continuous clock after its supply and output-enable input are valid for the specified start interval. The receiver uses an external-clock input; no resonator-drive amplifier or external crystal load capacitors are required at that input.
+\begin{center}
+\begin{tikzpicture}[font=\small,>=Stealth]
+\node[draw,minimum width=29mm,minimum height=13mm](q)at(0,0){Quartz network};
+\node[draw,minimum width=29mm,minimum height=13mm](a)at(4,0){Oscillator};
+\node[draw,minimum width=24mm,minimum height=13mm](b)at(7.5,0){CMOS buffer};
+\draw[->](q)--(a);\draw[->](a)--(b);\draw[->](b.east)--++(1.1,0)node[right]{OUT};
+\draw[->](7.5,1.7)node[above]{OE}--(b.north);
+\draw[->](4,1.7)node[above]{VDD / GND}--(a.north);
+\end{tikzpicture}
+\end{center}
+\section*{Electrical and frequency characteristics}
+
+\begin{tabularx}{\linewidth}{@{}p{.31\linewidth}p{.23\linewidth}Y@{}}
+\toprule\TableHead Characteristic & Specification & Conditions\\\midrule
+Nominal output & 8.000 MHz & Fundamental clock output.\\
+Total frequency allowance & $\pm50$ ppm & Combined envelope; do not add separate $\pm50$ ppm terms.\\
+Supply & 3.3 V nominal & 3.0--3.6 V operating range.\\
+Operating temperature & $-20$ to $+70\,^{\circ}$C & Frequency allowance applies over this range.\\
+Start / enable time & 5 ms maximum & From valid supply and OE; interrupted qualification starts again.\\
+Output duty & 45--55\% & Valid steady operation, load at most 15 pF.\\
+Output levels & $V_L\le0.1V_{DD}$; $V_H\ge0.9V_{DD}$ & Specified logic load.\\
+OE levels & $V_L\le0.3V_{DD}$; $V_H\ge0.7V_{DD}$ & Do not leave OE floating.\\
+Disabled output & High impedance & No valid-frequency guarantee during startup or disable.\\\bottomrule
+\end{tabularx}
+
+\begin{Notice}{CLOCK PRESENT IS NOT CLOCK QUALIFIED}
+Edges during startup do not establish frequency accuracy. Allow the full start interval or use receiver-side clock qualification. A processor's internal reset-release timer is not part of this module.
+\end{Notice}
+\vfill\Caption{XO8-33 is a powered oscillator, not a two-terminal crystal resonator. The host clock tree and its multiplication/division factors belong to the receiving device.}
+\clearpage
+\Continuation{Connections and application layout}{Functional terminals and clock routing practice.}
+
+\begin{tabularx}{\linewidth}{@{}l l Y@{}}
+\toprule\TableHead Terminal & Direction & Function\\\midrule
+VDD & Supply & Decouple to local signal return.\\
+GND & Return & Low-impedance reference for supply and clock output.\\
+OE & Input & High enables operation; low disables the output.\\
+OUT & Output & CMOS clock; route to a compatible clock input.\\\bottomrule
+\end{tabularx}
+
+\section*{Typical connection}
+\begin{center}
+\begin{tikzpicture}[font=\small,>=Stealth]
+\node[draw,minimum width=38mm,minimum height=27mm](xo)at(0,0){XO8-33};
+\node[draw,minimum width=38mm,minimum height=18mm](host)at(7,0){CLK input};
+\draw[->](xo.east)--node[above]{OUT}(host.west);
+\draw(-.9,1.35)--(-.9,2.3)node[above]{3.3 V};
+\draw(.9,1.35)--(.9,2.3)node[above]{OE};
+\draw(0,-1.35)--(0,-2)node[below]{GND};
+\draw(-.9,2)--(-3,2)--(-3,.4);\draw(-3.2,.4)--(-2.8,.4);\draw(-3.2,.23)--(-2.8,.23);
+\draw(-3,.23)--(-3,-2)--(0,-2);\node[left,align=right]at(-3,.4){100 nF\\local bypass};
+\end{tikzpicture}
+\end{center}
+Place the bypass capacitor close to VDD and GND. Keep the clock route short with a continuous return path. Separate it from switching-power and high-current return paths. Reserve a source-series damping position when needed by the load and trace geometry; determine its value from the implemented interconnect.
+
+One OUT terminal does not imply unlimited fan-out. Add the receiver capacitances, trace capacitance and probe load. Use a qualified distribution buffer when the total exceeds the specified load. Devices share a timebase only when their clock inputs are actually connected to it; a data bus alone does not distribute the clock source.
+\section*{Startup and interrupted supply}
+After each invalid-supply or OE-low interval, the full start interval applies again. OUT must not be used to infer retained host state. Temporary supply loss can interrupt edges while the receiving device remains powered; receiver reset, fallback and fault policy are independent design decisions.
+\section*{Application boundaries}
+The published frequency allowance is not a zero-jitter guarantee. This issue does not specify cycle-to-cycle jitter, EMI performance of a finished board, PCB stack-up, crystal drive level outside the sealed module, or absolute maximum pin stress. Mechanical land-pattern release is a separate manufacturing drawing.
+\vfill\Caption{Meridion Frequency Products / MFP-008 / XO8-33 / Issue A. Functional signal labels are not a released package land pattern.}
+\end{document}

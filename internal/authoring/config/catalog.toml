@@ -1,0 +1,138 @@
+version = "0.7.0"
+
+[[documents]]
+id = "mcu_b16"
+title = "Northstar B8/B16 arithmetic and peripheral follow-on manual"
+source = "latex/mcu/b16-follow-on.tex"
+output_stem = "NMD-B16-Follow-On"
+vendor = "northstar"
+default_preset = "bad_xerox"
+expected_pages = 10
+
+[[documents]]
+id = "mux"
+title = "MX8-1 digital multiplexer"
+source = "latex/mux/mx8-1.tex"
+output_stem = "MX8-1"
+vendor = "triaxis"
+default_preset = "bad_xerox"
+artifact = true
+expected_pages = 3
+
+[[documents]]
+id = "requirements"
+title = "Half-A/Labs / Customer correspondence and clarification drawings"
+source = "latex/requirements/brief.tex"
+output_stem = "HAL-Customer-Correspondence"
+vendor = "halfalabs"
+default_preset = "bad_xerox"
+artifact = true
+expected_pages = 10
+
+[[documents]]
+id = "proof_northstar"
+title = "northstar identity proof"
+source = "latex/proofs/northstar.tex"
+output_stem = "Proof-northstar"
+vendor = "northstar"
+artifact = false
+expected_pages = 1
+
+[[documents]]
+id = "proof_pixelriver"
+title = "pixelriver identity proof"
+source = "latex/proofs/pixelriver.tex"
+output_stem = "Proof-pixelriver"
+vendor = "pixelriver"
+artifact = false
+expected_pages = 1
+
+[[documents]]
+id = "proof_triaxis"
+title = "triaxis identity proof"
+source = "latex/proofs/triaxis.tex"
+output_stem = "Proof-triaxis"
+vendor = "triaxis"
+artifact = false
+expected_pages = 1
+
+[[documents]]
+id = "proof_kestrel"
+title = "kestrel identity proof"
+source = "latex/proofs/kestrel.tex"
+output_stem = "Proof-kestrel"
+vendor = "kestrel"
+artifact = false
+expected_pages = 1
+
+[[documents]]
+id = "proof_vortek"
+title = "vortek identity proof"
+source = "latex/proofs/vortek.tex"
+output_stem = "Proof-vortek"
+vendor = "vortek"
+artifact = false
+expected_pages = 1
+
+[[documents]]
+id = "proof_thermasense"
+title = "thermasense identity proof"
+source = "latex/proofs/thermasense.tex"
+output_stem = "Proof-thermasense"
+vendor = "thermasense"
+artifact = false
+expected_pages = 1
+
+[[documents]]
+id = "mcu"
+title = "B8 microcontroller user manual"
+source = "latex/mcu/blender8.tex"
+output_stem = "NMD-B8-Controller"
+vendor = "northstar"
+default_preset = "bad_xerox"
+expected_pages = 32
+
+[[documents]]
+id = "lcd"
+title = "PX32-16 display module interface reference"
+source = "latex/lcd/px32-16.tex"
+output_stem = "PRD-PX32-16"
+vendor = "pixelriver"
+default_preset = "bad_xerox"
+expected_pages = 5
+
+[[documents]]
+id = "buttons"
+title = "BA-8 interlocked command assembly"
+source = "latex/buttons/ba-8.tex"
+output_stem = "KAS-BA-8"
+vendor = "kestrel"
+default_preset = "bad_xerox"
+expected_pages = 3
+
+[[documents]]
+id = "motor"
+title = "MD20 motor and driver interface reference"
+source = "latex/motor/md20.tex"
+output_stem = "VM-MD20"
+vendor = "vortek"
+default_preset = "bad_xerox"
+expected_pages = 4
+
+[[documents]]
+id = "temperature"
+title = "AVT10 linear case-temperature sensor"
+source = "latex/temperature/avt10.tex"
+output_stem = "TSC-AVT10"
+vendor = "thermasense"
+default_preset = "bad_xerox"
+expected_pages = 3
+
+[[documents]]
+id = "oscillator"
+title = "XO8-33 crystal-controlled clock oscillator"
+source = "latex/oscillator/xo8.tex"
+output_stem = "MFP-XO8-33"
+vendor = "meridion"
+default_preset = "bad_xerox"
+expected_pages = 2
