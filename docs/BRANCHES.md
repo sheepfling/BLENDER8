@@ -3,10 +3,10 @@
 The GitHub integration branch is named `main` in this repository. These two working branches
 have separate purposes:
 
-| Branch                     | Purpose                         | Integration policy                      |
-| -------------------------- | ------------------------------- | --------------------------------------- |
-| `feature/b8-b16-workbench` | Problem presentation and tools  | Intended to merge into `main`           |
-| `feature/b16-solution`     | Worked B16 example and teaching | Stays separate; never merge into `main` |
+| Branch                     | Purpose                             | Integration policy                      |
+| -------------------------- | ----------------------------------- | --------------------------------------- |
+| `feature/b8-b16-workbench` | Problem presentation and tools      | Intended to merge into `main`           |
+| `feature/b16-solution`     | Worked B8/B16 examples and teaching | Stays separate; never merge into `main` |
 
 ## Problem presentation
 
@@ -25,12 +25,14 @@ under `internal/` retain their existing role outside the New Employee reading ro
 Switch to `feature/b16-solution` and start with `TEACHING-SOLUTION.md`. That guide explains the
 controller's states, timing, register ownership, protection logic and experiments, with commands
 for native and Wasm builds. The controller stays in
-`internal/owner/experiments/b16-controller/`; selecting it is explicit. The editable starter at
+`internal/owner/experiments/b8-controller/` and `b16-controller/`; selecting a device and example is
+explicit. The editable starter at
 `platform/firmware/` remains available on both branches.
 
-The worked controller is B16-specific. B8 remains a supported exercise target; this branch does
-not claim to contain a completed B8 implementation. Automated acceptance, requirements decisions,
-human reviews and physical validation remain distinct.
+Both devices have worked examples. B8 uses explicit byte operations and a compact streamed font;
+B16 uses byte/word arithmetic and binary32. `feature/b16-solution` keeps its existing branch name
+and holds both. Automated acceptance, requirements decisions, human reviews and physical validation
+remain distinct.
 
 ## Direction of changes
 
