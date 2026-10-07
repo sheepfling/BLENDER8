@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "name": "short_invalid_changeover",
+  "mode": "firmware",
+  "profile": "chassis04",
+  "notes": "panel-04: no arbitrary transient winner; 40 ms invalid qualifier",
+  "events": [
+    {
+      "at_us": 0,
+      "command": "bounce off"
+    },
+    {
+      "at_us": 2300000,
+      "command": "stop 1"
+    },
+    {
+      "at_us": 2350000,
+      "command": "stop 0"
+    },
+    {
+      "at_us": 2400000,
+      "command": "speed 4"
+    },
+    {
+      "at_us": 3500000,
+      "command": "contact 0 closed"
+    },
+    {
+      "at_us": 3530000,
+      "command": "contact 0 normal"
+    }
+  ],
+  "checks": [
+    {
+      "at_us": 3550000,
+      "field": "drive_enabled",
+      "op": "eq",
+      "value": true,
+      "why": "A 30 ms conflicting indication does not qualify IF"
+    },
+    {
+      "at_us": 3600000,
+      "field": "lcd_pixels",
+      "op": "eq",
+      "value": "00000000000000000000000000000000000000000000000001100000000000000000000000000000011000000000000000000000000000011110000000000000000000000000000111100000000000000000000000000110011000000000000000000000000001100110000000000000000000000001100001100000000000000000000000011000011000000000000000000000000111111111100000000000000000000001111111111000000000000000000000000000011000000000000000000000000000000110000000000000000000000000000001100000000000000000000000000000011000000000000000000000000000000000000000000000",
+      "why": "Candidate encoding for 4; legibility remains human review"
+    }
+  ]
+}

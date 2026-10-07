@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "name": "priority_ts_over_il",
+  "mode": "firmware",
+  "profile": "chassis04",
+  "notes": "temperature-04/interlock-04: TS > IL",
+  "events": [
+    {
+      "at_us": 0,
+      "command": "bounce off"
+    },
+    {
+      "at_us": 2300000,
+      "command": "stop 1"
+    },
+    {
+      "at_us": 2350000,
+      "command": "stop 0"
+    },
+    {
+      "at_us": 2400000,
+      "command": "speed 4"
+    },
+    {
+      "at_us": 3500000,
+      "command": "sensor open"
+    },
+    {
+      "at_us": 3500000,
+      "command": "jar 0"
+    }
+  ],
+  "checks": [
+    {
+      "at_us": 3520000,
+      "field": "mcu.gpiob_out",
+      "op": "eq",
+      "value": 0,
+      "why": "No enable request"
+    },
+    {
+      "at_us": 3520000,
+      "field": "mcu.pwm_enabled",
+      "op": "eq",
+      "value": 0,
+      "why": "PWM disabled"
+    },
+    {
+      "at_us": 3520000,
+      "field": "mcu.pwm_shadow",
+      "op": "eq",
+      "value": 0,
+      "why": "Pending duty cleared"
+    },
+    {
+      "at_us": 3650000,
+      "field": "lcd_pixels",
+      "op": "eq",
+      "value": "00000000000000000000000000000000000001111111111000011111111000000000011111111110000111111110000000000000011000000110000000000000000000000110000001100000000000000000000001100000011000000000000000000000011000000110000000000000000000000110000000011111100000000000000001100000000111111000000000000000011000000000000001100000000000000110000000000000011000000000000001100000000000000110000000000000011000000000000001100000000000000110000001111111100000000000000001100000011111111000000000000000000000000000000000000000",
+      "why": "Candidate encoding for TS; legibility remains human review"
+    }
+  ]
+}

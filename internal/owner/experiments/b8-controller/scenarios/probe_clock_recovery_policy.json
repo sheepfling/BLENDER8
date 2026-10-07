@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "name": "probe_clock_recovery_policy",
+  "mode": "firmware",
+  "profile": "chassis04",
+  "notes": "E-02 characterization probe, not a new normative requirement: STOP alone does not switch a locked clock plan",
+  "events": [
+    {
+      "at_us": 0,
+      "command": "bounce off"
+    },
+    {
+      "at_us": 2300000,
+      "command": "stop 1"
+    },
+    {
+      "at_us": 2350000,
+      "command": "stop 0"
+    },
+    {
+      "at_us": 2400000,
+      "command": "speed 4"
+    },
+    {
+      "at_us": 3500000,
+      "command": "clock_failed 1"
+    },
+    {
+      "at_us": 3700000,
+      "command": "clock_failed 0"
+    },
+    {
+      "at_us": 3900000,
+      "command": "stop 1"
+    },
+    {
+      "at_us": 3950000,
+      "command": "stop 0"
+    },
+    {
+      "at_us": 4000000,
+      "command": "speed 4"
+    },
+    {
+      "at_us": 4200000,
+      "command": "reset"
+    },
+    {
+      "at_us": 6500000,
+      "command": "stop 1"
+    },
+    {
+      "at_us": 6550000,
+      "command": "stop 0"
+    },
+    {
+      "at_us": 6600000,
+      "command": "speed 4"
+    }
+  ],
+  "checks": [
+    {
+      "at_us": 4100000,
+      "field": "mcu.gpiob_out",
+      "op": "eq",
+      "value": 0,
+      "why": "No enable request"
+    },
+    {
+      "at_us": 4100000,
+      "field": "mcu.pwm_enabled",
+      "op": "eq",
+      "value": 0,
+      "why": "PWM disabled"
+    },
+    {
+      "at_us": 4100000,
+      "field": "mcu.pwm_shadow",
+      "op": "eq",
+      "value": 0,
+      "why": "No pending duty"
+    },
+    {
+      "at_us": 4100000,
+      "field": "lcd_pixels",
+      "op": "eq",
+      "value": "00000000000000000000000000000000000000011111111001100000011000000000000111111110011000000110000000000110000000000110000110000000000001100000000001100001100000000000011000000000011001100000000000000110000000000110011000000000000001100000000001111000000000000000011000000000011110000000000000000110000000000110011000000000000001100000000001100110000000000000011000000000011000011000000000000110000000000110000110000000000000011111111001100000011000000000000111111110011000000110000000000000000000000000000000000000",
+      "why": "Observed candidate label CK; documents a design choice rather than a new customer gate"
+    },
+    {
+      "at_us": 6700000,
+      "field": "drive_enabled",
+      "op": "eq",
+      "value": true,
+      "why": "Controller reset permits clock qualification and a later fresh STOP and command"
+    }
+  ]
+}

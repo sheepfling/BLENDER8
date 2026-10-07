@@ -1,0 +1,324 @@
+{
+  "schema": 1,
+  "verified_at": "2026-10-07T20:44:34.390402+00:00",
+  "baseline_commit": "2b877e9243fc76f61dee215586c74187d8bbfafc",
+  "scope": "B8 worked solution on teaching branch only; safe starter, numeric gate, requirements and full-precision plant unchanged",
+  "source_sha256": {
+    "byte_pair.hpp": "633c1328fb89848db1a06b557e707ad6830f408e4e3b6d3a02a941a01becd403",
+    "compact_font.hpp": "8a4a6cd8ab5b4d9cabb61819fba82cdad4e6cf6665274d54307dd68c5f8ad447",
+    "firmware.cpp": "6f6de019916475515ca914028cb4fdf4df3537dde627ca6d2c2edce1d431367b",
+    "font-source.json": "43893dae670bb75ef29f994c7f1d1ead6d7a7d69e968e78ff37a0d8b1989c0f6",
+    "font.hpp": "fa57495f69774356024280a92971fd983b58cf35133ddb872cc6d491d77f5a48",
+    "generate_font.py": "e470df8b2532c8a7790fa886d2d04ad1d8de17bf0186fe326ea3094834527a43",
+    "glyphs.json": "a036e758ecbc6b0e3ee2efd77e71d33eaede27678ab6e9496ea9e13f5dcdaaa9",
+    "pixels.hpp": "254abe0578b5be00263723d95676839cc06cdb7304fb7f87523c4fead3854bda",
+    "scenarios/clock_fast.json": "8cf93604cd67afae986453c19a448c08622e8ee2b4c4612e567ea2794207c4c4",
+    "scenarios/clock_slow.json": "92ff28663f2365676b2495cc2b29ef8b7f818a4613403764d7700c377c0420aa",
+    "scenarios/intentional_coast_not_stall.json": "2030b6d4a460692e0e402f3360af3fdc22da920e3587fff92d19da55b5860f5a",
+    "scenarios/loaded_idle_pulse.json": "198f1f2a80e7a706676c57771eb47fafa51008d2562c634a1dd30394e5a4c2f7",
+    "scenarios/minimum_pulse_slow_bounce.json": "70982c83239eab2bfc01d662540371ca8ab031f6b7d1b71158b394b145fda640",
+    "scenarios/nominal_noise_full_load.json": "96c7b21592562ca6347076c0ac4d8548815f1ae3ce3d9283effdad517ee55cff",
+    "scenarios/priority_ck_over_wd.json": "882759ff746f422366b512f08815653bceacd7dc108f3e0aea7bbca91993f797",
+    "scenarios/priority_if_over_il.json": "a9cd3480405051d9f5edc4585e46b909b3fa752b3744aa56bf50a7bacef4a551",
+    "scenarios/priority_il_over_st.json": "ecb318b0f2a411a69e51937f5c419a4cf360d94f975f84c79269c7e3ca3e2523",
+    "scenarios/priority_th_over_if.json": "31654e8b8ab8bc157cc14ab9a9de8536da98bf4364ba5b745b1ae3d1e432ff9e",
+    "scenarios/priority_ts_over_il.json": "0dfd16a8d8b6bbed1e7da1b125a3d522ad1ceaed7bc76e42bd6d0ff68b0a4509",
+    "scenarios/priority_wd_over_dm.json": "a2a9facfb6322e8b700b06ce563a1a8f2b5ebe905cbc6d0949b4649d536b6dc6",
+    "scenarios/probe_adc_deadman_interaction.json": "38df95f0ed726bdb787a864aa6d3f47044d3aab2f638e6823f53703d9894032d",
+    "scenarios/probe_brownout_clears_diagnosis.json": "f4a23a37c745bad66b49df88ef73f67c6cd3a99b47ab6d3ee0f4f4eea0c9d2a0",
+    "scenarios/probe_clock_recovery_policy.json": "cd6c5771fa35322a04fff2236d22b0c2d0cdae61bd4739b7ebea76edc1784f3a",
+    "scenarios/short_invalid_changeover.json": "45e117fcc5211f57388acd7574da5a489c85284c4919273a65da7599117748bc",
+    "scenarios/startup_stop_not_queued.json": "a4cc15d49b9e6a17f0399ea5ef31327d1a96e4b5a4f487c2a846f6382e1abe2d",
+    "scenarios/stuck_command_blocks_restart.json": "1e8108c1cbcea5f222528a645e84f0b847205b6925a45e0d60c743a65a4aa5fc",
+    "scenarios/tach_stuck_high.json": "b6133e23caeb6b58d50ad9ebda03b19625be1aa67fe655ab8262f9ee2bff8feb",
+    "scenarios/warm_reset_retains_ts.json": "93ab07795c333ff1eb83f530f28afbf8d2427038939ed4f4c35e4c99fbd6bd3d",
+    "scenarios/watchdog_fast.json": "b1c21e3cb189516d2ec0898a09e602f5652c3e0d718fc9de55a6c9c2021f45ed",
+    "scenarios/watchdog_slow.json": "c0cc4bd9a2d359689027363d060145ec40058a97b7ee9a9c6d99ba54b8ac2e8f",
+    "test_helpers.py": "7411fa68022f30e42301f452cf21b43650bd4827295ad7cb08b1a4acf14a870d"
+  },
+  "builds": [
+    {
+      "toolchain": "native",
+      "image": "build/teaching-b8-native/b8_emulator",
+      "image_sha256": "75f7a41e13527ba759d7c1deb2bfab410c37ab67ee2aed597d97814e1f2dce4b",
+      "receipt": "reports/teaching-b8-native.json.gz",
+      "receipt_sha256": "19a873f19085407b0b986fe41d59c4885ae4159779cad738d16b4adbd76d1ae7",
+      "acceptance": {
+        "pass": 61,
+        "fail": 0,
+        "review": 2
+      },
+      "additional_requirement_scenarios": 19,
+      "characterization_probes": 3,
+      "memory": {
+        "schema": 1,
+        "device": "B8",
+        "tier": "standard",
+        "limits": {
+          "ram": 2048,
+          "program": 16384
+        },
+        "usage": {
+          "program": 5933,
+          "ram": 79
+        },
+        "static_ram": 79,
+        "peripheral_ram": 0,
+        "measurement": "isolated-object-sections",
+        "unaccounted": [
+          "runtime stack",
+          "heap",
+          "external linked helpers"
+        ],
+        "exceeded": []
+      },
+      "observed_devices": [
+        {
+          "device": "B8",
+          "interface": 3,
+          "chassis": 4
+        }
+      ]
+    },
+    {
+      "toolchain": "gcc",
+      "image": "build/teaching-b8-gcc/b8_emulator",
+      "image_sha256": "a9a760eb976650439ca02aab7147bcc24aa184bc3029a0457b3522802323a8b7",
+      "receipt": "reports/teaching-b8-gcc.json.gz",
+      "receipt_sha256": "45864d882bd8067c70cf4cd65287ce3a95f99c84a8581f930b228fe02e2940bf",
+      "acceptance": {
+        "pass": 61,
+        "fail": 0,
+        "review": 2
+      },
+      "additional_requirement_scenarios": 19,
+      "characterization_probes": 3,
+      "memory": {
+        "schema": 1,
+        "device": "B8",
+        "tier": "standard",
+        "limits": {
+          "ram": 2048,
+          "program": 16384
+        },
+        "usage": {
+          "program": 6626,
+          "ram": 78
+        },
+        "static_ram": 78,
+        "peripheral_ram": 0,
+        "measurement": "isolated-object-sections",
+        "unaccounted": [
+          "runtime stack",
+          "heap",
+          "external linked helpers"
+        ],
+        "exceeded": []
+      },
+      "observed_devices": [
+        {
+          "device": "B8",
+          "interface": 3,
+          "chassis": 4
+        }
+      ]
+    },
+    {
+      "toolchain": "sanitize",
+      "image": "build/teaching-b8-sanitize/b8_emulator",
+      "image_sha256": "85f22bb63de77edf41b7b2ac513634b7258d1cc32416bb84b8a5d7c99377faa5",
+      "receipt": "reports/teaching-b8-sanitize.json.gz",
+      "receipt_sha256": "8741c97f706a806606bfbbd488ec487fe121e65accabf9043009c1b6c25abb38",
+      "acceptance": {
+        "pass": 61,
+        "fail": 0,
+        "review": 2
+      },
+      "additional_requirement_scenarios": 19,
+      "characterization_probes": 3,
+      "memory": {
+        "schema": 1,
+        "device": "B8",
+        "tier": "plus",
+        "limits": {
+          "ram": 4096,
+          "program": 32768
+        },
+        "usage": {
+          "program": 14273,
+          "ram": 3520
+        },
+        "static_ram": 3520,
+        "peripheral_ram": 0,
+        "measurement": "isolated-object-sections",
+        "unaccounted": [
+          "runtime stack",
+          "heap",
+          "external linked helpers"
+        ],
+        "exceeded": []
+      },
+      "observed_devices": [
+        {
+          "device": "B8",
+          "interface": 3,
+          "chassis": 4
+        }
+      ]
+    },
+    {
+      "toolchain": "wasm",
+      "image": "build/teaching-b8-wasm/web/b8_student.wasm",
+      "image_sha256": "b34381bf5b32bf3dbe8ce8c552eb84582347885754875fa9602b652ee9ddb947",
+      "receipt": "reports/teaching-b8-wasm.json.gz",
+      "receipt_sha256": "0c586a66df7166e779233bfaa09005a95c2e96e958a1c0aca7d2eb0792ad9162",
+      "acceptance": {
+        "pass": 61,
+        "fail": 0,
+        "review": 2
+      },
+      "additional_requirement_scenarios": 19,
+      "characterization_probes": 3,
+      "memory": {
+        "schema": 1,
+        "device": "B8",
+        "tier": "standard",
+        "limits": {
+          "ram": 2048,
+          "program": 16384
+        },
+        "usage": {
+          "program": 7230,
+          "ram": 395
+        },
+        "static_ram": 395,
+        "peripheral_ram": 0,
+        "measurement": "isolated-object-sections",
+        "unaccounted": [
+          "runtime stack",
+          "heap",
+          "external linked helpers"
+        ],
+        "exceeded": []
+      },
+      "observed_devices": [
+        {
+          "device": "B8",
+          "interface": 3,
+          "chassis": 4
+        }
+      ]
+    }
+  ],
+  "conformance": {
+    "clang": {
+      "passed": 237,
+      "total": 237
+    },
+    "gcc": {
+      "passed": 237,
+      "total": 237
+    },
+    "clang-asan-ubsan": {
+      "passed": 237,
+      "total": 237,
+      "memory_tier": "plus for instrumentation only"
+    },
+    "emscripten_ctest": {
+      "passed": 9,
+      "total": 9
+    }
+  },
+  "helper_tests": {
+    "passed": 3,
+    "all_counter_values": 65536,
+    "boundary_deltas": 8,
+    "pixel_bytes": 1536,
+    "native_requested_run_us": 73450000
+  },
+  "compiled_workbench_checks": {
+    "B8": {
+      "passed": 11,
+      "total": 11
+    },
+    "B16": {
+      "passed": 11,
+      "total": 11
+    },
+    "includes": "epoch wrap beyond 70 logical seconds, then STOP"
+  },
+  "selected_firmware_parity": {
+    "passed": true,
+    "mode": "selected firmware, not component bench",
+    "commands": [
+      "bounce off",
+      "run 2300000",
+      "stop 1",
+      "run 50000",
+      "stop 0",
+      "run 50000",
+      "speed 4",
+      "run 1000000",
+      "pulse 1",
+      "run 50000",
+      "pulse 0",
+      "food_preset frozen_fruit",
+      "run 1000000",
+      "sensor open",
+      "run 50000",
+      "sensor healthy",
+      "reset",
+      "run 100000",
+      "snapshot",
+      "voltage 2.0",
+      "run 20000",
+      "voltage auto",
+      "run 2300000",
+      "stop 1",
+      "run 50000",
+      "stop 0",
+      "run 50000",
+      "speed 1",
+      "run 1000000",
+      "noise 0.001 4815",
+      "run 1000000",
+      "stop 1",
+      "run 50000"
+    ],
+    "device": "B8",
+    "native_sha256": "75f7a41e13527ba759d7c1deb2bfab410c37ab67ee2aed597d97814e1f2dce4b",
+    "wasm_sha256": "b34381bf5b32bf3dbe8ce8c552eb84582347885754875fa9602b652ee9ddb947",
+    "float_comparison": {
+      "relative": 1e-09,
+      "absolute": 1e-07,
+      "discrete": "exact"
+    }
+  },
+  "accepted": false,
+  "pending": [
+    "human progress-authorization review",
+    "human combined-fault-retention review",
+    "glyph legibility",
+    "four common requirements decisions",
+    "physical validation and startup/retention implementation"
+  ],
+  "limits": [
+    "Finite SWIL evidence, no instruction ISA or execution cost model",
+    "Object section accounting excludes stack, heap and linked helpers",
+    "B8 diagnosis retention uses the documented C++ binding reset-entry behavior; physical no-init storage is unverified"
+  ],
+  "quality": {
+    "strict_python_and_markdown": "passed",
+    "owner_python_ruff_pyright": "passed",
+    "helper_boundary_and_source_bundle_tests": 13
+  },
+  "tool_source_sha256": {
+    "platform/tools/check_numeric.py": "4dc90d3e458036207badfa6f4dd6d2eba4e5244b67d1e0538a37f92955623a63",
+    "platform/tools/check_memory.py": "43ede81b397380979fc525c2f44cf39ca13370f7fe91c36d1ba39bb8d1831e00",
+    "platform/tools/acceptance.py": "5066978394c12210ff238d7d5d8ea24730fa73d190ae19d8a4c5cc43874be18f",
+    "platform/tools/experiment.py": "aa7e9d9411eb027d1b7bf237949041cb52d98aae29f255b475c0ea41fa2f199c",
+    "platform/tools/scenario.py": "a0ee4b4b5c28676b752965f25666268d99588c4d884c32a1a6c98eeb737401c8",
+    "tools/teaching.py": "d55119cda59bec3ce5aae0c7ff41e6672ba874ea9bae8a81e28f6be3416f8937",
+    "platform/tests/wasm/candidate-view.test.mjs": "29f1e6acd3e4e5c8bb1a37bcebfa4f0bd3936f243bba72f6017db3d38bb9da69"
+  }
+}

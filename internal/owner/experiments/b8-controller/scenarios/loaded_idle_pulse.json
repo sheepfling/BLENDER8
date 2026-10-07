@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "name": "loaded_idle_pulse",
+  "mode": "firmware",
+  "profile": "chassis04",
+  "notes": "motion-04 and MD20: full load at the minimum 2000 RPM no-load target",
+  "events": [
+    {
+      "at_us": 0,
+      "command": "bounce off"
+    },
+    {
+      "at_us": 2300000,
+      "command": "stop 1"
+    },
+    {
+      "at_us": 2350000,
+      "command": "stop 0"
+    },
+    {
+      "at_us": 0,
+      "command": "load 1"
+    },
+    {
+      "at_us": 2400000,
+      "command": "pulse 1"
+    }
+  ],
+  "checks": [
+    {
+      "at_us": 3500000,
+      "field": "drive_enabled",
+      "op": "eq",
+      "value": true,
+      "why": "Lowest requested speed must tolerate full specified load"
+    },
+    {
+      "at_us": 3500000,
+      "field": "motor.rpm",
+      "op": "between",
+      "value": [
+        900,
+        1100
+      ],
+      "why": "MD20 load 1 halves idle PULSE nominal speed"
+    }
+  ]
+}

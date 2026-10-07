@@ -1,6 +1,6 @@
 # Blender-8 teaching and solution workspace
 
-This is **`feature/b16-solution`**. Start with the [worked B16 teaching route](TEACHING-SOLUTION.md)
+This is **`feature/b16-solution`**. Start with the [worked B8/B16 teaching route](TEACHING-SOLUTION.md)
 for the explicit solution build, code walkthrough, experiments and requirements discussion.
 This branch stays outside `main`. The problem presentation lives on `feature/b8-b16-workbench`.
 

@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "name": "probe_brownout_clears_diagnosis",
+  "mode": "firmware",
+  "profile": "chassis04",
+  "notes": "Characterization of the B8 binding retention choice, not a new customer requirement: warm reset preserves TS, BOR begins a new diagnosis with inhibited startup.",
+  "events": [
+    {
+      "at_us": 0,
+      "command": "bounce off"
+    },
+    {
+      "at_us": 2300000,
+      "command": "stop 1"
+    },
+    {
+      "at_us": 2350000,
+      "command": "stop 0"
+    },
+    {
+      "at_us": 2400000,
+      "command": "speed 4"
+    },
+    {
+      "at_us": 3500000,
+      "command": "sensor open"
+    },
+    {
+      "at_us": 3600000,
+      "command": "sensor healthy"
+    },
+    {
+      "at_us": 3700000,
+      "command": "reset"
+    },
+    {
+      "at_us": 4000000,
+      "command": "voltage 2.0"
+    },
+    {
+      "at_us": 4100000,
+      "command": "voltage auto"
+    },
+    {
+      "at_us": 6500000,
+      "command": "stop 1"
+    },
+    {
+      "at_us": 6550000,
+      "command": "stop 0"
+    },
+    {
+      "at_us": 6600000,
+      "command": "speed 1"
+    }
+  ],
+  "checks": [
+    {
+      "at_us": 3850000,
+      "field": "lcd_pixels",
+      "op": "eq",
+      "value": "00000000000000000000000000000000000001111111111000011111111000000000011111111110000111111110000000000000011000000110000000000000000000000110000001100000000000000000000001100000011000000000000000000000011000000110000000000000000000000110000000011111100000000000000001100000000111111000000000000000011000000000000001100000000000000110000000000000011000000000000001100000000000000110000000000000011000000000000001100000000000000110000001111111100000000000000001100000011111111000000000000000000000000000000000000000",
+      "why": "Warm reset preserves application diagnosis"
+    },
+    {
+      "at_us": 4300000,
+      "field": "lcd_pixels",
+      "op": "eq",
+      "value": "00000000000000000000000000000000000000000000011111100000000000000000000000000111111000000000000000000000000110000001100000000000000000000001100000011000000000000000000000011000011110000000000000000000000110000111100000000000000000000001100110011000000000000000000000011001100110000000000000000000000111100001100000000000000000000001111000011000000000000000000000011000000110000000000000000000000110000001100000000000000000000000011111100000000000000000000000000111111000000000000000000000000000000000000000000000",
+      "why": "BOR starts new diagnosis"
+    },
+    {
+      "at_us": 4300000,
+      "field": "drive_enabled",
+      "op": "eq",
+      "value": false,
+      "why": "BOR does not authorize restart"
+    },
+    {
+      "at_us": 6700000,
+      "field": "drive_enabled",
+      "op": "eq",
+      "value": true,
+      "why": "New qualification, acknowledgment and command can run"
+    }
+  ]
+}

@@ -3,11 +3,16 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {pathToFileURL} from 'node:url';
+import {resolve} from 'node:path';
 import {ViewClient} from '../../webview/view-client.mjs';
 
 const web=process.env.B8_CANDIDATE_WEB;
-if(!web)throw new Error('B8_CANDIDATE_WEB must identify the compiled B16 experiment');
-const glyphs=JSON.parse(await readFile(new URL('../../../internal/owner/experiments/b16-controller/glyphs.json',import.meta.url)));
+if(!web)throw new Error('B8_CANDIDATE_WEB must identify the compiled experiment');
+const device=process.env.B8_CANDIDATE_DEVICE||'B16';
+const oracle=process.env.B8_CANDIDATE_ROOT
+ ?pathToFileURL(resolve(process.env.B8_CANDIDATE_ROOT,'glyphs.json'))
+ :new URL('../../../internal/owner/experiments/b16-controller/glyphs.json',import.meta.url);
+const glyphs=JSON.parse(await readFile(oracle));
 async function candidate(){
  const create=(await import(pathToFileURL(web+'/b8_student.mjs'))).default;
  const m=await create({wasmBinary:await readFile(web+'/b8_student.wasm')});
@@ -16,7 +21,7 @@ async function candidate(){
  const cmd=text=>{const r=JSON.parse(m.ccall('b8_wasm_command','string',['string','number'],[text,Buffer.byteLength(text)]));assert.equal(r.ok,true,r.error);return r.state;};
  const key=(code,down)=>v.event(down?4:5,code);
  const lcd=label=>assert(glyphs[label].includes(cmd('snapshot').lcd_pixels),`actual LCD must show ${label}`);
- assert.equal(JSON.parse(m.ccall('b8_wasm_hello','string',[],[])).device,'B16');
+ assert.equal(JSON.parse(m.ccall('b8_wasm_hello','string',[],[])).device,device);
  cmd('run 2500000');key(32,true);cmd('run 60000');key(32,false);cmd('run 20000');
  key(52,true);key(52,false);assert.equal(cmd('run 1000000').drive_enabled,true);lcd('4');
  return {v,cmd,key,lcd,close:()=>m.ccall('b8_wasm_dispose',null,[],[])};
@@ -66,3 +71,16 @@ for(const [fixture,duration,bit,label,detail] of [['halt 1',320000,4,'WD',32],['
   }finally{c.close();}
  });
 }
+
+test('controller remains responsive across a 65,536 ms epoch wrap',async()=>{
+ const c=await candidate();try{
+  c.key(49,true);c.key(49,false);c.cmd('run 100000');c.lcd('1');
+  const serial=c.cmd('snapshot').mcu.reset_serial;
+  for(let i=0;i<7;++i){
+   const s=c.cmd('run 10000000');assert.equal(s.drive_enabled,true);
+   assert.equal(s.mcu.reset_serial,serial,'epoch wrap must not cause a reset');
+  }
+  c.lcd('1');c.key(32,true);c.cmd('run 50000');c.lcd('0');
+  assert.equal(c.cmd('snapshot').drive_enabled,false);
+ }finally{c.close();}
+});

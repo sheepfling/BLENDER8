@@ -1,15 +1,18 @@
-# Worked B16 controller: teaching route
+# Worked B8 and B16 controllers: teaching route
 
 This guide belongs to **`feature/b16-solution`**, which stays outside `main`.
 The problem presentation and all shared tooling live on `feature/b8-b16-workbench`.
 See [branch purposes and update direction](docs/BRANCHES.md). Use the
 [New Employee route](NEW-EMPLOYEE-START.md) for a first attempt at the exercise.
 
-This is a worked B16 example, with documented design decisions and unresolved requirements.
-The default `platform/firmware/` remains the unfinished starter. The worked source is
-[firmware.cpp](internal/owner/experiments/b16-controller/firmware.cpp); it includes only the public
-SDK and its own font. Its location also excludes it from the learner source handoff bundle.
-B8 is a supported exercise device; this guide does not claim to provide a completed B8 solution.
+Both devices now have worked examples with documented design decisions and unresolved requirements.
+The default `platform/firmware/` remains the unfinished starter. Each controller includes only the
+public SDK and its own files, and stays outside the learner source handoff bundle.
+
+| Device | Worked source                                                          | Arithmetic and storage                   |
+| ------ | ---------------------------------------------------------------------- | ---------------------------------------- |
+| B8     | [Byte controller](internal/owner/experiments/b8-controller/README.md)  | Byte pairs, ADC thresholds, compact font |
+| B16    | [Word controller](internal/owner/experiments/b16-controller/README.md) | Byte/word arithmetic, binary32, SRAM     |
 
 ## 1. Build, run and inspect
 
@@ -22,8 +25,9 @@ python tools/teaching.py test --root .
 python tools/teaching.py verify-native --root .
 ```
 
-The Python runner explicitly selects B16, standard memory, the production watchdog fuse and the
-worked firmware directory. Native products go to `build/teaching-b16-native/`. Verification writes
+The Python runner defaults to B16. Add `--device B8` to select B8 on every command; the build always
+selects standard memory, the production watchdog fuse and the matching worked firmware directory.
+Native products go to `build/teaching-b16-native/`. Verification writes
 `reports/teaching-b16-native.json.gz`, containing the actual image hash, observed device identity,
 automated correspondence cases and additional scenarios. A successful automated run still reports
 `accepted: false`; it supplies no human approval.
@@ -41,6 +45,22 @@ Wasm products go to `build/teaching-b16-wasm/`. Open the printed loopback URL an
 firmware**. Component bench executes no firmware. The local upload control accepts the matching
 `b8_student.mjs` and `b8_student.wasm` from the same build's `web/` folder; select B16. The page
 executes the compiled controller, MCU, plant and renderer in its browser worker.
+
+For B8, use the same route with explicit device selection:
+
+```sh
+python tools/teaching.py native --root . --device B8
+python tools/teaching.py test --root . --device B8
+python tools/teaching.py verify-native --root . --device B8
+python tools/teaching.py wasm --root . --device B8
+python tools/teaching.py check-wasm --root . --device B8
+python tools/teaching.py verify-wasm --root . --device B8
+python tools/teaching.py serve --root . --device B8 --port 8095
+```
+
+Its products and receipts use `teaching-b8` in place of `teaching-b16`. Choose B8 in the upload UI.
+B8 `test` also exercises byte carry/borrow, every generated pixel byte and a native run beyond
+the paired-byte epoch wrap. Use separate build directories and ports when comparing controllers.
 
 To start: allow two cool logical seconds, tap STOP, release the controls, then select a speed.
 STOP clears the command; its release does not resume the previous speed. After a fault, remove
@@ -84,6 +104,20 @@ coast and the motor to cool through the plant's physical models; it does not era
 
 ## 3. Timing and ownership decisions
 
+### B8 arithmetic lesson
+
+Compare the implementations of `timer()`, temperature qualification and `display()`. B8 uses
+explicit low/high bytes with carry and borrow instead of native word operations. Its timer
+snapshot masks the ISR while copying the pair; its ADC/tach reads respect hardware capture order.
+The [B8 walkthrough](internal/owner/experiments/b8-controller/README.md) explains the raw ADC
+thresholds, 148-byte streamed font and explicit warm-reset diagnosis strategy.
+
+There is no instruction flags register in the C++ binding. Carry/borrow are local helper results;
+signed overflow is a separate condition. The helpers are tested against wider host arithmetic,
+which remains permitted in tests and physics. These byte representations obey the B8 policy.
+
+### Shared control design
+
 The [candidate design table](internal/owner/experiments/b16-controller/README.md#design-choices-and-timing)
 records the complete choices and margins. The central ideas are:
 
@@ -104,9 +138,9 @@ records the complete choices and margins. The central ideas are:
   poll BUSY and respect its 8 microsecond recovery; this example does not use DMA or schedule
   every update inside VBLANK. Active-scan writes can tear until the next refresh.
 
-B16 word arithmetic and binary32 obey the selected numeric policy. Host motor, thermal and
-emulator calculations retain full precision. The model advances at SDK service boundaries;
-these deadlines do not establish MCU instruction timing or physical interrupt latency.
+B8 byte operations and B16 word/binary32 operations obey their selected numeric policies.
+Host motor, thermal and emulator calculations retain full precision. The model advances at SDK
+service boundaries; these deadlines do not establish MCU instruction timing or physical interrupt latency.
 
 ## 4. Experiments to try
 
@@ -135,12 +169,16 @@ decisions: stale ADC versus deadman expiry, deliberate clock-fault recovery, dia
 and the measurement/validation envelope. These are proposals for customer clarification, not
 extra hidden grading rules.
 
-The verified candidate passes 61 automated correspondence cases and 19 additional scenarios on
-native and actual compiled Wasm. Two further characterization probes record unresolved choices.
+Both candidates pass 61 automated correspondence cases and 19 additional scenarios on native and
+actual compiled Wasm. B16 has two characterization probes; B8 has a third for brownout diagnostic
+lifetime. Their tests also cover execution past a full 65,536-tick epoch wrap.
 The progress-authorization and combined-fault-retention reviews remain open; glyph matching
 checks encoding and does not approve human readability. The
 [historical receipt](internal/owner/experiments/b16-controller/verification.json) identifies its
 original images; rerun verification to identify the image built from this checkout.
+The [B8 receipt](internal/owner/experiments/b8-controller/verification.json) records its own images
+and standard-memory measurements. Sanitizer instrumentation uses B8 plus; ordinary builds use
+standard. Neither object's section accounting measures the runtime stack or physical instruction cost.
 
 As a teaching exercise, choose one unresolved decision, write the proposed customer follow-up,
 define an observable test and predicted result, then change the controller. Keep the current

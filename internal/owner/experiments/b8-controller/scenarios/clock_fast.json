@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "name": "clock_fast",
+  "mode": "firmware",
+  "profile": "chassis04",
+  "notes": "clock-04: external oscillator frequency tolerance endpoint",
+  "events": [
+    {
+      "at_us": 0,
+      "command": "bounce off"
+    },
+    {
+      "at_us": 2300000,
+      "command": "stop 1"
+    },
+    {
+      "at_us": 2350000,
+      "command": "stop 0"
+    },
+    {
+      "at_us": 2400000,
+      "command": "speed 4"
+    },
+    {
+      "at_us": 0,
+      "command": "xo_ppm 50"
+    }
+  ],
+  "checks": [
+    {
+      "at_us": 3500000,
+      "field": "drive_enabled",
+      "op": "eq",
+      "value": true,
+      "why": "Clock tolerance does not break supervision"
+    },
+    {
+      "at_us": 3500000,
+      "field": "mcu.peripheral_hz",
+      "op": "between",
+      "value": [
+        999000,
+        1001000
+      ],
+      "why": "PB target with external frequency allowance"
+    }
+  ]
+}
