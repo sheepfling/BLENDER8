@@ -5,6 +5,10 @@ B8 interface 03 or B16 interface 04, chassis 04. The supplied firmware is a safe
 starter; platform tests
 do not mean that its customer behavior is complete.
 
+Use the problem presentation branch, `feature/b8-b16-workbench`, for the exercise. The separate
+`feature/b16-solution` branch contains the worked teaching example. See
+[branch purposes](docs/BRANCHES.md) before switching between them.
+
 ## 1. Install the tools
 
 Install Python 3.12 or newer, CMake 3.20 or newer, and a C++20 compiler. LLVM Clang supplies the
