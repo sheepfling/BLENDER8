@@ -71,6 +71,12 @@ def run(args: Sequence[str], root: Path, extra_env: dict[str, str] | None = None
 
 def include(path: Path, root: Path) -> bool:
     relative = path.relative_to(root)
+    if relative.as_posix() in {
+        "TEACHING-SOLUTION.md",
+        "tools/teaching.py",
+        "platform/tests/wasm/candidate-view.test.mjs",
+    }:
+        return False
     if relative.parts[:2] in {("internal", "owner"), ("internal", "history")}:
         return False
     if any(

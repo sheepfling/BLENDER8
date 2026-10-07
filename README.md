@@ -13,6 +13,10 @@ Start with the [New Employee route](NEW-EMPLOYEE-START.md) to install the Python
 the PDF packet, compile C++ tests, and build and serve the WebAssembly page. The
 [documentation index](docs/INDEX.md) links the current guides.
 
+This is the **problem presentation** branch, `feature/b8-b16-workbench`, intended for `main`.
+The worked teaching example lives on `feature/b16-solution` and stays outside `main`.
+See [branch purposes and update direction](docs/BRANCHES.md).
+
 | Location                                                              | Role                                                                   |
 | --------------------------------------------------------------------- | ---------------------------------------------------------------------- |
 | `platform/sdk/include/blender8/`                                      | Public B8 headers available to firmware                                |

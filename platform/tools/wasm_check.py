@@ -24,6 +24,9 @@ FLOAT_FIELDS = {
     "motor.duty",
     "motor.case_c",
     "motor.loss_w",
+    "thermal.nearby_air_c",
+    "thermal.food_c",
+    "thermal.load_current_equivalent_a",
     "mcu.system_hz",
     "mcu.peripheral_hz",
 }

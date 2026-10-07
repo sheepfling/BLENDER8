@@ -47,6 +47,7 @@ void bench() {
     call("snapshot");
     contains(call("write 0xA7 60"), "\"ok\":true");
     contains(call("write 0xA8 165"), "\"ok\":true");
+    contains(call("write 0xB0 1"), "\"ok\":true"); // Enable on the D1 option too.
     contains(call("run 300000"), "\"reset_causes\":5"); // POR|WDT; bench never feeds it.
 }
 void validation() {
@@ -65,6 +66,7 @@ void exceptions() {
     contains(call("write 0xFFFF 1"), "\"ok\":false");
     // A recoverable exception does not abort Wasm or poison subsequent replies.
     contains(call("snapshot"), "\"ok\":true");
+    contains(call("write 0xB0 1"), "\"ok\":true");
     contains(call("write 0xB2 0"), "\"ok\":true"); // Bad service key requests hardware reset.
     contains(call("run 2000"), "\"reset_causes\":5");
 }

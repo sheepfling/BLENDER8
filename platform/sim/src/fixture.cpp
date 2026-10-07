@@ -42,6 +42,11 @@ std::function<void(Board&)> parse_fixture_command(std::string_view line,bool ben
         };
     }
     if(cmd=="load"){size(a,2);auto n=real(a[1],0,1);return [n](Board& b){b.motor().set_load(n);};}
+    if(cmd=="food_preset"){
+        size(a,2);
+        for(const auto& p:food_presets)if(a[1]==p.name)return [p](Board& b){b.motor().set_food_preset(p);};
+        throw std::invalid_argument("food preset: empty, water, frozen_fruit, hot_vegetables");
+    }
     if(cmd=="temperature"){size(a,2);auto n=real(a[1],-40,150);return [n](Board& b){b.motor().thermal().set_initial_temperature(n);};}
     if(cmd=="environment"){size(a,4);auto amb=real(a[1],-40,150),food=real(a[2],-40,150),g=real(a[3],0,.2);return [=](Board& b){b.motor().thermal().set_environment(amb,food,g);};}
     if(cmd=="food"){size(a,3);auto food=real(a[1],-40,150),g=real(a[2],0,.2);return [=](Board& b){b.motor().thermal().set_food(food,g);};}
@@ -89,7 +94,7 @@ std::function<void(Board&)> parse_fixture_command(std::string_view line,bool ben
         else if(a[1]=="motor")f=Fuse::motor;else throw std::invalid_argument("unknown fuse branch");
         bool v=boolean(a[2]);return [=](Board& b){b.power_domain().set_fuse(f,v);};
     }
-    if(cmd=="reset"){size(a,1);return [](Board& b){b.mcu().reset(ResetCause::external);};}
+    if(cmd=="reset"){size(a,1);return [](Board& b){b.mcu().reset(ResetCause::external,0,b.now());};}
     if(cmd=="write"){
         if(!bench)throw std::invalid_argument("register writes are available only in --bench mode; firmware owns outputs");
         size(a,3);auto r=static_cast<Reg>(integer(a[1],65535));auto v=static_cast<std::uint8_t>(integer(a[2],255));
@@ -105,7 +110,7 @@ std::string json_string(std::string_view text){
     }
     s<<'"';return s.str();
 }
-std::string snapshot_json(Board& b){
+std::string snapshot_json(Board& b,bool captures){
     std::ostringstream s;s.imbue(std::locale::classic());s<<std::setprecision(17)<<std::boolalpha;
     const auto m=b.mcu().observe();
     s<<"{\"time_us\":"<<b.now()<<",\"powered\":"<<b.powered()<<",\"ready\":"<<b.ready()
@@ -124,7 +129,9 @@ std::string snapshot_json(Board& b){
         const auto& t=motor->thermal();
         s<<"{\"nearby_air_c\":"<<t.air_temperature_c()<<",\"food_c\":";
         if(t.food_present())s<<t.food_temperature_c();else s<<"null";
-        s<<",\"food_present\":"<<t.food_present()<<",\"load_current_equivalent_a\":"<<t.last_load_current_a()<<'}';
+        s<<",\"preset\":"<<json_string(t.food_kind())<<",\"load\":"<<motor->load()
+         <<",\"capacity_j_per_k\":"<<t.food_capacity()<<",\"conductance_w_per_k\":"<<t.food_conductance()
+         <<",\"food_present\":"<<t.food_present()<<",\"load_current_equivalent_a\":"<<t.last_load_current_a()<<'}';
     }else s<<"null";
     s<<",\"sensor_c\":";
     if(auto* sensor=dynamic_cast<SensorProbe*>(&b.sensor_device());sensor && sensor->debug_sensor_available())s<<sensor->debug_sensor_c();else s<<"null";
@@ -136,10 +143,47 @@ std::string snapshot_json(Board& b){
     B8_FIELD(pb_div);B8_FIELD(wdt_control);B8_FIELD(wdt_scale);B8_FIELD(dmt_enabled);B8_FIELD(dmt_locked);
     B8_FIELD(dmt_limit);B8_FIELD(dmt_window);B8_FIELD(adc_status);B8_FIELD(adc_result);B8_FIELD(adc_enabled);B8_FIELD(adc_fresh_reads);B8_FIELD(last_adc_read_us);B8_FIELD(last_adc_read_code);B8_FIELD(last_adc_read_channel);B8_FIELD(system_hz);
 #undef B8_FIELD
-    s<<"\"irq_deliveries\":[";for(unsigned i=0;i<(b.mcu().device()==DeviceProfile::b16?6u:5u);++i){if(i)s<<',';s<<m.irq_deliveries[i];}s<<"],";
+    const auto& w=m.watchdog;const auto& d=m.deadman;
+    s<<"\"watchdog\":{\"available\":"<<m.supervision_available<<",\"enabled\":"<<w.enabled<<",\"fused_on\":"<<w.fused_on
+     <<",\"locked\":"<<w.locked<<",\"armed\":"<<w.armed<<",\"error\":"<<w.error<<",\"count\":"<<w.count
+     <<",\"limit\":"<<w.limit<<",\"key_count\":"<<w.key_count<<",\"services\":"<<w.services<<",\"clock_hz\":"<<m.lfrc_hz
+     <<",\"counting\":"<<(m.supervision_available&&w.enabled&&m.reset_released)<<"},";
+    s<<"\"deadman\":{\"available\":"<<m.supervision_available<<",\"enabled\":"<<d.enabled<<",\"locked\":"<<d.locked
+     <<",\"armed\":"<<d.armed<<",\"error\":"<<d.error<<",\"window_open\":"<<d.window_open<<",\"count\":"<<d.count
+     <<",\"limit\":"<<d.limit<<",\"window\":"<<d.window<<",\"key_count\":"<<d.key_count<<",\"services\":"<<d.services
+     <<",\"clock_hz\":"<<m.system_hz/1024.<<",\"counting\":"<<(m.supervision_available&&d.enabled&&m.reset_released&&!m.clock_stopped&&!b.mcu().core_halted())<<"},";
+    s<<"\"reset_history\":[";
+    for(unsigned i=0;i<m.reset_history_size;++i){const auto& e=m.reset_history[i];if(i)s<<',';
+     s<<"{\"serial\":"<<e.serial<<",\"time_us\":"<<e.time_us<<",\"causes\":"<<e.causes<<",\"details\":"<<e.details
+      <<",\"cause_names\":"<<json_string(reset_cause_names(e.causes))<<",\"detail_names\":"<<json_string(reset_detail_names(e.details))<<'}';}
+    s<<"],\"irq_deliveries\":[";for(unsigned i=0;i<(b.mcu().device()==DeviceProfile::b16?6u:5u);++i){if(i)s<<',';s<<m.irq_deliveries[i];}s<<"],";
     s<<"\"peripheral_hz\":"<<m.peripheral_hz<<"},\"lcd_vblank\":"<<b.display_device().vblank()<<",\"lcd_pixels\":";
     if(auto* display=dynamic_cast<DisplayProbe*>(&b.display_device())){
         s<<'"';for(unsigned y=0;y<16;++y)for(unsigned x=0;x<32;++x)s<<(display->pixel(x,y)?'1':'0');s<<'"';
+    }else s<<"null";
+    s<<",\"lcd_bus\":";
+    if(auto* probe=dynamic_cast<DisplayBusProbe*>(&b.display_device())){
+        const auto bus=probe->observe_display_bus(b.now());
+        s<<"{\"reads\":"<<bus.reads<<",\"writes\":"<<bus.writes<<",\"data_writes\":"<<bus.data_writes
+         <<",\"rejected\":"<<bus.rejected<<",\"epoch_us\":"<<bus.epoch_us<<",\"phase_us\":"<<bus.phase_us
+         <<",\"ready_at_us\":"<<bus.ready_at_us<<",\"address\":"<<unsigned(bus.address)<<",\"control\":"<<unsigned(bus.control)
+         <<",\"busy\":"<<bus.busy<<",\"error\":"<<bus.error<<",\"captures_included\":"<<captures;
+        if(captures){
+        auto transfers=[&](const char* name,const auto& events,unsigned size){
+            s<<",\""<<name<<"\":[";
+            for(unsigned i=0;i<size;++i){const auto& e=events[i];if(i)s<<',';
+                s<<"{\"serial\":"<<e.serial<<",\"time_us\":"<<e.time_us<<",\"write\":"<<e.write
+                 <<",\"reg\":"<<unsigned(e.reg)<<",\"data\":"<<unsigned(e.data)<<",\"address\":"<<unsigned(e.address)
+                 <<",\"accepted\":"<<e.accepted<<",\"vblank\":"<<e.vblank<<'}';}
+            s<<']';
+        };
+        transfers("transfers",bus.transfers,bus.transfer_size);transfers("data",bus.data,bus.data_size);
+        s<<",\"blank_edges\":[";
+        for(unsigned i=0;i<bus.blank_size;++i){const auto& e=bus.blank_edges[i];if(i)s<<',';
+            s<<"{\"time_us\":"<<e.time_us<<",\"high\":"<<e.high<<",\"reset\":"<<e.reset<<'}';}
+        s<<']';
+        }
+        s<<'}';
     }else s<<"null";
     if(b.mcu().device()==DeviceProfile::b16){
         const auto dma=b.mcu().observe_dma();

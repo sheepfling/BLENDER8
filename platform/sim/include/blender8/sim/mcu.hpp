@@ -25,14 +25,20 @@ struct McuObservation {
     std::array<unsigned,2> timer_counts{},timer_compare{};
     std::array<unsigned,4> pin_routes{};
     bool pin_locked=true;
+    WatchdogObservation watchdog{};
+    DeadmanObservation deadman{};
+    double lfrc_hz=10000;
+    bool supervision_available=false,reset_released=false,clock_stopped=false;
+    std::array<ResetRecord,16> reset_history{};
+    unsigned reset_history_size=0;
 };
 class Mcu {
 public:
     Mcu(std::array<DigitalNet*,8> a,std::array<DigitalNet*,8> b,DigitalNet& pwm,BytePeripheral& external,
-        std::array<const AnalogNet*,2> analog,const ClockNet* clock=nullptr,DeviceProfile device=DeviceProfile::b8);
+        std::array<const AnalogNet*,2> analog,const ClockNet* clock=nullptr,DeviceProfile device=DeviceProfile::b8,bool watchdog_fused_on=true);
     [[nodiscard]] DeviceProfile device() const noexcept {return device_;}
     [[nodiscard]] DmaObservation observe_dma() const noexcept {return dma_.observe();}
-    void reset(ResetCause cause=ResetCause::por,std::uint8_t detail=0);
+    void reset(ResetCause cause=ResetCause::por,std::uint8_t detail=0,std::optional<Tick> at=std::nullopt);
     void hold_in_reset(bool held) noexcept { external_hold_=held; }
     [[nodiscard]] bool ready() const noexcept {return !external_hold_ && reset_hold_==0 && !clock_.stopped() && !core_halted_;}
     [[nodiscard]] bool reset_released() const noexcept {return !external_hold_ && reset_hold_==0;}
@@ -82,6 +88,8 @@ private:
     unsigned reset_hold_=0;
     double lf_phase_=0,pb_phase_=0,lfrc_ppm_=0;
     std::uint8_t reset_causes_=0,reset_details_=0;
+    std::array<ResetRecord,16> reset_history_{};
+    unsigned reset_history_size_=0;
     std::uint64_t reset_serial_=0,adc_fresh_reads_=0,last_adc_read_us_=0;
     unsigned last_adc_read_code_=0,last_adc_read_channel_=0;
     std::optional<unsigned> temperature_adc_code_;

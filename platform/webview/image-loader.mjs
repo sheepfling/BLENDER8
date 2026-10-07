@@ -27,17 +27,22 @@ export function checkMemory(compiled,policy='warn',tier='standard',profiles){
  if(policy==='strict'&&(!report||warnings.some(w=>w.includes('exceeds'))))throw new Error(warnings.join('; '));
  return {policy,tier,report,warnings:policy==='off'?[]:warnings,scope:'firmware object sections; self-declared, not authenticated'};
 }
-export async function instantiateImage(bytes,create,label='compiled image',options={}){
+export async function instantiateImage(bytes,create,label='compiled image',options={},log=null){
+ const started=globalThis.performance?.now()??Date.now();
+ log?.emit('debug','image.validating',{label,bytes:bytes?.length});
  validateImage(bytes);
  const memory=checkMemory(await WebAssembly.compile(bytes),options.policy,options.tier,options.profiles);
  const sha=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');
  const module=await create({wasmBinary:bytes,locateFile:name=>new URL(name,import.meta.url).href,
-   print:message=>console.info('[MCU]',message),printErr:message=>console.error('[MCU]',message)});
+   print:message=>log?log.emit('info','wasm.stdout',{message}):console.info('[MCU]',message),
+   // These callbacks are supported by existing loaders. onAbort is not in their incoming API.
+   printErr:message=>log?log.emit('error',String(message).startsWith('Aborted(')?'wasm.abort':'wasm.stderr',{message}):console.error('[MCU]',message)});
  if(module.ccall('b8_wasm_abi','number',[],[])!==1||module.ccall('b8_view_abi','number',[],[])!==1)
    throw new Error('This image does not implement the machine and scene ABI 1');
+ log?.emit('info','image.loaded',{label,wasm_sha256:sha,bytes:bytes.length,duration_ms:(globalThis.performance?.now()??Date.now())-started,memory});
  return {module,identity:{label,wasm_sha256:sha,bytes:bytes.length,bridge_abi:1,scene_abi:1,backend:'wasm',memory}};
 }
-export async function loadImage(variant,upload,options={}){
+export async function loadImage(variant,upload,options={},log=null){
  let bytes,create,label;
  if(upload){
    if(typeof upload.glue!=='string'||new TextEncoder().encode(upload.glue).length>MAX_GLUE_BYTES||!(upload.bytes instanceof ArrayBuffer))
@@ -49,12 +54,13 @@ export async function loadImage(variant,upload,options={}){
  }else{
    const stem=`b8_${variant}`;
    const response=await fetch(new URL(`./${stem}.wasm`,import.meta.url));
+   log?.emit(response.ok?'debug':'error','image.fetch',{asset:stem+'.wasm',status:response.status});
    if(!response.ok)throw new Error(`Missing ${stem}.wasm`);
    bytes=new Uint8Array(await response.arrayBuffer());
    create=(await import(new URL(`./${stem}.mjs`,import.meta.url))).default;label=stem+'.wasm';
  }
  options.profiles=await (await fetch(new URL('./memory-profiles.json',import.meta.url))).json();
- return instantiateImage(bytes,create,label,options);
+ return instantiateImage(bytes,create,label,options,log);
 }
 // Fresh, non-invasive execution smoke check. It observes the chosen firmware; it does not
 // impose a solution or interpret product acceptance. Host wall time is not MCU instruction time.

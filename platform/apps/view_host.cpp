@@ -31,7 +31,7 @@ int main(int argc,char**argv){
     if(op=="frame"){double ms;if(!(input>>ms)||(input>>extra))throw std::invalid_argument("frame interval required");view.frame(ms);}
     else if(op=="event"){
      unsigned kind;int id;double x,y;if(!(input>>kind>>id>>x>>y)||(input>>extra))throw std::invalid_argument("event fields required");
-     if(kind<4)view.pointer(kind,id,{x,y});else if(kind==4||kind==5)view.key(id,kind==4);else if(kind==6)view.release_inputs();else throw std::invalid_argument("invalid event kind");
+     if(kind<4)view.pointer(kind,id,{x,y});else if(kind==4||kind==5)view.key(id,kind==4);else if(kind==6||kind==7)view.release_inputs(kind==6);else throw std::invalid_argument("invalid event kind");
     }else if(op=="resize"){
      unsigned w,h;if(!(input>>w>>h)||(input>>extra))throw std::invalid_argument("dimensions required");view.resize(w,h);
     }else if(op=="journal"){if(input>>extra)throw std::invalid_argument("no arguments");reply(false,",\"journal\":"+view.journal_json());continue;}

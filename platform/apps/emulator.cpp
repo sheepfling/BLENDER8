@@ -15,6 +15,10 @@ int main(int argc, char** argv) {
     using namespace b8::sim;
     try {
         SessionOptions options;
+#if defined(B8_FIXED_PRODUCTION_FUSE)
+        // The fixed conformance fixture is independent of the selected development image.
+        options.watchdog_fused_on = true;
+#endif
         std::string trace_path;
         for (int i = 1; i < argc; ++i) {
             const std::string argument = argv[i];

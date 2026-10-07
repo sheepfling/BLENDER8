@@ -3,12 +3,19 @@
 #include "blender8/sim/signals.hpp"
 #include "blender8/sim/thermal_model.hpp"
 namespace b8::sim {
+// Fictional teaching fixtures, not measured material properties or a fluid/phase-change model.
+struct FoodPreset { std::string_view name; double load,temperature_c,conductance,capacity; };
+inline constexpr std::array<FoodPreset,4> food_presets{{
+    {"empty",0,25,0,1200}, {"water",.15,25,.15,1200},
+    {"frozen_fruit",.8,-10,.06,600}, {"hot_vegetables",.45,80,.18,900}
+}};
 enum class TachFault { healthy, stuck_low, stuck_high };
 class Motor : public MotorDevice, public MotorProbe, public RotationProbe {
 public:
     Motor(DigitalNet& pwm,DigitalNet& enable,DigitalNet& tach,ThermalNode& case_temperature);
     void advance_one_us() override;
-    void set_load(double normalized_load); // fixture-only, [0,1]
+    void set_load(double normalized_load);
+    void set_food_preset(const FoodPreset& preset); // fixture-only, [0,1]
     void set_jammed(bool jammed) noexcept { jammed_=jammed; if(jammed_) rpm_=0; }
     void set_tach_fault(TachFault fault) noexcept { tach_fault_=fault; }
     LumpedThermal& thermal() noexcept { return thermal_; } // fixture-only

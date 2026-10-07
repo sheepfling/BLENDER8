@@ -7,7 +7,7 @@ source = "latex/mcu/b16-follow-on.tex"
 output_stem = "NMD-B16-Follow-On"
 vendor = "northstar"
 default_preset = "bad_xerox"
-expected_pages = 10
+expected_pages = 11
 
 [[documents]]
 id = "mux"

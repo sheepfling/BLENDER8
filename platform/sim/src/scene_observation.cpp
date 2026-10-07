@@ -15,7 +15,9 @@ SceneObservation observe_scene(Board& b) {
     if(auto* p=dynamic_cast<PowerDomain*>(&b.power_device()))s.brownout_forced=p->override_voltage().has_value() && *p->override_voltage()<2.9;
     for(unsigned i=0;i<8;++i){s.gpioa[i]=b.probe_gpio(0,i);s.gpiob[i]=b.probe_gpio(1,i);}
     s.foreground=b.foreground_enabled();s.lcd_vblank=b.display_device().vblank();
+    if(auto* p=dynamic_cast<DisplayBusProbe*>(&b.display_device()))s.lcd_bus=p->observe_display_bus(b.now());
     if(auto* p=dynamic_cast<PowerDomain*>(&b.power_device()))s.rear_power=p->requested();
+    if(auto* p=dynamic_cast<ButtonAssembly*>(&b.button_device()))s.bounce_mode=p->bounce_mode();
     if(auto* p=dynamic_cast<ButtonProbe*>(&b.button_device()))s.buttons=p->observe_buttons();
     if(auto* p=dynamic_cast<MotorProbe*>(&b.motor_device()))s.motor=p->observe_motor();
     if(auto* p=dynamic_cast<RotationProbe*>(&b.motor_device()))s.shaft_turns=p->shaft_turns();
@@ -23,6 +25,8 @@ SceneObservation observe_scene(Board& b) {
         s.load=p->load();s.jammed=p->jammed();
         s.nearby_air_c=p->thermal().air_temperature_c();
         s.food_present=p->thermal().food_present();
+        s.food_kind=p->thermal().food_kind();s.food_capacity=p->thermal().food_capacity();
+        s.food_conductance=p->thermal().food_conductance();
         if(*s.food_present)s.food_c=p->thermal().food_temperature_c();
         s.load_current_a=p->thermal().last_load_current_a();
         s.room_c=p->thermal().room_temperature_c();s.case_air_w=p->thermal().case_air_w();

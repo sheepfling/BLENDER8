@@ -12,7 +12,13 @@ double Motor::steady_rpm(double duty,double load) {
 }
 void Motor::set_load(double load) {
     if (!std::isfinite(load)||load<0||load>1) throw std::out_of_range("load must be [0,1]");
-    load_=load; target_=steady_rpm(duty_,load_);
+    load_=load; target_=steady_rpm(duty_,load_);thermal_.custom_food();
+}
+void Motor::set_food_preset(const FoodPreset& p) {
+    // Validate both domains before committing either physical change.
+    if(!std::isfinite(p.load)||p.load<0||p.load>1)throw std::out_of_range("food load [0,1]");
+    thermal_.set_food(p.temperature_c,p.conductance,p.capacity,p.name);
+    load_=p.load;target_=steady_rpm(duty_,load_);
 }
 void Motor::advance_one_us() {
     const bool enabled=enable_.sample();

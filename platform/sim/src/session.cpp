@@ -23,7 +23,7 @@ void no_extra(std::istringstream& input) {
 }
 }
 Session::Session(FirmwareImage image, SessionOptions options)
-    : image_(std::move(image)), options_(options), board_(options.profile, {}, image_.device),
+    : image_(std::move(image)), options_(options), board_(options.profile, {}, image_.device,options.watchdog_fused_on),
       runtime_(board_, image_.vectors) {
     if (image_.device == DeviceProfile::b16 && options.profile == BoardProfile::legacy02)
         throw std::invalid_argument("B16 requires the clocked chassis");
@@ -101,7 +101,7 @@ std::string Session::execute(std::string_view command) {
                         board.jar().permitted()};
                     if (!previous || key != *previous) {
                         if (events.size() >= 10000) throw std::length_error("trace event limit");
-                        previous = key; events.push_back(snapshot_json(board));
+                        previous = key; events.push_back(snapshot_json(board,false));
                     }
                 });
                 output = ",\"samples\":[";
@@ -110,7 +110,7 @@ std::string Session::execute(std::string_view command) {
                 while (board_.now() < end) {
                     advance(std::min(step, end - board_.now()));
                     if (!first) output += ',';
-                    first = false; output += snapshot_json(board_);
+                    first = false; output += snapshot_json(board_,false);
                 }
                 board_.set_observer({});
                 output += "],\"events\":[";

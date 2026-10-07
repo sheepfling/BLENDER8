@@ -78,6 +78,31 @@ public:
     virtual ~DisplayProbe() = default;
     [[nodiscard]] virtual bool pixel(unsigned x, unsigned y) const = 0;
 };
+// Host instrumentation at the display boundary: CPU, bench and DMA all arrive here.
+// Transaction markers describe ordered byte transfers, not electrical setup/hold timing.
+struct DisplayTransfer {
+    Tick time_us = 0;
+    std::uint64_t serial = 0;
+    std::uint8_t reg = 0, data = 0, address = 0;
+    bool write = false, accepted = true, vblank = false;
+};
+struct DisplayBlankEdge { Tick time_us = 0; bool high = false, reset = false; };
+struct DisplayBusObservation {
+    std::uint64_t reads = 0, writes = 0, data_writes = 0, rejected = 0;
+    Tick epoch_us = 0, phase_us = 0, ready_at_us = 0;
+    std::uint8_t address = 0, control = 0;
+    bool busy = false, error = false;
+    // Chronological bounded captures. DATA writes survive floods of STATUS polling.
+    std::array<DisplayTransfer,32> transfers{};
+    std::array<DisplayTransfer,64> data{};
+    std::array<DisplayBlankEdge,32> blank_edges{};
+    unsigned transfer_size = 0, data_size = 0, blank_size = 0;
+};
+class DisplayBusProbe {
+public:
+    virtual ~DisplayBusProbe() = default;
+    [[nodiscard]] virtual DisplayBusObservation observe_display_bus(Tick now) const = 0;
+};
 struct ButtonObservation {
     std::uint8_t latched_mask; bool pulse_held; bool stop_held; bool pulse_blocked;
 };

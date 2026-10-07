@@ -14,7 +14,7 @@ template<class T> std::unique_ptr<T> checked(std::unique_ptr<T> p){
     return p;
 }
 }
-Board::Board(BoardProfile profile,ComponentFactories f,DeviceProfile device)
+Board::Board(BoardProfile profile,ComponentFactories f,DeviceProfile device,bool watchdog_fused_on)
  :a_(nets(Logic::low)),b_(nets(Logic::low)),contacts_(nets(Logic::high)),
   gate_driver_(gated_enable_.attach(Logic::low)),
   vblank_driver_(b_[6].attach()),
@@ -26,7 +26,7 @@ Board::Board(BoardProfile profile,ComponentFactories f,DeviceProfile device)
   oscillator_(checked<OscillatorDevice>(f.oscillator?f.oscillator(external_clock_):std::make_unique<CrystalOscillator>(external_clock_))),
   power_domain_(checked<PowerDevice>(f.power?f.power():std::make_unique<PowerDomain>())),
   mcu_(pointers(a_),pointers(b_),pwm_,*lcd_,{&temperature_voltage_,&spare_analog_},
-        profile!=BoardProfile::legacy02?&external_clock_:nullptr,device),
+        profile!=BoardProfile::legacy02?&external_clock_:nullptr,device,watchdog_fused_on),
   motor_(checked<MotorDevice>(f.motor?f.motor({pwm_,gated_enable_,b_[1],case_temperature_}):
         std::make_unique<Motor>(pwm_,gated_enable_,b_[1],case_temperature_))),
   temperature_sensor_(checked<TemperatureDevice>(f.sensor?f.sensor({case_temperature_,temperature_voltage_}):
@@ -80,8 +80,8 @@ void Board::advance(Tick delta) {
                 const bool good=power_domain_->good();
                 if(good!=powered_){
                     powered_=good;
-                    if(good){mcu_.reset(ever_powered_?ResetCause::brownout:ResetCause::por);ever_powered_=true;}
-                    else{mcu_.reset(ResetCause::brownout);lcd_->reset(now_);}
+                    if(good){mcu_.reset(ever_powered_?ResetCause::brownout:ResetCause::por,0,now_);ever_powered_=true;}
+                    else{mcu_.reset(ResetCause::brownout,0,now_);lcd_->reset(now_);}
                     mcu_.hold_in_reset(!good);
                 }
                 oscillator_->advance_one_us(good);
@@ -98,7 +98,7 @@ void Board::power(bool on) {
         auto& supply=power_domain();
         if(on==supply.requested())return;
         supply.request(on,now_);
-        if(!on){powered_=false;mcu_.reset(ResetCause::external);mcu_.hold_in_reset(true);lcd_->reset(now_);}
+        if(!on){powered_=false;mcu_.reset(ResetCause::external,0,now_);mcu_.hold_in_reset(true);lcd_->reset(now_);}
         settle();return;
     }
     if(on==powered_)return;

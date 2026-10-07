@@ -17,6 +17,11 @@ struct FirmwareImage {
 struct SessionOptions {
     bool bench = false;
     BoardProfile profile = BoardProfile::chassis04;
+#if defined(B8_WATCHDOG_FUSED_ON) && !B8_WATCHDOG_FUSED_ON
+    bool watchdog_fused_on = false;
+#else
+    bool watchdog_fused_on = true;
+#endif
 };
 class Session final {
 public:

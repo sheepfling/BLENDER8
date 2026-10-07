@@ -19,7 +19,7 @@ void adc_step(){
  }else b8::idle();
 }
 FirmwareImage image(){return {{},[](){},[](){b8::idle();},"scene-test"};}
-void click(Workbench& w,Control id,int token=10){for(auto c:w.controls())if(c.id==id){Point p{c.rect.x+c.rect.w/2,c.rect.y+c.rect.h/2};w.pointer(0,token,p);w.pointer(1,token,p);return;}throw std::runtime_error("missing control");}
+void click(Workbench& w,Control id,int token=10){if(id==Control::truth)id=Control::thermal;for(auto c:w.controls())if(c.id==id){Point p{c.rect.x+c.rect.w/2,c.rect.y+c.rect.h/2};w.pointer(0,token,p);w.pointer(1,token,p);return;}throw std::runtime_error("missing control");}
 void run_case(const std::string& name){
  auto owner=std::make_unique<Session>(image(),SessionOptions{true});auto app=std::make_unique<Workbench>(*owner);auto& s=*owner;auto& w=*app;
  if(name=="initial"){require(s.scene().time_us==0,"constructor stepped time");require(!w.running(),"auto-run");require(w.canvas().pixels().size()==1280*900*4,"framebuffer size");}
@@ -28,8 +28,8 @@ void run_case(const std::string& name){
  else if(name=="release_outside"){w.pointer(0,7,{530,660});require(s.scene().buttons->pulse_held,"pulse not down");w.pointer(1,7,{-100,-100});require(!s.scene().buttons->pulse_held,"release outside stranded PULSE");}
  else if(name=="cancel"){w.pointer(0,7,{590,660});require(s.scene().stop,"STOP not asserted");w.pointer(3,7,{-100,-100});require(!s.scene().stop,"cancel stranded STOP");}
  else if(name=="multisource"){w.pointer(0,7,{530,660});w.key('P',true);w.pointer(1,7,{0,0});require(s.scene().buttons->pulse_held,"released second holder");w.key('P',false);require(!s.scene().buttons->pulse_held,"last holder did not release");}
- else if(name=="held_through_stop"){w.key('P',true);w.key(' ',true);w.key(' ',false);auto st=s.scene();require(st.buttons->pulse_held&&st.buttons->pulse_blocked,"physical and contact state conflated");require(!st.run_permit,"STOP pulse block");w.key('P',false);w.key('P',true);require(s.scene().run_permit,"fresh PULSE");}
- else if(name=="focus_release"){w.key('P',true);w.key(' ',true);click(w,Control::run);w.release_inputs();require(!w.running()&&!s.scene().stop&&!s.scene().buttons->pulse_held,"focus leave failed");}
+ else if(name=="held_through_stop"){w.key('P',true);w.key(' ',true);w.key(' ',false);auto st=s.scene();require(st.buttons->pulse_held&&st.buttons->pulse_blocked,"physical and contact state conflated");require(!st.run_permit,"STOP pulse block");for(int i=0;i<3;++i)w.step(20000);w.key('P',false);w.key('P',true);require(s.scene().run_permit,"fresh PULSE");}
+ else if(name=="focus_release"){w.key('P',true);w.key(' ',true);click(w,Control::run);w.release_inputs(false);require(w.running()&&!s.scene().stop&&!s.scene().buttons->pulse_held,"focus release paused time or stranded input");}
  else if(name=="fixture_ownership"){ok(w,"stop 1");w.release_inputs();require(s.scene().stop,"blur released a fixture-owned STOP");ok(w,"stop 0");w.key(' ',true);w.release_inputs();require(!s.scene().stop,"blur failed to release GUI-owned STOP");}
  else if(name=="repeat_key"){w.key('R',true);w.key('R',true);require(w.running(),"repeat toggled run");w.key('R',false);w.key('R',true);require(!w.running(),"new press missing");}
  else if(name=="register_purity"){ok(w,"power 1");ok(w,"run 80000");ok(w,"write 0xA7 195");w.render(16);(void)w.status_json();ok(w,"write 0xA7 60");w.render(16);ok(w,"write 0xA8 165");require((s.scene().mcu.clock_status&8)==0,"observation broke clock key");}
@@ -45,6 +45,29 @@ void run_case(const std::string& name){
  else if(name=="exhibit"){click(w,Control::exhibit);for(int i=0;i<80;++i)w.frame(10);require(s.scene().drive&&s.scene().motor->rpm>5000,"exhibit does not drive actual plant");require(s.scene().shaft_turns.has_value(),"missing phase");const auto rpm=s.scene().motor->rpm;click(w,Control::jar);require(!s.scene().drive,"jar animation delayed physical trip");require(s.scene().motor->rpm==rpm,"opening jar erased rotor momentum");w.frame(10);require(s.scene().motor->rpm<rpm&&s.scene().motor->rpm>0,"not coasting");}
  else if(name=="exhibit_finishes"){click(w,Control::exhibit);for(int i=0;i<210;++i)w.frame(10);require(!s.scene().drive&&s.scene().motor->rpm>0,"scheduled shutdown/coast");}
  else if(name=="view_no_time"){auto t=s.scene().time_us;click(w,Control::chassis);w.render(16);require(w.selected_view()==1&&s.scene().time_us==t,"view change steps time");}
+ else if(name=="lcd_bus"){
+  ok(w,"run 80000");ok(w,"write 0x80 1");ok(w,"write 0x81 129");
+  const auto before=s.hello();click(w,Control::lcd_bus);for(unsigned i=0;i<10;++i)w.render(0);
+  require(w.selected_view()==7&&s.hello()==before,"LCD page mutated machine or bus/address");
+  const auto b=*s.scene().lcd_bus;require(b.data_size==1&&b.data[0].data==129,"page missing actual transfer");
+  w.key('L',true);w.key('L',false);require(w.selected_view()==7,"LCD bus keyboard route");
+  const auto trace=w.command("trace 20000 100");
+  require(trace.find("\"captures_included\":false")!=std::string::npos,"dense trace repeated full captures");
+  const auto full=trace.find("\"captures_included\":true");
+  require(full!=std::string::npos&&trace.find("\"captures_included\":true",full+1)==std::string::npos,"trace final state missing or repeated full captures");
+ }
+ else if(name=="supervision"){
+  ok(w,"run 80000");ok(w,"write 0xB0 1");ok(w,"write 0xB2 165");
+  const auto before=s.hello();click(w,Control::supervision);w.render(0);(void)w.status_json();
+  require(w.selected_view()==6&&s.hello()==before,"supervision page mutated machine or feed key");
+  ok(w,"write 0xB2 90");require(s.scene().mcu.watchdog.services==1,"observer invalidated watchdog key");
+  ok(w,"write 0xC0 1");ok(w,"run 70000");ok(w,"write 0xC8 105");
+  const auto armed=s.hello();w.render(0);require(s.hello()==armed,"renderer consumed deadman key");
+  ok(w,"write 0xC9 150");require(s.scene().mcu.deadman.services==1,"observer invalidated deadman key");
+  ok(w,"write 0xB2 0");ok(w,"run 1000");ok(w,"write 0x02 255");ok(w,"write 0x03 255");w.render(0);
+  const auto m=s.scene().mcu;require(m.reset_causes==0&&m.reset_history[m.reset_history_size-1].causes==4,"page lost acknowledged reset");
+  w.key('U',true);w.key('U',false);require(w.selected_view()==6,"supervision keyboard route");
+ }
  else if(name=="bounded_input"){for(int i=0;i<100;++i)w.pointer(0,i,{530,660});require(w.status_json().find("\"held_inputs\":32")!=std::string::npos,"unbounded input");w.release_inputs();require(!s.scene().buttons->pulse_held,"release all");}
  else if(name=="firmware_separation"){app.reset();owner.reset();Session candidate(image(),{});Workbench v(candidate);require(v.command("write 0x29 1").starts_with("{\"ok\":false"),"GUI granted register writes to firmware mode");click(v,Control::exhibit);require(candidate.scene().time_us==0&&!v.running(),"bench exhibit available in firmware mode");}
  else if(name=="canvas_bounds"){Canvas c(320,240);c.clear({0,0,0});c.rect({-500,-500,2500,2500},{7,8,9},20);c.ellipse({0,0},20,50,{80,90,100});c.text("ABC 123",{20,20},2,{255,255,255});require(c.pixels().size()==320*240*4,"pixel size changed");for(std::size_t i=3;i<c.pixels().size();i+=4)require(c.pixels()[i]==255,"alpha byte");}
@@ -79,26 +102,78 @@ void run_case(const std::string& name){
   require(*p.room_c==22,"room boundary wrong");
   ok(w,"environment 25 5 0");require(!w.plant_history().back().food_c,"absent food invented truth");
   const auto case_before=s.scene().motor->case_c,air_before=*s.scene().nearby_air_c;
-  click(w,Control::thermal);click(w,Control::food);
+  click(w,Control::thermal);click(w,Control::water);
   require(s.scene().food_c&&*s.scene().food_c==25,"GUI food addition missing");
   require(s.scene().motor->case_c==case_before&&*s.scene().nearby_air_c==air_before,"adding food reset other thermal nodes");
-  click(w,Control::food);require(!s.scene().food_c,"GUI food removal missing");
+  click(w,Control::empty);require(!s.scene().food_c,"GUI food removal missing");
   const auto count=w.plant_history().size();const auto measured=w.canvas().hash();
-  click(w,Control::truth);require(w.canvas().hash()!=measured,"truth overlay not rendered");
+  click(w,Control::truth);require(w.canvas().hash()==measured&&w.selected_view()==2,"thermal and truth should share one view");
   for(int i=0;i<10;++i)w.render(16);require(w.plant_history().size()==count,"render cadence creates samples");
  }
  else if(name=="plant_cadence"){
   click(w,Control::run);for(int i=0;i<12;++i)w.frame(20);
   const auto count=w.plant_history().size();require(count==3,"wrong 100ms history cadence");
   require(w.plant_history()[1].time_us==100000&&w.plant_history()[2].time_us==200000,"off-grid plant samples");
-  w.release_inputs();w.frame(100);require(w.plant_history().size()==count,"pause samples wall time");
+  click(w,Control::run);w.release_inputs();w.frame(100);require(w.plant_history().size()==count,"pause samples wall time");
  }
  else if(name=="all_subsystems"){
-  auto before=s.hello();for(auto c:{Control::thermal,Control::truth,Control::motor,Control::systems,Control::chassis,Control::appliance}){
+  auto before=s.hello();for(auto c:{Control::thermal,Control::truth,Control::motor,Control::systems,Control::supervision,Control::lcd_bus,Control::chassis,Control::appliance}){
    click(w,c);w.render(16);require(s.hello()==before,"subsystem page changes time or registers");
   }
   for(const auto& a:w.controls())for(const auto& b:w.controls())if(a.id!=b.id)
    require(!(a.rect.x<b.rect.x+b.rect.w&&a.rect.x+a.rect.w>b.rect.x&&a.rect.y<b.rect.y+b.rect.h&&a.rect.y+a.rect.h>b.rect.y),"overlapping controls");
+ }
+ else if(name=="stop_click"){
+  ok(w,"run 80000");w.key(' ',true);w.key(' ',false);
+  require(s.scene().stop,"zero-wall-time click lost STOP");
+  w.step(20000);require(s.scene().stop,"STOP stroke too short");
+  w.step(20000);w.step(20000);require(!s.scene().stop,"STOP stroke never released");
+  const auto j=w.journal_json();require(j.find("stop 1")<j.find("run 50000")&&j.find("run 50000")<j.find("stop 0"),"STOP stroke journal order");
+ }
+ else if(name=="food_presets"){
+  ok(w,"run 80000");ok(w,"temperature 50");
+  const auto before=s.scene();
+  for(auto c:{Control::water,Control::frozen,Control::vegetables}){
+   click(w,c);const auto now=s.scene();
+   require(now.time_us==before.time_us&&now.motor->case_c==before.motor->case_c&&now.nearby_air_c==before.nearby_air_c,"food reset other plant state");
+   require(now.food_c&&now.food_capacity&&now.food_conductance,"food thermal properties absent");
+   require(now.food_kind== (c==Control::water?"water":c==Control::frozen?"frozen_fruit":"hot_vegetables"),"wrong preset");
+   require(*now.load==(c==Control::water?.15:c==Control::frozen?.8:.45),"missing mechanical load");
+   require(*now.food_c==(c==Control::water?25:c==Control::frozen?-10:80),"missing food temperature");
+  }
+  const auto unchanged=s.hello();require(w.command("food_preset invalid").starts_with("{\"ok\":false"),"bad preset accepted");require(s.hello()==unchanged,"bad food mutated plant");
+  ok(w,"load 0.6");require(s.scene().food_kind=="custom","manual load kept stale preset label");
+  click(w,Control::empty);require(!s.scene().food_c&&s.scene().load==0,"empty must clear contents and load");
+  require(w.journal_json().find("food_preset frozen_fruit")!=std::string::npos,"food missing from replay");
+ }
+ else if(name=="food_physics"){
+  // Actual MD20 model: equal electrical input, different foods, no firmware policy.
+  DigitalNet pwm,enable,tach1,tach2;
+  const auto pd=pwm.attach(Logic::high),ed=enable.attach(Logic::high);(void)pd;(void)ed;
+  ThermalNode a,b;Motor water(pwm,enable,tach1,a),fruit(pwm,enable,tach2,b);
+  water.set_food_preset(food_presets[1]);fruit.set_food_preset(food_presets[2]);
+  for(unsigned i=0;i<1000000;++i){water.advance_one_us();fruit.advance_one_us();}
+  require(fruit.debug_rpm()<water.debug_rpm()*.75,"food load did not cause sag");
+  require(fruit.thermal().last_load_current_a()>water.thermal().last_load_current_a(),"food load did not increase current");
+  require(fruit.thermal().last_heat_w()>water.thermal().last_heat_w(),"food load did not increase heat");
+  require(water.thermal().food_temperature_c()>25&&fruit.thermal().food_temperature_c()>-10,"food conduction did not integrate");
+  ThermalNode small_node,large_node;LumpedThermal small(small_node),large(large_node);
+  small.set_food(0,.15,600);large.set_food(0,.15,1200);small.advance(10,0,0,0,false);large.advance(10,0,0,0,false);
+  require(small.food_temperature_c()>large.food_temperature_c()*1.9,"capacity not in thermal integration");
+ }
+ else if(name=="cold_injection"){
+  click(w,Control::cool);require(s.scene().motor->case_c==5,"minus temperature was an absolute 25C reset");
+  click(w,Control::cool);require(s.scene().motor->case_c==-15,"cannot inject cold case");
+  for(int i=0;i<4;++i)click(w,Control::cool);require(s.scene().motor->case_c==-40,"cold fixture exceeded range");
+ }
+ else if(name=="bounce_capture"){
+  ok(w,"run 80000");click(w,Control::speed2);w.step(20000);
+  const auto captured=w.contact_capture();require(captured.size()>20,"bounce capture missing");
+  unsigned edges=0;for(std::size_t i=1;i<captured.size();++i)edges+=captured[i].contacts!=captured[i-1].contacts;
+  require(edges>=3,"bounce edges not captured");
+  ok(w,"run 500000");w.step(20000);require(w.contact_capture().back().time_us==captured.back().time_us,"settled contact trace erased bounce");
+  click(w,Control::bounce);require(s.scene().bounce_mode==2,"slow bounce control");
+  click(w,Control::bounce);require(s.scene().bounce_mode==0,"bounce off control");
  }
  else throw std::runtime_error("unknown test");
 }

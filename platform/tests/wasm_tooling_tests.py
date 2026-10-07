@@ -51,6 +51,8 @@ class WasmToolingTests(unittest.TestCase):
             self.assertEqual(data["bridge_abi"], 1)
             self.assertEqual(data["scene_abi"], 1)
             self.assertIn("/scene-worker.mjs", assets)
+            self.assertIn("/debug-log.mjs", assets)
+            self.assertIn("/debug-panel.mjs", assets)
             self.assertIn("/diagnostics.html", assets)
             self.assertNotIn("/native-scene-worker.mjs", assets)
             self.assertIn("scene-shell.mjs", assets["/index.html"].decode())

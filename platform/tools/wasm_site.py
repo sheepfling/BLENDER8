@@ -19,6 +19,8 @@ UI_FILES = (
     "transport.mjs",
     "workbench.mjs",
     "wasm-main.mjs",
+    "debug-log.mjs",
+    "debug-panel.mjs",
 )
 MODULES = ("b8_student", "b8_probe", "b8_starter")
 

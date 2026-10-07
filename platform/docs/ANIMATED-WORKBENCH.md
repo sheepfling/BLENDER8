@@ -25,7 +25,8 @@ python tools/b8.py animated --probe --open
 ```
 
 The probe is firmware: it reads B8 registers and writes the actual LCD through the byte bus. Its
-motor stays off. The rear switch initially requests ON; click RUN to advance supply settling, reset,
+motor stays off. The rear switch initially requests ON; the page starts logical time for firmware.
+RUN/PAUSE controls supply settling, reset,
 and firmware. Press a speed button and observe its latch, contact history and scanned LCD pixels.
 
 To see actual motor dynamics without supplying a finished firmware solution:
@@ -34,7 +35,7 @@ To see actual motor dynamics without supplying a finished firmware solution:
 python tools/b8.py animated --bench --open
 ```
 
-In a **fresh** component-bench session click **2S MOTOR EXHIBIT**. This activates a journaled,
+In a **fresh** component-bench session click **MOTOR EXHIBIT**. This activates a journaled,
 finite sequence of register/fixture commands: supply qualification, STOP acknowledgment, a selected
 mechanical command, changing PWM, and drive removal at two seconds. It explicitly services the WDT
 during that experiment, not in normal firmware or idle bench mode. Lift the jar while running and
@@ -133,6 +134,39 @@ unavailable rotation detail; no imaginary RPM, heat or phase is synthesized. Phy
 fault toggles that depend on a particular reference implementation are disabled when that
 implementation is absent. All new probe declarations remain outside the firmware SDK.
 
+## Supervision status
+
+Open **Supervision** or press **U** for watchdog/deadman enablement, locks, service counts,
+window, expiry estimates and retained reboot history. Firmware chooses enablement; a separate
+development fuse permits optional watchdog operation. See [supervision configuration and reset
+reasons](SUPERVISION.md).
+
+## LCD bus and blanking
+
+Open **LCD BUS** or press **L**. The PX32-16 accepts ordered eight-bit byte transfers from the
+MCU; its VBLANK output travels back to the MCU. The view plots the last 40 logical milliseconds of
+actual blanking edges: 16 ms of active scan followed by 4 ms of blanking. A second scope magnifies
+the latest DATA-write burst into D7 through D0 and decodes the last 16 bytes as hexadecimal.
+Pink bytes were rejected because the LCD was still BUSY. The accepted DATA-write recovery time is
+8 microseconds. Writes during scanout remain visible in the capture and can cause tearing.
+
+Instrumentation lives at the display boundary, so CPU, bench and B16 DMA traffic use the same
+capture. The probe records reads, writes, register selection, the VRAM address before each access,
+acceptance and the contemporaneous VBLANK level. Observation never reads MMIO, changes a selector
+or advances logical time. A DMA completion counts issued bytes; the LCD capture reports whether
+those bytes were accepted. A CPU access rejected by DMA ownership never reaches this boundary.
+
+Captures retain 64 DATA-write attempts, 32 bus transactions and 32 blanking/reset edges. Lifetime
+counters continue after older records roll off. DATA history is separate so repeated STATUS reads
+cannot evict a burst. LCD power resets mark the trace and restart the scan epoch; retained traffic
+from before reset is labeled. Restart session creates fresh counters and captures. A replacement
+display without `DisplayBusProbe` shows unavailable bus instrumentation.
+
+The bit lanes hold byte values between timestamped transaction markers for readability. They do
+not model electrical setup/hold timing, propagation or a serial clock. Blanking edges and byte
+timestamps come from the component model, independently of the 100 microsecond contact scope.
+The chassis also shows the data and VBLANK connections with their directions.
+
 ## Time and animation
 
 `Workbench::frame(elapsed_ms)` accepts finite elapsed values in [0,1000] for pacing only. The
@@ -147,9 +181,10 @@ outcomes across different drawing cadences and verify that register latches, ADC
 unlock keys survive observation unchanged.
 
 RUN pauses/resumes automatic logical stepping. STEP advances exactly 1,000 logical microseconds
-through the same simulator. Focus loss and hidden tabs release GUI-owned momentary inputs and pause,
-without unlatching speed selections or asserting a fictional electrical STOP. Resuming never catches
-up time spent hidden. Pointer/key ownership is independent: releasing one PULSE holder does not
+through the same simulator. Canvas focus loss releases GUI-owned momentary inputs and preserves
+the RUN selection. Hidden tabs and unfocused windows suspend browser pacing. Returning resumes
+pacing if RUN was selected, without catching up hidden time or unlatching speed selections.
+Pointer/key ownership is independent: releasing one PULSE holder does not
 release another. STOP blocks PULSE mechanically/electrically as specified. Repeat keydown is
 ignored. A fresh pump generation prevents stale in-flight animation callbacks from spawning
 duplicate loops after blur/focus.
@@ -171,7 +206,10 @@ b8_view_status(), b8_view_journal()     -> module-owned UTF-8 JSON
 ```
 
 Input kinds: 0 pointer-down, 1 pointer-up, 2 pointer-move, 3 pointer-cancel, 4 key-down, 5 key-up, 6
-release GUI input and pause. C++ converts physical canvas coordinates to the logical 1280x900
+release GUI inputs and pause (legacy). Additive kind 7 releases GUI inputs while preserving RUN;
+`view.input_release_kind` advertises it. Older uploaded images retain their documented focus-pause
+behavior and emit a compatibility warning. C++ converts physical canvas coordinates to logical
+1280x900
 layout, including letterboxing. Resize bounds are 320..1920 by 240..1440. Pointer IDs are
 nonnegative; ASCII keys use a separate internal ownership space. Invalid fields are rejected.
 
@@ -195,6 +233,39 @@ coordinates or render frequency. Adjacent runs are coalesced without reordering 
 a fresh session with the same firmware and bench mode; the scene test exercises this. It is not an
 authenticated customer approval or a self-contained firmware binary. Use the separate release
 manifest/executable hashes when comparing builds.
+
+## Browser debug logs
+
+Both `index.html` and `diagnostics.html` have a **Debug logs** button. The panel combines page and
+worker records and also sends them to the browser console with a `[Half-A/Labs]` prefix. Use the
+console's severity filter or search for an event such as `host.failure` or `wasm.abort`.
+
+| Level          | Output                                                         |
+| -------------- | -------------------------------------------------------------- |
+| Info (default) | Image identity, startup, observed machine changes and failures |
+| Debug          | Also request IDs, queue/response durations and input events    |
+| Trace          | Also every frame or high-frequency snapshot/run request        |
+| Warn / Error   | Only the selected severity and higher                          |
+
+Each record identifies its source, session, sequence, wall timestamp and host elapsed time. Page
+observations also carry the last observed logical microsecond count. These clocks are separate:
+host timing is diagnostic context and does not drive firmware. Image loading records include the
+Wasm SHA-256, ABI, device and memory-policy result. Worker exceptions retain their JavaScript stack
+when available; Emscripten stdout, stderr and abort messages use the same log. Host timeouts report
+the outstanding request and explicitly remain distinct from observed MCU resets.
+
+**Save debug log** downloads `mcu-debug-log.json` with the structured records and context. **View
+JSON** exposes a selectable export snapshot, including in embedded browsers without file downloads.
+The panel retains at most 1,000 entries and reports evicted entries. Scene restart preserves the existing
+history with a new session ID; page reload clears it. **Clear log** clears the retained history.
+Local loader source, binary contents and native preview capability tokens are omitted or redacted.
+The log has no network collector or persistent browser storage.
+
+Logs observe replies already produced by the C++ machine. They do not read registers, advance
+logical time, consume firmware RAM or replace the fixture journal. State-change records can miss
+transitions between replies. Trace can slow the host, so enable it only for a bounded investigation.
+Full C++ source stacks require a Wasm build containing suitable debug information; JavaScript
+logging cannot recover symbols absent from the compiled image.
 
 ## Verification gates
 
@@ -226,26 +297,69 @@ platform bindings, not proof that this particular port has compiled. See the pri
 
 ## Thermal, motor and subsystem views
 
-The canvas navigation offers Appliance, Chassis, Thermal, Truth, Motor and Systems. They observe
+The canvas navigation offers Appliance, Chassis, Thermal + Truth, Motor and Systems. They observe
 one machine and share its controls and history; changing pages never advances logical time.
-With the canvas focused, T opens Thermal, Y Truth, M Motor and S Systems.
+T and Y both open the combined thermal page; M opens Motor and S opens Systems.
 
-- **Thermal** plots the AN0 wire's nominal temperature estimate and the last fresh AN0 ADC read
-  made by firmware. The ADC curve is held between reads; it is absent before the first read and
-  cleared by MCU reset. Its age and raw code appear at the right. Viewing the page does not start
-  conversions or read MMIO. The wire is a host voltmeter observation, not a firmware ADC reading.
-- **Truth** overlays those same measured traces with case, lagged sensor, local air, optional food
-  and room boundary temperatures. Food is absent when the configured conductance is zero. Signed
-  heat flows show case-to-air, case-to-food, food-to-air and air-to-room exchange in watts.
+- **Thermal + Truth** overlays the nominal AN0 wire estimate and actual firmware ADC reads with
+  case, lagged sensor, local air, optional food and room boundary temperatures. ADC values are held
+  between reads and absent before a fresh read. No conversion or MMIO read is initiated by viewing
+  the page. Signed heat flows show case/air/food/room conduction and ventilation in watts.
 - **Motor** plots shaft RPM and generated heat over time, with load current and effective duty.
   Load, jam, PWM, power, STOP and jar permission act on the existing motor model.
 - **Systems** shows the button assembly and mux, jar gate, power/reset, WDT/DMT, clock/core/timers,
   motor/tach/PWM, thermal network, sensor/ADC, LCD/XBUS, GPIO/interrupts and B16 pin routes/DMAC.
   B8 explicitly marks its absent DMAC. Missing component probes remain unavailable.
 
-The thermal tabs also offer Add 25C Food / Remove Food. These fixture actions change the food
-node and its case conductance (0.15 W/K when present), preserving case and nearby-air temperatures.
-They are journaled as `food 25 0.15` / `food 25 0`.
+The real scanned LCD remains visible on every page. Its contents come exclusively from firmware
+and the LCD component. The host does not replace them with an inferred label. The appliance lamps
+indicate motor power and jar permission; they are not buttons. JAM SHAFT belongs to fault injection.
+The case temperature controls add or subtract 20 degrees C, bounded to -40..150 degrees C, without
+resetting the sensor or air. Sensor lag remains visible.
+
+## Food fixtures and animations
+
+Food buttons atomically replace mechanical load and the food thermal node. They preserve motor
+case, local air, rotor momentum, MCU state and logical time, and are replayed as
+`food_preset NAME`. Manual load or legacy food commands mark the contents as custom. Empty removes
+food conduction and mechanical load.
+
+| Preset             | Load | Initial temperature | Case conductance | Food heat capacity |
+| ------------------ | ---- | ------------------- | ---------------- | ------------------ |
+| `water`            | 15%  | 25 degrees C        | 0.15 W/K         | 1,200 J/K          |
+| `frozen_fruit`     | 80%  | -10 degrees C       | 0.06 W/K         | 600 J/K            |
+| `hot_vegetables`   | 45%  | 80 degrees C        | 0.18 W/K         | 900 J/K            |
+| `empty`            | 0%   | absent              | 0 W/K            | inactive           |
+
+These are fictional teaching parameters. Food heat capacity participates in time integration;
+mechanical load causes speed sag, increased equivalent current and increased motor heating.
+The C++ drop animation and rotating contents illustrate the fixture action. They are not fluid,
+blade-contact, rheology or ice phase-change simulations, and do not advance logical time.
+
+## Playback and visible contact bounce
+
+The page defaults to Selected firmware and starts pacing for firmware modes. A fresh Component
+bench stays paused for its explicit finite exhibit. A selected unfinished starter still needs the
+employee's controller. For the owner candidate: wait for two cool logical seconds, briefly hold
+STOP and release, then select a speed. Faults latch; remove their cause, qualify cooling, tap STOP,
+release commands and make a new selection. CK additionally requires a controller reset after clock
+restoration. The page includes the LCD code legend and recovery instructions.
+
+There is no session duration limit. Ten minutes bounds the plot history, not execution. Explicit
+PAUSE freezes physics and the LCD. Background suspension releases momentary controls and resumes
+on return, preserving an explicit user pause. The finite bench exhibit removes drive at two seconds;
+this is an electrical test sequence, not a simulation time limit.
+
+A GUI STOP click completes a 50 ms physical stroke in logical time, so a press/release between
+browser frames is sampled by firmware. Holding STOP keeps it asserted longer. Cancel or focus loss
+releases GUI ownership immediately. The release is journaled at its actual logical time; raw
+`stop 1` / `stop 0` fixtures retain unrestricted timing. A paused scene needs RUN to complete the
+stroke and update the LCD.
+
+The contact display retains the last change plus ten milliseconds, with a twenty-millisecond zoom
+sampled at 100 microseconds. It stays visible after the contacts settle. BOUNCE cycles nominal
+1.8 ms, 5 ms and off; `bounce random SEED` remains available through fixtures. This visualization
+preserves the original microsecond mechanical/electrical model and firmware debounce behavior.
 
 Temperature estimates use the nominal 3.3 V ADC reference and AVT10 transfer of 0.5 V + 10 mV/C.
 Calibration, reference error, noise, open/short faults and sensor lag can separate them from truth;

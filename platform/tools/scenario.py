@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import json
 import math
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any, cast
 
@@ -89,12 +90,20 @@ def load_scenario(path: Path) -> dict[str, Any]:
     return data
 
 
-def run_scenario(executable: Path, path: Path) -> dict[str, Any]:
+def run_scenario(
+    executable: Path,
+    path: Path,
+    *,
+    engine_factory: Callable[[bool, bool], Engine] | None = None,
+) -> dict[str, Any]:
     spec = load_scenario(path)
     checks: list[dict[str, Any]] = []
-    with Engine(
-        executable, bench=spec["mode"] == "bench", legacy=spec.get("profile") == "legacy02"
-    ) as engine:
+    bench, legacy = spec["mode"] == "bench", spec.get("profile") == "legacy02"
+    with (
+        engine_factory(bench, legacy)
+        if engine_factory
+        else Engine(executable, bench=bench, legacy=legacy) as engine
+    ):
         # Validation/parsing of all scheduled commands occurs before advancing time.
         for event in spec["events"]:
             engine.command(f"schedule {event['at_us']} {event['command']}")

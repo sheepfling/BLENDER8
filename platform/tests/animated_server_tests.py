@@ -179,6 +179,10 @@ class NativeHTTPTests(unittest.TestCase):
             self.assertEqual(error.exception.code, code)
 
     def test_asset_allowlist(self) -> None:
+        for path in ("/debug-log.mjs", "/debug-panel.mjs"):
+            with urlopen(self.base + path, timeout=3) as response:
+                self.assertEqual(response.status, 200)
+                self.assertIn("javascript", response.headers.get_content_type())
         for path in (
             "/../CMakeLists.txt",
             "/scene-worker.mjs",

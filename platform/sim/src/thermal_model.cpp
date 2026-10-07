@@ -5,7 +5,7 @@
 #include <stdexcept>
 namespace b8::sim {
 namespace {
-constexpr double case_capacity=60.0,air_capacity=200.0,food_capacity=1200.0;
+constexpr double case_capacity=60.0,air_capacity=200.0;
 constexpr double ventilation_g=20.0,food_air_g=0.12,load_resistance=1.0;
 double load_current(double duty,double rpm,double free_rpm,bool enabled) {
     if(!enabled) return 0;
@@ -17,12 +17,12 @@ double load_current(double duty,double rpm,double free_rpm,bool enabled) {
 void LumpedThermal::set_environment(double ambient,double food,double g) {
     if(!std::isfinite(ambient)||!std::isfinite(food)||!std::isfinite(g)||g<0||g>0.2)
         throw std::invalid_argument("thermal environment: finite values; Gfood in [0,0.2]");
-    room_c_=ambient;air_c_=ambient;food_c_=food;food_g_=g;
+    room_c_=ambient;air_c_=ambient;food_c_=food;food_g_=g;food_capacity_=1200;custom_food();
 }
-void LumpedThermal::set_food(double food,double g) {
-    if(!std::isfinite(food)||food < -40||food>150||!std::isfinite(g)||g<0||g>.2)
+void LumpedThermal::set_food(double food,double g,double capacity,std::string_view kind) {
+    if(!std::isfinite(food)||food < -40||food>150||!std::isfinite(g)||g<0||g>.2||!std::isfinite(capacity)||capacity<100||capacity>10000)
         throw std::invalid_argument("food temperature [-40,150] C; conductance [0,0.2] W/K");
-    food_c_=food;food_g_=g;
+    food_c_=food;food_g_=g;food_capacity_=capacity;food_kind_=g>0?kind:"empty";
 }
 void LumpedThermal::set_initial_temperature(double t) {
     if(!std::isfinite(t)||t < -40||t>150) throw std::out_of_range("initial temperature [-40,150] C");
@@ -51,7 +51,7 @@ void LumpedThermal::advance(double dt,double duty,double rpm,double free_rpm,boo
         const double food_air=g_food_air*(t[2]-t[1]);
         return State{(heat_w_-case_air-case_food)/case_capacity,
                      (case_air+food_air-ventilation_g*(t[1]-room_c_))/air_capacity,
-                     (case_food-food_air)/food_capacity};
+                     (case_food-food_air)/food_capacity_};
     };
     auto add=[](const State& a,const State& b,double scale) {
         return State{a[0]+scale*b[0],a[1]+scale*b[1],a[2]+scale*b[2]};
