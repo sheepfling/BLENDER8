@@ -38,7 +38,10 @@ python platform/tools/b8.py --root platform --build-dir ../build/astin-b16 anima
 Pass signals: `native_ready` is true; CMake configures the B16 profile; the selected firmware,
 simulator, and C++ tests compile; CTest passes; the workbench opens and **RUN** advances logical
 time. The untouched starter keeps the motor off. Platform CTest is platform/model evidence, not
-proof that the learner's product behaviors pass. Stop the workbench server with Ctrl-C.
+proof that the learner's product behaviors pass. The default fused-on watchdog is not serviced by
+the starter; if the page keeps running, periodic WDT reset warnings are expected while drive remains
+off. This is a useful supervision observation, not evidence of product acceptance. Stop the workbench
+server with Ctrl-C.
 
 ## 2. Small isolated exercises
 

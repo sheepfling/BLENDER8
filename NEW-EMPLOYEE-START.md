@@ -64,7 +64,11 @@ python platform/tools/b8.py --root platform --build-dir ../build/astin-b16 anima
 Pass expectations: the doctor says `native_ready: true`; the B16 build completes in
 `build/astin-b16/`; the platform C++ tests pass; and the animated page opens at the URL it prints.
 Click **RUN** to advance simulated time. The unmodified starter keeps the motor off. Stop the page
-server with Ctrl-C. This native path does not need PDF generation or Emscripten.
+server with Ctrl-C. The selected starter does not service the default fused-on watchdog, so leaving
+it running can produce periodic `WDT` reset entries in the debug log while the motor stays off. That
+is the expected incomplete-starter behavior and a useful observation for the later supervision
+lesson; it is not a compile failure or a product-acceptance result. This native path does not need
+PDF generation or Emscripten.
 
 Before editing the application, build the isolated [B16 subsystem practice
 harness](platform/labs/b16/README.md):

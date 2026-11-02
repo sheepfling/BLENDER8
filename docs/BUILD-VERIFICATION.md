@@ -31,7 +31,10 @@ teaching files. The starter remains intentionally incomplete.
 - Emscripten 6.0.10 rebuilt the selected B16 target and test fixtures. `wasm-test` passed **9/9
   CTests**, **15/15** compiled Node tests, ten native/Wasm conformance scenarios, two seeded 128-action
   trajectories, fifteen probe commands, and selected-B16 motion/DMA parity. This was a Node-based
-  compiled-Wasm check, not a manual browser pass.
+  compiled-Wasm check. A local browser smoke test also loaded `b8_student.wasm` for B16, advanced
+  logical time, paused the workbench, and stepped 1 ms. The debug panel reported 88 entries and no
+  dropped events; repeated WDT warnings were from the unfinished starter under the fused-on default.
+  This is a launch/step smoke test, not a check of every browser control or customer behavior.
 - `tools/project.py docs --root .` regenerated the clean and G3 seven-handout binders at **62 pages**,
   the clean/G1/G2/G3 source-unit copies, and the optional B16 follow-on at **11 pages**. The B16 G3
   page-count metadata now records 11, matching the compiled manual. Contact sheets covered all G3
