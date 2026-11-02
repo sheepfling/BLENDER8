@@ -39,6 +39,28 @@ SUFFIXES = {
     ".pfb",
     ".pfm",
 }
+SOLUTION_ONLY = {"tests/wasm/candidate-view.test.mjs"}
+
+
+def matches_safe_starter(root: Path) -> bool:
+    """Recognize the shipped firmware bytes; other inputs have unknown provenance."""
+    firmware = root / "firmware"
+    fixture = root / "tests/fixtures/safe-starter"
+    if not firmware.is_dir() or not fixture.is_dir():
+        return False
+
+    def code_files(directory: Path) -> dict[str, bytes] | None:
+        records: dict[str, bytes] = {}
+        for path in directory.rglob("*"):
+            if path.is_symlink():
+                return None
+            if path.is_file() and path.name != "README.md":
+                records[path.relative_to(directory).as_posix()] = path.read_bytes()
+        return records
+
+    source = code_files(firmware)
+    expected = code_files(fixture)
+    return source is not None and expected is not None and source == expected and bool(source)
 
 
 def included(path: Path, root: Path) -> bool:
@@ -47,6 +69,7 @@ def included(path: Path, root: Path) -> bool:
         path.is_file()
         and not path.is_symlink()
         and path.suffix.lower() not in SUFFIXES
+        and rel.as_posix() not in SOLUTION_ONLY
         and path.name not in {"MANIFEST.sha256", "SOURCE-INVENTORY.json", ".DS_Store"}
         and not any(
             x in EXCLUDED or x == "build" or x.startswith("build-") or x.startswith("cmake-build-")
@@ -72,13 +95,15 @@ def bundle(output: Path, root: Path) -> dict[str, object]:
         for p in files
     ]
     manifest = "".join(f"{r['sha256']}  {r['path']}\n" for r in records)
+    known_safe_starter = matches_safe_starter(root)
     inventory = {
         "version": VERSION,
         "b8_interface": "03",
         "chassis": "04",
         "files": records,
         "font_files_included": False,
-        "firmware_solution": False,
+        "firmware_solution": False if known_safe_starter else None,
+        "firmware_provenance": "safe_starter_bytes_match" if known_safe_starter else "unknown",
         "physical_hwil_validated": False,
     }
     output.parent.mkdir(parents=True, exist_ok=True)

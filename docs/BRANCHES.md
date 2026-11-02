@@ -50,7 +50,8 @@ if the solution files are subsequently deleted.
 
 Before switching branches, commit or otherwise preserve local work. Use a separate checkout when
 both are active. Keep separate native/Wasm build directories for the starter and worked controller;
-CMake caches retain firmware paths and device settings.
+CMake caches retain firmware paths and device settings. The standard learner build commands also
+explicitly restore `platform/firmware/` into a reused cache.
 
 ## Boundary check
 
@@ -60,11 +61,17 @@ From an activated Python environment at the checkout root:
 python tools/branch_policy.py --root . --expect problem
 ```
 
-Use `--expect teaching` on the solution branch. CI resolves the role from the source branch and
-PR target. PRs targeting `main` or `master` always undergo the problem check, which rejects
-solution material and reachable solution history. Full Git history is required; CI checks out
-with `fetch-depth: 0`. The workflow provides a failing check; GitHub branch protection must require
-that check to make it a mandatory merge gate.
+Use `--expect teaching` on the solution branch. For pull requests, the destination determines the
+role: the learner workbench and `main`/`master` always receive the problem-boundary check, even
+when the source is the solution branch; the solution branch receives the teaching check, including
+shared changes arriving from the learner branch. Without a PR base, automatic mode falls back to
+the source branch. The problem check rejects visible solution material and reachable solution
+history. Full Git history is required; CI checks out with `fetch-depth: 0`.
+
+The GitHub quality workflow runs the branch-boundary check and Python/Markdown static checks. It
+does not run native CTest, selected-firmware acceptance, Emscripten/Wasm builds, browser checks, or
+hardware validation. Local runtime results must be reported separately. The workflow provides a
+failing check; GitHub branch protection must require that check to make it a mandatory merge gate.
 
 The hosted Site currently demonstrates the worked controller. A Site publication is a separate
 compiled snapshot and does not change either branch or the default exercise firmware.

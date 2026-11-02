@@ -39,6 +39,7 @@ there retain their recorded bytes and stay outside Markdown rewrites.
 - [platform/docs/ARCHITECTURE.md](../platform/docs/ARCHITECTURE.md)
 - [platform/docs/BOARD_WIRING.md](../platform/docs/BOARD_WIRING.md)
 - [platform/docs/B16-FOLLOW-ON.md](../platform/docs/B16-FOLLOW-ON.md)
+- [platform/docs/B16-FIRMWARE-LAB.md](../platform/docs/B16-FIRMWARE-LAB.md)
 - [platform/docs/DEVICE-WORKFLOW.md](../platform/docs/DEVICE-WORKFLOW.md)
 - [platform/docs/CLOCK_RESET_CONTRACT.md](../platform/docs/CLOCK_RESET_CONTRACT.md)
 - [platform/docs/COMPONENTS-AND-HWIL.md](../platform/docs/COMPONENTS-AND-HWIL.md)

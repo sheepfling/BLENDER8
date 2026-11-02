@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from tools.branch_policy import SOLUTION_BRANCH, expected_role, violations
+from tools.branch_policy import PROBLEM_BRANCH, SOLUTION_BRANCH, expected_role, violations
 
 
 def command(root: Path, *arguments: str) -> None:
@@ -73,6 +73,14 @@ def test_solution_pr_into_integration_is_problem_checked(base: str) -> None:
 def test_shared_updates_can_enter_teaching_branch() -> None:
     assert expected_role("auto", SOLUTION_BRANCH, "feature/b8-b16-workbench") == "teaching"
     assert expected_role("auto", "", SOLUTION_BRANCH) == "teaching"
+
+
+def test_solution_pr_into_problem_branch_is_problem_checked() -> None:
+    assert expected_role("auto", PROBLEM_BRANCH, SOLUTION_BRANCH) == "problem"
+
+
+def test_problem_pr_into_solution_branch_is_teaching_checked() -> None:
+    assert expected_role("auto", SOLUTION_BRANCH, PROBLEM_BRANCH) == "teaching"
 
 
 def test_shallow_checkout_cannot_certify_absent_solution_history(repository: Path) -> None:

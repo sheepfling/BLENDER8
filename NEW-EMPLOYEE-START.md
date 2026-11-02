@@ -11,9 +11,11 @@ Use the problem presentation branch, `feature/b8-b16-workbench`, for the exercis
 
 ## 1. Install the tools
 
-Install Python 3.12 or newer, CMake 3.20 or newer, and a C++20 compiler. LLVM Clang supplies the
-firmware numeric check when compiling with GCC or MSVC. PDF generation also needs Tectonic or
-`latexmk` with `pdflatex`. The browser build additionally needs Emscripten (`emcmake`
+For the native C++ route, install Python 3.12 or newer, CMake 3.20 or newer, a C++20 compiler,
+LLVM `clang++`, and `llvm-size` or the platform's `size` utility. CMake requires Clang for the
+firmware numeric-width check and a size tool for the firmware memory report, even when your main
+compiler is GCC or MSVC. PDF generation uses Tectonic or `latexmk` with `pdflatex`; those tools are
+not needed for the first native build. The optional browser build also needs Emscripten (`emcmake`
 and `em++`) and Node; follow the [Emscripten
 setup](platform/docs/WASM.md#1-install-and-activate-emscripten).
 
@@ -42,8 +44,52 @@ do not infer a root from their own file path.
 python tools/project.py doctor --root .
 ```
 
-The doctor reports the Python, LaTeX, CMake, C++ and optional Emscripten tools it can find. The
-Python environment is ignored by Git and can be recreated by rerunning the bootstrap.
+The root doctor reports native, PDF and optional Emscripten tools. For a focused native check, use
+`python platform/tools/b8.py --root platform doctor`; `native_ready` is true only when CMake, a C++
+compiler, Clang and the firmware size tool are all available. The Python environment is ignored by
+Git and can be recreated by rerunning the bootstrap.
+
+### First native C++ session: B16 first
+
+Run the short loop from the repository root. This uses a separate ignored build directory for the
+learner image and does not need the PDF or WebAssembly toolchains:
+
+```sh
+python platform/tools/b8.py --root platform doctor
+python platform/tools/b8.py --root platform --build-dir ../build/astin-b16 build --device B16
+python platform/tools/b8.py --root platform --build-dir ../build/astin-b16 test
+python platform/tools/b8.py --root platform --build-dir ../build/astin-b16 animated --open
+```
+
+Pass expectations: the doctor says `native_ready: true`; the B16 build completes in
+`build/astin-b16/`; the platform C++ tests pass; and the animated page opens at the URL it prints.
+Click **RUN** to advance simulated time. The unmodified starter keeps the motor off. Stop the page
+server with Ctrl-C. The selected starter does not service the default fused-on watchdog, so leaving
+it running can produce periodic `WDT` reset entries in the debug log while the motor stays off. That
+is the expected incomplete-starter behavior and a useful observation for the later supervision
+lesson; it is not a compile failure or a product-acceptance result. This native path does not need
+PDF generation or Emscripten.
+
+Before editing the application, build the isolated [B16 subsystem practice
+harness](platform/labs/b16/README.md):
+
+```sh
+cmake -S platform/labs/b16 -B build/astin-b16-labs -DCMAKE_BUILD_TYPE=Debug
+cmake --build build/astin-b16-labs
+ctest --test-dir build/astin-b16-labs -R '^b16\.(adc|fake)' --output-on-failure
+ctest --test-dir build/astin-b16-labs -R '^b16\.temperature$' --output-on-failure
+```
+
+The configure/build and five ADC fake tests should pass; `b16.temperature` should initially fail on
+the TODO. Run the ADC tests with `--verbose` to see the status/low/high transaction trace. The
+scripted host fake checks register sequencing; it does not simulate conversion time or replace the
+platform ADC conformance tests. Implement only the temperature conversion in
+`platform/labs/b16/student.cpp`, rebuild, and rerun `b16.temperature`. Pass means all three
+documented nominal ADC samples are within tolerance. A compiler error fails the build; a mismatched
+sample fails that test with expected and actual values. Then continue with the MD20 and BA-8 tests
+in the [B16 subsystem walkthrough](platform/docs/B16-FIRMWARE-LAB.md). The practice helpers are not
+connected to PWM or safety gates. Keep the supplied product firmware unfinished; its acceptance
+suite is expected to fail until the learner implements requirements.
 
 ## 2. Read the contract and choose the work area
 
@@ -53,7 +99,7 @@ in `dist/recipient/`. The final accepted messages and current r4 drawings govern
 behavior. In particular, two speed indications persisting for 40 ms stop drive and show `IF`;
 STOP overrides a concurrent speed or PULSE request.
 
-Edit `platform/firmware/firmware.cpp` and local `.hpp` files. Read
+After the isolated exercises, edit `platform/firmware/firmware.cpp` and local `.hpp` files. Read
 `platform/firmware/board_config.hpp` for chassis wiring constants; update it only with an approved
 wiring change. Include the public interface from `platform/sdk/include/blender8/`.
 
@@ -70,11 +116,12 @@ and `platform/tests/`. Their headers and private observations are not firmware i
 
 The local `internal/owner/private/` list is Git-ignored. If a New Employee works in the same
 checkout as the owner, it remains owner material, not an extra requirement. The test harness may
-inspect the simulated machine; firmware may only use B8 registers and its own state.
+inspect the simulated machine; firmware may only use selected-device SDK registers and its own
+state.
 
 ## 3. Use the firmware headers
 
-The B8 firmware API uses `.hpp` files, not `.h` files. These are the project headers available to
+The firmware API uses `.hpp` files, not `.h` files. These are the project headers available to
 the firmware target:
 
 | Include                             | Purpose                                                                          |
@@ -87,26 +134,26 @@ the firmware target:
 | `#include "blender8/b16.hpp"`       | Added B16 SRAM, DMA and pin-selection addresses.                                 |
 | `#include "board_config.hpp"`       | Local chassis pin and channel constants beside the firmware source.              |
 
-See the [SDK header map](platform/sdk/README.md) for this interface in one place.
+Astin starts with B16, so include `blender8/b16.hpp` only for its added SRAM, DMA, and pin-selection
+registers. B16 requires six vector handlers, with DMAC last. See the [SDK header map](platform/sdk/README.md)
+for this interface in one place.
 `platform/firmware/firmware.hpp` is the local include shim for the SDK entry-point header. CMake
 compiles the selected firmware with only `platform/sdk/include/` and its own source directory on
 its project include path. `platform/wasm/api.h` and `platform/wasm/view_api.h` are host bridge
-headers, not firmware interfaces. The [firmware lab](platform/docs/FIRMWARE-LAB.md) walks through
-small register and LCD exercises.
+headers, not firmware interfaces. The [B16-first firmware lab](platform/docs/B16-FIRMWARE-LAB.md)
+walks through small isolated subsystems, then timer, interrupt, and supervision composition.
 
-The build checks selected firmware with the B8 numeric profile: 8-bit integer data and operations,
-with no floating point. Use `numeric.hpp` helpers when C++ would promote an expression to a wider
-`int`. For 10-bit ADC and 16-bit timer values, use explicit low/high bytes and carry/borrow.
-The `access.hpp` helpers that return `uint16_t` are outside the strict B8 profile; its interrupt
-acknowledgment helper remains available. The [B8/B16 guide](platform/docs/B16-FOLLOW-ON.md)
-explains the numeric profiles, examples and enforcement limits.
+The B16 firmware checker permits 8/16-bit integers and binary32 `float`; it rejects `double` and
+32-bit-or-wider integer variables or intermediates in selected firmware. Use `1.25f`, not `1.25`.
+These are constraints of the fictional B16 target and its checker, not general C++ rules. The
+standalone host practice harness does not apply this checker. The [B8/B16 guide](platform/docs/B16-FOLLOW-ON.md)
+explains the numeric profiles and enforcement limits. B8's stricter byte-only/no-float profile is a
+later stretch exercise.
 
-## 4. Generate the manuals and build native C++
+## 4. Generate and inspect the learner manuals
 
 ```sh
 python tools/project.py docs --root .
-python tools/project.py native --root .
-python tools/project.py test --root .
 ```
 
 `docs` compiles pristine, searchable PDFs from LaTeX under `build/docs/clean/`. It then saves the
@@ -117,15 +164,17 @@ folder also holds handout and binder previews of the pristine, G1 and G2 stages.
 files are Git-ignored. The repository command supplies the LaTeX search paths; the standalone
 editor preview cannot resolve this multi-file project on its own.
 
-The command also generates the [B8/B16 follow-on manual](platform/docs/B16-FOLLOW-ON.md) separately
-under `dist/field/`. Choose B8 or B16; both have native and Wasm behavioral models. B16 adds SRAM,
-DMA, pin selection, six vectors and binary32 arithmetic. The seven shared handouts and their binder
-retain their existing membership. Follow [the two-device workflow](platform/docs/DEVICE-WORKFLOW.md)
-for the pin wiring, exact build directories and local image upload.
+The command also generates the optional [B8/B16 follow-on manual](platform/docs/B16-FOLLOW-ON.md)
+separately. For Astin, pair its B16 addendum with relevant shared recipient handouts; it is not part
+of the seven-handout binder. Clean/G1/G2/G3 copies live under `build/docs/` and `dist/field/`. Give
+the learner `dist/recipient/` or its G3 binder, plus only the optional B16 addendum if useful. Other
+`dist/field/`, `build/docs/`, and `internal/` files are not the learner packet. None of these PDFs
+is needed for the first C++ harness or native build.
 
-Add `--device B16` to `native`, `test`, `wasm`, `wasm-test` and `serve-wasm` for B16. The default
-is B8. B16 builds use `build/native-b16/` and `build/wasm-b16/`; the numeric policy always matches
-the selected device.
+Add `--device B16` to `native`, `test`, `wasm`, `wasm-test` and `serve-wasm` for B16. The project
+default is B8, so use the option for Astin's route. Project B16 builds use `build/native-b16/` and
+`build/wasm-b16/`; the numeric policy always matches the selected device. The dedicated
+`build/astin-b16/` directory above is his isolated firmware build.
 
 `native` builds the C++ emulator, simulator, renderer and unit-test executables under
 `build/native/`. `test` rebuilds as needed, checks the document tooling with Python tests, and runs
@@ -135,22 +184,32 @@ native CTest. To rerun only the C++/platform tests after a native build, use:
 python platform/tools/b8.py --root platform --build-dir ../build/native test
 ```
 
-The safe starter should pass platform self-tests while failing many customer-acceptance cases. Run
-acceptance on the selected firmware after implementing a behavior; a passing subset is
-only a local diagnostic.
+The focused C++ test command runs the platform CTest suite and does not require generated manuals:
+
+```sh
+python platform/tools/b8.py --root platform --build-dir ../build/astin-b16 test
+```
+
+The broader repository gate is `python tools/project.py test --root .`. It also checks generated PDF
+examples and the Python/documentation suite, so create the manuals first when the PDF artifacts are
+not already present. The safe starter should pass platform self-tests while failing many
+customer-acceptance cases. Run acceptance on the selected firmware after implementing a behavior; a
+passing subset is only a local diagnostic.
 
 ## 5. Build and serve the C++ WebAssembly page
 
-Activate the Emscripten environment in the same terminal as the Python environment, then run:
+After the native and isolated subsystem loops, activate Emscripten in the same terminal as the
+Python environment if the optional browser path is useful. Astin's first edit does not require it.
+For B16, run:
 
 ```sh
-python tools/project.py wasm --root .
-python tools/project.py wasm-test --root .
-python tools/project.py serve-wasm --root . --port 8089
+python tools/project.py wasm --root . --device B16
+python tools/project.py wasm-test --root . --device B16
+python tools/project.py serve-wasm --root . --device B16 --port 8089
 ```
 
-`wasm` compiles the real C++ B8 machine, selected firmware and C++ scene renderer with Emscripten.
-The static page is `build/wasm/site/index.html`; the serve command prints the loopback URL. Open
+`wasm` compiles the real C++ B16 machine, selected firmware and C++ scene renderer with Emscripten.
+The static page is `build/wasm-b16/site/index.html`; the serve command prints the loopback URL. Open
 that URL in a browser. Choose the matching `.wasm` and `.mjs` from either build's `web/` directory,
 select its MCU and click **Load image**. **Test fresh image** recreates the module and runs a
 100 ms execution smoke check; **Save test result** records the image hash and observations.

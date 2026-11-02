@@ -14,6 +14,17 @@ from typing import cast
 from b8client import resolve_executable
 
 
+def native_toolchain_ready(
+    *,
+    cmake: str | None,
+    compiler: str | None,
+    numeric_policy_clang: str | None,
+    size_tool: str | None,
+) -> bool:
+    """Match the tools CMake requires before the native build can configure."""
+    return all((cmake, compiler, numeric_policy_clang, size_tool))
+
+
 def from_root(path: Path, root: Path) -> Path:
     """Interpret relative CLI paths from the selected platform root."""
     return path.resolve() if path.is_absolute() else (root / path).resolve()
@@ -99,6 +110,8 @@ def main() -> int:
             None,
         )
         cmake = shutil.which("cmake")
+        numeric_policy_clang = shutil.which("clang++")
+        size_tool = shutil.which("llvm-size") or shutil.which("size")
         print(
             json.dumps(
                 {
@@ -106,16 +119,31 @@ def main() -> int:
                     "python": sys.executable,
                     "cmake": cmake,
                     "cxx": compiler,
-                    "numeric_policy_clang": shutil.which("clang++"),
+                    "numeric_policy_clang": numeric_policy_clang,
+                    "firmware_size_tool": size_tool,
                     "emcmake_optional": shutil.which("emcmake"),
                     "node_optional": shutil.which("node"),
                     "firmware_source": str(root / "firmware"),
-                    "native_ready": bool(cmake and compiler),
+                    "native_ready": native_toolchain_ready(
+                        cmake=cmake,
+                        compiler=compiler,
+                        numeric_policy_clang=numeric_policy_clang,
+                        size_tool=size_tool,
+                    ),
                 },
                 indent=2,
             )
         )
-        return 0 if cmake and compiler else 1
+        return (
+            0
+            if native_toolchain_ready(
+                cmake=cmake,
+                compiler=compiler,
+                numeric_policy_clang=numeric_policy_clang,
+                size_tool=size_tool,
+            )
+            else 1
+        )
     default_build = Path("build-wasm" if args.action.startswith("wasm-") else "build")
     if getattr(args, "numeric_profile", "B8") == "B16":
         default_build = Path(str(default_build) + "-b16")
@@ -201,9 +229,8 @@ def main() -> int:
             f"-DB8_NUMERIC_PROFILE={args.numeric_profile}",
             f"-DB8_MEMORY_PROFILE={args.memory_profile}",
             f"-DB8_WATCHDOG_FUSED_ON={'ON' if args.watchdog == 'forced' else 'OFF'}",
+            f"-DB8_FIRMWARE_DIR={from_root(args.firmware or Path('firmware'), root)}",
         ]
-        if args.firmware:
-            cmd.append(f"-DB8_FIRMWARE_DIR={from_root(args.firmware, root)}")
         if args.compiler:
             cmd.append(f"-DCMAKE_CXX_COMPILER={args.compiler}")
         cmd.append(f"-DB8_SANITIZE={'ON' if args.sanitize else 'OFF'}")

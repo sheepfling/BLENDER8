@@ -3,6 +3,64 @@
 This record applies to the integrated working tree on macOS/arm64. It records toolchain and browser
 behavior, not finished firmware acceptance or physical hardware behavior.
 
+## Junior B16 recovery check — 2026-11-02
+
+Fresh local review work is based on problem branch `feature/b8-b16-workbench` at
+`47a1fb0f6684cdadc8fe75129d025364967afbde`; it does not include the worked controller or owner-only
+teaching files. The starter remains intentionally incomplete.
+
+- The entry route is [NEW-EMPLOYEE-START.md](../NEW-EMPLOYEE-START.md). Its B16-first native loop
+  separates C++ build/test from PDF and Emscripten prerequisites. A standalone host lab at
+  `platform/labs/b16/` has a scripted `RegisterBackend` ADC transaction example, deterministic
+  register traces, and TODO exercises for temperature conversion, motor duty, and button/mux mapping.
+  The subsystem guide orders the later timer, IRQ, LCD, watchdog/deadman, DMA, and composition work.
+- `python -m pytest -q`: **256 passed**. The clean native B16 build and full platform CTest passed
+  **237/237**. Regressions that replace the learner's editable firmware with a compile-time error
+  still built the native and Emscripten fixed-starter targets; reused native build selection also
+  returned to `platform/firmware/` instead of a stale worked-controller path. Branch-policy tests
+  cover both PR directions, and learner bundles omit the solution-only candidate-view test. Bundle
+  metadata marks firmware as non-solution only for a byte match with the shipped safe starter;
+  modified inputs are `unknown` rather than assumed to be safe or solved.
+- The complete `tools/project.py test --root . --device B16` aggregate also passed: document packet
+  assembly (**62 pages / 7 handouts**), manual-example check, **256 Python tests**, and **237/237**
+  native B16 CTests. The strict `scripts/ci.py --static --root .` gate passed Ruff, Pyright, rumdl,
+  mdrepo, and pre-commit configuration checks.
+- The B16 lab configured and built. Its five ADC/fake-hardware tests passed; the temperature,
+  motor, and panel TODO cases failed as expected because their learner implementations are empty.
+  Those three failures are exercises, not platform failures or product acceptance results.
+- Emscripten 6.0.10 rebuilt the selected B16 target and test fixtures. `wasm-test` passed **9/9
+  CTests**, **15/15** compiled Node tests, ten native/Wasm conformance scenarios, two seeded 128-action
+  trajectories, fifteen probe commands, and selected-B16 motion/DMA parity. This was a Node-based
+  compiled-Wasm check. A local browser smoke test also loaded `b8_student.wasm` for B16, advanced
+  logical time, paused the workbench, and stepped 1 ms. The debug panel reported 88 entries and no
+  dropped events; repeated WDT warnings were from the unfinished starter under the fused-on default.
+  This is a launch/step smoke test, not a check of every browser control or customer behavior.
+- `tools/project.py docs --root .` regenerated the clean and G3 seven-handout binders at **62 pages**,
+  the clean/G1/G2/G3 source-unit copies, and the optional B16 follow-on at **11 pages**. The B16 G3
+  page-count metadata now records 11, matching the compiled manual. Contact sheets covered all G3
+  binder pages and the B16 addendum; selected technical pages and the clean cover were rendered at
+  full size and visually checked. Ignored QA renders are under `build/qa-pdf/`; PDFs are in
+  `build/docs/` and `dist/`, not source changes.
+- Read-only Alphus commands against the sibling checkout were:
+
+  ```sh
+  /Users/rick/GIT/sheepfling/alphus/.venv/bin/python \
+    -m alphus.gates.cpp.cpp_advisory_quality style platform \
+    --include '*.cpp' --include '*.hpp' --exclude 'build*' --exclude 'node_modules/**' \
+    --output /tmp/blender8-alphus-style-20261102.json
+  /Users/rick/GIT/sheepfling/alphus/.venv/bin/python \
+    -m alphus.gates.cpp.cpp_artifact_quality scan build/astin-b16 \
+    --no-sections --output /tmp/blender8-alphus-artifact-20261102.json
+  ```
+
+  The advisory style scan reported **0 provisional findings**; the artifact scan reported **27
+  artifacts / 24 executables / 0 findings**. There is no BLENDER8 Alphus policy, so these results
+  supplement, rather than replace, CMake/compiler, numeric-policy, or CTest gates.
+
+Sanitizer builds, manual browser interaction, selected-firmware customer acceptance, and physical
+hardware validation were not run in this recovery check. No result here implies the starter meets the
+product requirements.
+
 ## Thermal and subsystem visualization
 
 - The shared native/Wasm C++ renderer now offers Thermal, Truth, Motor and Systems alongside
