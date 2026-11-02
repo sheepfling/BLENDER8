@@ -28,8 +28,9 @@ test('export retains error stacks and redacts capabilities and local image conte
  const log=quiet(),data={token:'native-capability',authorization:'bearer',glue:'local-loader',
   bytes:new Uint8Array([1,2]),nested:{password:'private'},error:new Error('bad ABI')};
  data.self=data;log.emit('error','load_failed',data);
- const text=JSON.stringify(log.export());assert(!text.includes('native-capability'));assert(!text.includes('local-loader'));
- assert(!text.includes('bearer'));assert(!text.includes('private'));assert(text.includes('bad ABI'));assert(text.includes('debug-log.test.mjs'));
+ const exported=log.export(),text=JSON.stringify(exported);assert(!text.includes('native-capability'));assert(!text.includes('local-loader'));
+ assert(!text.includes('bearer'));assert.equal(exported.records[0].data.nested.password,'[redacted]');
+ assert(text.includes('bad ABI'));assert(text.includes('debug-log.test.mjs'));
  assert.deepEqual(log.records[0].data.bytes,{type:'Uint8Array',bytes:2});assert.equal(data.token,'native-capability');
 });
 test('unchanged observations and repeated scene errors do not flood the log',()=>{

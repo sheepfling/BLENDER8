@@ -11,7 +11,9 @@ async function uploaded(){const bytes=new Uint8Array(await readFile(web+'/b8_stu
  return {module,identity,hello:JSON.parse(module.ccall('b8_wasm_hello','string',[],[]))};}
 test('local compiled bytes execute a fresh selected device and render real C++ pixels',async()=>{
  const {module,identity,hello}=await uploaded();const view=new ViewClient(module);
- const result=smokeCheck(module,identity,hello);assert.equal(result.ok,true);assert.equal(result.final.time_us,100000);
+ // A run can finish at the end of its current callback; use actual logical time.
+ const result=smokeCheck(module,identity,hello);assert.equal(result.ok,true);
+ assert.ok(result.final.time_us>=result.initial.time_us+100000);
  assert.equal(result.device,process.env.B8_EXPECT_DEVICE??'B8');assert.equal(result.identity.wasm_sha256.length,64);
  assert.equal(view.pixels().rgba.length,1280*900*4);module.ccall('b8_wasm_dispose',null,[],[]);
 });

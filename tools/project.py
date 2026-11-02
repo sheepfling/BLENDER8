@@ -264,18 +264,33 @@ def main() -> None:
     if args.command == "doctor":
         run([sys.executable, "-m", "b8docs", "doctor", "--json", "--root", str(root)], root)
         path = str(Path(sys.executable).parent) + os.pathsep + os.environ.get("PATH", "")
+        cmake = shutil.which("cmake", path=path)
+        cxx = next(
+            (
+                binary
+                for name in ("c++", "clang++", "g++", "cl")
+                if (binary := shutil.which(name, path=path))
+            ),
+            None,
+        )
+        numeric_policy_clang = shutil.which("clang++", path=path)
+        size_tool = shutil.which("llvm-size", path=path) or shutil.which("size", path=path)
+        native_ready = bool(cmake and cxx and numeric_policy_clang and size_tool)
         print(
             json.dumps(
                 {
                     "python": sys.executable,
-                    "cmake": shutil.which("cmake", path=path),
-                    "cxx": shutil.which("c++", path=path),
-                    "numeric_policy_clang": shutil.which("clang++", path=path),
+                    "cmake": cmake,
+                    "cxx": cxx,
+                    "numeric_policy_clang": numeric_policy_clang,
+                    "firmware_size_tool": size_tool,
+                    "native_ready": native_ready,
                     "emcmake": shutil.which("emcmake", path=path),
                 },
                 indent=2,
             )
         )
+        raise SystemExit(0 if native_ready else 1)
     elif args.command == "docs":
         run([sys.executable, "tools/extract_manual_examples.py", "--root", str(root)], root)
         run(
@@ -304,6 +319,7 @@ def main() -> None:
             f"-DPython3_EXECUTABLE={sys.executable}",
             f"-DB8_NUMERIC_PROFILE={args.numeric_profile}",
             f"-DB8_MEMORY_PROFILE={args.memory_profile}",
+            f"-DB8_FIRMWARE_DIR={root / 'platform/firmware'}",
         ]
         if args.compiler:
             command.append(f"-DCMAKE_CXX_COMPILER={args.compiler}")

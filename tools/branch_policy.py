@@ -8,6 +8,7 @@ import subprocess
 from pathlib import Path
 
 SOLUTION_BRANCH = "feature/b16-solution"
+PROBLEM_BRANCH = "feature/b8-b16-workbench"
 PROTECTED_BRANCHES = {"main", "master"}
 SOLUTION_PATHS = (
     "TEACHING-SOLUTION.md",
@@ -23,12 +24,14 @@ def git(root: Path, *arguments: str) -> str:
 
 
 def expected_role(requested: str, base: str, source: str) -> str:
-    """Protected integration targets always require a problem-only history."""
-    if base in PROTECTED_BRANCHES or source in PROTECTED_BRANCHES:
+    """Use the PR destination's role, falling back to the local source when no base is known."""
+    if base in PROTECTED_BRANCHES or source in PROTECTED_BRANCHES or base == PROBLEM_BRANCH:
         return "problem"
+    if base == SOLUTION_BRANCH:
+        return "teaching"
     if requested != "auto":
         return requested
-    return "teaching" if SOLUTION_BRANCH in (base, source) else "problem"
+    return "teaching" if source == SOLUTION_BRANCH else "problem"
 
 
 def violations(root: Path, role: str) -> list[str]:

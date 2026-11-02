@@ -49,6 +49,53 @@ Boards/runtimes are not internally thread-safe. Separate firmware tests run in s
 because firmware globals are not automatically isolated between C++ objects or reconstructed on
 reset.
 
+## B16 learner integration architecture
+
+The starter is still one incomplete firmware translation unit. The following is a decomposition
+guide for Astin's work, not a claim that the application modules already exist. Keep the device
+boundary in the existing CMake targets: `student_firmware` sees the SDK and its selected firmware
+directory; `blender8_sim`, host probes and physics stay on the host side.
+
+```mermaid
+flowchart LR
+    C["CMake: B16 profile"] --> F["student_firmware<br/>reset / step / six vectors"]
+    F -->|"SDK read8 / write8 / idle only"| M["Modeled MCU and runtime"]
+    M --> B["Board signals and independent gates"]
+    B --> P["Mux, buttons, ADC, motor, LCD"]
+    H["Host tests, probes, workbench"] -. "observe; never link into firmware" .-> M
+```
+
+As the learner composes the application, keep these responsibilities distinguishable even if they
+remain small functions in the starter directory:
+
+| Responsibility           | Input and output seam                                                                                | Current status and evidence                                                                             |
+| ------------------------ | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Acquire and validate     | Electrical contacts or completed peripheral result -> stable, fresh value or explicit invalid status | Device behavior exists in the model; scan/acquisition firmware is unfinished.                           |
+| Normalize commands       | Valid mux contact -> speed/PULSE/STOP intent                                                         | `platform/labs/b16/` has a TODO pure contact mapper; it does not scan or debounce.                      |
+| Convert subsystem values | ADC code -> nominal temperature estimate; positive target -> duty fraction                           | TODO temperature and motor helpers exist as isolated host exercises. They do not read ADC or write PWM. |
+| Decide application state | Startup, command, independent inhibit, sensor validity, and fault -> permitted or inhibited state    | Not implemented in the supplied learner firmware; preserve the customer recovery contract.              |
+| Apply outputs            | Permitted request -> PWM/enable and bounded display update                                           | Output registers and simulated components exist; the product control path remains an exercise.          |
+| Schedule and supervise   | Timer/IRQ events plus foreground progress -> bounded work and useful monitor service                 | Peripheral conformance tests exist; learner timer/ISR/WDT/DMT composition is unfinished.                |
+
+These are boundaries for learning and review, not fixed class names or a prescribed controller
+algorithm. Begin with the pure host helpers, then exercise one SDK operation through the lab's
+scripted `RegisterBackend` fake and inspect its ordered byte trace. The fake checks driver
+transactions only; it does not model ADC time, electrical behavior, or W1C semantics. Use the
+platform model for peripheral conformance, then compose the operation into selected B16 firmware
+and verify it with the named acceptance case. The host harness is not linked into
+`student_firmware`; firmware changes must still pass the B16 numeric and include-boundary checks.
+
+For the ordered source/manual inventory, concrete C++ milestones, harness status, and expected
+observations, follow the [B16-first subsystem walkthrough](B16-FIRMWARE-LAB.md). Keep the results
+separate: model CTests establish peripheral/platform behavior, `accept --case ...` runs the selected
+firmware, and scenario replay/workbench observations show integration behavior. The isolated lab
+tests are not product acceptance. B8 remains the later stretch profile.
+
+The source bundle excludes the solution-only candidate-view test. Its `SOURCE-INVENTORY.json`
+reports `firmware_solution: false` only when every non-README file under `firmware/` matches the
+shipped safe-starter fixture; other inputs are marked `null` / `unknown`. This narrow byte comparison
+does not attest the provenance of other bundled files, build settings, or generated binaries.
+
 ## Time and ordering
 
 Logical time is an unsigned 64-bit microsecond count. `Board::advance` advances in one-microsecond
@@ -81,10 +128,11 @@ returned time. State readers do not advance time or acknowledge registers.
 
 ## IRQ and reset execution
 
-The five-source fixed-priority vector table is unchanged. Entry masks global delivery, nesting is
-unsupported, and the handler must acknowledge only its source. Flags coalesce; they are not a queue.
-Host observation includes monotonic per-vector delivery counts so a live timer ISR can be
-distinguished from a merely enabled source.
+The B8 fixed-priority vector table has five sources. B16 retains those five and appends DMAC as
+vector six; the SDK's `b8::VectorTable` reflects the selected profile. Entry masks global delivery,
+nesting is unsupported, and each handler must acknowledge only its source. Flags coalesce; they are
+not a queue. Host observation includes monotonic per-vector delivery counts so a live timer ISR can
+be distinguished from a merely enabled source.
 
 Runtime reset entry persists across successive `run_for` calls. UI chunking is not reset. Only a new
 hardware reset epoch invokes `firmware::reset` again. A reset during an ISR abandons the interrupted
